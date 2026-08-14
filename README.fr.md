@@ -2,29 +2,26 @@
 
 > [Read in English](README.md)
 
-L'intelligence artificielle rend-elle la collusion *plus* ou *moins* probable ?
+Dans un jeu de prix répété, les joueurs humains convergent vers des prix
+tacitement collusifs plutôt que vers l'équilibre concurrentiel. Savoir si les
+algorithmes soutiennent ce comportement, le brisent ou l'intensifient est une
+question ouverte en économie industrielle, aux conséquences directes pour la
+politique de la concurrence.
 
-Ce dépôt rassemble le travail réalisé lors d'un stage de recherche au **GAEL**
-(Grenoble Applied Economics Laboratory, UGA / INRAE), portant sur la capacité
-d'agents artificiels à soutenir des comportements coopératifs dans des jeux de
-concurrence par les prix répétés — le cadre où la collusion tacite apparaît
-chez les humains.
+Un stage de recherche au **GAEL** (Grenoble Applied Economics Laboratory,
+UGA / INRAE) consacré à cette question — état de l'art, modélisation du
+mécanisme d'imitation qui pourrait sous-tendre la coopération, et construction
+d'un agent pour l'observer.
+
+**Il s'agit d'un travail exploratoire, pas d'un résultat.** Le stage a produit
+un état de l'art, un modèle et un agent fonctionnel ; il ne tranche pas la
+question, et le rapport est une étude plutôt qu'une conclusion.
 
 | | |
 |---|---|
 | **Stagiaire** | Mohamed Hamlil, L2 MIASHS, Université Grenoble Alpes |
 | **Encadrants** | Alexis Garapin (UGA) et Olivier Bonroy (INRAE) |
 | **Laboratoire** | GAEL — Grenoble Applied Economics Laboratory |
-| **Période** | 23 janvier – 14 avril 2025 |
-
-## La question
-
-Dans un jeu de prix répété, les joueurs humains convergent souvent vers des prix
-tacitement collusifs plutôt que vers l'équilibre concurrentiel. Si la
-tarification est déléguée à des algorithmes, cette tendance subsiste-t-elle,
-disparaît-elle, ou s'intensifie-t-elle ? Le stage aborde la question par trois
-voies : la littérature d'économie expérimentale, un modèle théorique de
-l'imitation, et un agent en fonctionnement.
 
 ## Contenu
 
@@ -32,14 +29,9 @@ l'imitation, et un agent en fonctionnement.
 |---|---|
 | [`RapportDeStageFinal.pdf`](RapportDeStageFinal.pdf) | **Le rapport de stage** — commencer ici |
 | [`Presentation.pdf`](Presentation.pdf) | Diapositives de la soutenance |
-| [`Litterature/`](Litterature/) | Bibliographie annotée, et mes notes de lecture dans `Summary/` sur quatre des articles |
+| [`Litterature/`](Litterature/) | Bibliographie annotée, et mes notes de lecture sur quatre des articles |
 | [`Neurones_Mirroirs/`](Neurones_Mirroirs/) | Les neurones miroirs comme mécanisme des comportements mimétiques et coopératifs — démarche rédigée et implémentation Jupyter |
-| [`Projet_Prolog/`](Projet_Prolog/) | Un agent Prolog pour un jeu concurrentiel répété, confronté aux agents d'autres étudiants lors d'un tournoi, et une étude de l'équilibre stratégique vers lequel les comportements convergent |
-
-Le projet Prolog est un projet semestriel mené en parallèle ; il figure ici
-parce qu'il constitue le pendant appliqué de la question théorique du stage :
-vers quelle stratégie un agent artificiel converge-t-il réellement lorsqu'il
-cherche à maximiser son gain face à d'autres qui font de même.
+| [`Projet_Prolog/`](Projet_Prolog/) | Un agent Prolog pour un jeu concurrentiel répété, engagé dans un tournoi contre les agents d'autres étudiants, avec une étude de l'équilibre vers lequel les comportements convergent |
 
 ## Crédits
 
