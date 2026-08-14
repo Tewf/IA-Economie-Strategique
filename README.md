@@ -1,31 +1,46 @@
-# Stage_GAEL
+# AI & Strategic Pricing — GAEL research internship
 
-# Stratégies de prix avec l’IA – Projet de stage (UGA, Laboratoire GAEL)
+> [Lire en français](README.fr.md)
 
-Ce dépôt contient les données et les scripts développés dans le cadre d’un projet de recherche sur l’impact de l’intelligence artificielle dans les stratégies de prix en économie industrielle.
+Does artificial intelligence make firms *more* or *less* likely to collude?
 
-## 📌 Contexte
+This repository holds the work from a research internship at **GAEL**
+(Grenoble Applied Economics Laboratory, UGA / INRAE), studying whether
+artificial agents sustain cooperative behaviour in repeated price-competition
+games — the setting where tacit collusion emerges among humans.
 
-**Stagiaire :** Mohamed Hamlil  
-**Établissement :** Université Grenoble Alpes  
-**Formation :** L2 MIASHS (Mathématiques - Informatique - Économie)  
-**Période :** du 23 janvier au 14 avril 2025  
-**Encadrants :** Alexis Garapin (UGA) et Olivier Bonroy (INRAE)  
-**Sujet :** Étude de l’influence de l’IA sur les comportements coopératifs dans les jeux de prix, à travers des modèles théoriques et des expérimentations en laboratoire.
+| | |
+|---|---|
+| **Intern** | Mohamed Hamlil, L2 MIASHS, Université Grenoble Alpes |
+| **Supervisors** | Alexis Garapin (UGA) and Olivier Bonroy (INRAE) |
+| **Laboratory** | GAEL — Grenoble Applied Economics Laboratory |
+| **Period** | 23 January – 14 April 2025 |
 
+## The question
 
-## 📁 Structure du dépôt  
-```plaintext
-Stage_GAEL/  
-├── NeuronesMirroirs/   # Analyse du lien entre les neurones miroirs et les comportements coopératifs  
-├── Prolog/             # Projet semestriel en Prolog : conception d’une IA jouant à un jeu lié à l’étude des interactions entre agents artificiels  
-├── Litterature/        # Notes de lecture et documents de recherche pour l’état de l’art  
-├── RapportDeStage/     # Rapport de stage, incluant l’introduction, l’analyse théorique et les résultats  
-├── Presentation/       # Diapositives de la soutenance de stage  
-└── README.md           # Présentation générale du projet et des répertoires associés  
+In repeated price competition, human players often converge on tacitly
+collusive prices rather than the competitive equilibrium. If pricing is
+delegated to algorithms, does that tendency survive, disappear, or intensify?
+The internship approached this from three directions: the experimental
+economics literature, a theoretical model of imitation, and a working agent.
 
-```
-## 🎯 Objectif
+## Contents
 
-Analyser si des agents IA peuvent favoriser la coopération dans des situations de concurrence répétée (type dilemme du prisonnier), en comparaison aux comportements humains.
+| Path | What it is |
+|---|---|
+| [`RapportDeStageFinal.pdf`](RapportDeStageFinal.pdf) | **The internship report** — start here |
+| [`Presentation.pdf`](Presentation.pdf) | Slides from the defence |
+| [`Litterature/`](Litterature/) | Annotated bibliography, plus my reading notes in `Summary/` on four of the papers |
+| [`Neurones_Mirroirs/`](Neurones_Mirroirs/) | Mirror neurons as a mechanism for imitative and cooperative behaviour — write-up and a Jupyter implementation |
+| [`Projet_Prolog/`](Projet_Prolog/) | A Prolog agent for a repeated competitive game, pitted against other students' agents in a tournament, plus a study of which strategic equilibrium behaviour converges to |
 
+The Prolog agent was a semester project run in parallel; it is kept here because
+it is the applied counterpart to the internship's theoretical question — what
+strategy an artificial agent actually settles on when it is trying to maximise
+its own payoff against others doing the same.
+
+## Credits
+
+Published papers cited in [`Litterature/`](Litterature/README.md) are referenced
+rather than redistributed, and the Prolog project brief belongs to its course.
+See [NOTICE](NOTICE).

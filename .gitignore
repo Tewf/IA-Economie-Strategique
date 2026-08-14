@@ -1,0 +1,4 @@
+# Articles publiés et sujets de cours — cités, pas redistribués. Voir NOTICE.
+Litterature/*.pdf
+!Litterature/Summary/*.pdf
+Projet_Prolog/consignesProjet.pdf

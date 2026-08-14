@@ -1,0 +1,22 @@
+NOTICE — what in this repository is mine, and what is not
+=========================================================
+
+**Mine:** the internship report (`RapportDeStageFinal.pdf`), the defence slides
+(`Presentation.pdf`), the reading notes in `Litterature/Summary/`, the mirror-
+neuron write-up and notebook in `Neurones_Mirroirs/`, and the Prolog agent and
+convergence study in `Projet_Prolog/`.
+
+Produced during a research internship at GAEL (Grenoble Applied Economics
+Laboratory, UGA / INRAE) under the supervision of Alexis Garapin (UGA) and
+Olivier Bonroy (INRAE), 23 January – 14 April 2025.
+
+**Not mine, and not redistributed here:**
+
+  * The nine published papers that formed the state of the art. They are cited
+    with DOI, arXiv or SSRN links in `Litterature/README.md` and remain
+    available from their publishers.
+  * `consignesProjet.pdf`, the Prolog project brief, which belongs to the course
+    that set it.
+
+If you believe something here is yours and is credited incorrectly, please open
+an issue and I will fix it.
