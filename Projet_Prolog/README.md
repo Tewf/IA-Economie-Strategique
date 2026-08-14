@@ -1,28 +1,33 @@
-# Projet Prolog – IA stratégique en jeu concurrentiel
+# Projet Prolog — IA stratégique en jeu concurrentiel
 
-Ce dépôt regroupe le travail réalisé dans le cadre d’un **projet Prolog**, où l’objectif est de développer une **intelligence artificielle** capable de jouer à un jeu défini dans le fichier [`consignesProjet.pdf`](./consignesProjet.pdf). L’IA est ensuite confrontée à celles d’autres étudiants dans un tournoi.
+Un agent en **Prolog** conçu pour jouer à un jeu concurrentiel répété, puis
+confronté aux agents d'autres étudiants lors d'un tournoi.
 
-🎯 Ce projet est en lien direct avec la **thématique de mon stage** sur l’IA et les comportements stratégiques en économie. J’ai donc choisi de **combiner les deux approches** – théorique et appliquée – dans ce dépôt.
+🎯 Ce projet semestriel est ici parce qu'il constitue le pendant appliqué de la
+question du stage : dans un jeu où chaque agent cherche à maximiser son gain,
+vers quel équilibre stratégique les comportements convergent-ils réellement ?
 
-## 📂 Contenu du dépôt
+## Contenu
 
-- `Algorithme_explication/` : explication détaillée du fonctionnement de l’IA développée (logique, stratégie, inspiration théorique).
-- `Projet_khawa_khawa/` : implémentation complète de l’agent en Prolog, prêt à être utilisé dans les tests et le tournoi.
-- `convergence_des_strategies_dans_un_jeu/` : étude théorique sur la convergence du comportement stratégique dans des jeux où les agents cherchent à maximiser leur gain. La question centrale est :
-  
-  > * Dans un jeu ou les agents cherchent  a maximiser leur gain, vers quel équilibre stratégique leur comportement converge-t-il ?*
+| Fichier | Description |
+|---|---|
+| [`Code.pl`](Code.pl) | L'agent Prolog complet, utilisable en tournoi |
+| [`Algorithme_Explication.pdf`](Algorithme_Explication.pdf) | Fonctionnement de l'IA : logique, stratégie, inspiration théorique |
+| [`Convergence des stratégies dans un jeu répété/`](<Convergence des stratégies dans un jeu répété>) | Étude de la convergence des comportements stratégiques — notebook d'analyse d'équilibre et documents associés |
 
-- `consigneProjet.pdf` : énoncé officiel du projet de jeu.
+L'énoncé officiel du projet appartient au cours qui l'a produit et n'est pas
+redistribué ici ; voir le [NOTICE](../NOTICE).
 
-## 🔍 Objectifs du projet
+## Objectifs
 
 - Développer une IA compétitive en Prolog.
-- Étudier la convergence des comportements stratégiques vers un équilibre (ex. : Nash, coopération, domination).
-- Mettre en parallèle les résultats expérimentaux du projet avec les recherches menées dans le cadre du stage sur l’intelligence artificielle économique.
+- Étudier vers quel équilibre convergent les comportements stratégiques
+  (Nash, coopération, domination).
+- Mettre les résultats expérimentaux en regard des travaux du stage sur l'IA
+  et les comportements stratégiques en économie.
 
-### 💡 Remarque importante
+### 💡 Remarque
 
-> **Side note** : dans la **version 2** du jeu, bien que les gains soient cumulés et visibles, essayer d’en tirer un avantage direct peut rendre l’IA **prévisible** et donc **pénalisée** car les autres pourront en prendre profit.  
-> Ainsi, la solution optimale dans la version 2 **sera proche de celle de la version 1**, car résoudre efficacement la version 1 permet d’éviter d’être exploité.  
-> La principale différence entre les deux versions sera alors une **explosion des scores numériques**, **mais pas un changement dans le classement ou les comportements stratégiques**.
-
+> Dans la **version 2** du jeu, bien que les gains soient cumulés et visibles,
+> chercher à en tirer un avantage direct rend l'IA **prévisible**, donc
+> pénalisable : les autres agents peuvent en profiter.

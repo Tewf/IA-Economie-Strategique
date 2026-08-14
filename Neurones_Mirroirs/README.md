@@ -1,17 +1,13 @@
-# Neurones_Mirroirs
+# Neurones miroirs
 
-Ce répertoire fait partie du projet **Stage_GAEL** et contient des fichiers et analyses liés à l'étude des **neurones miroirs**. Les neurones miroirs sont une classe spécifique de neurones impliqués dans des processus tels que l'imitation, l'apprentissage et la compréhension des actions des autres.
-## Structure du Répertoire
+Les neurones miroirs s'activent aussi bien lorsqu'un individu agit que
+lorsqu'il observe la même action chez un autre. Ils sont un mécanisme candidat
+pour l'imitation, et donc pour l'émergence de comportements coopératifs — ce
+qui est exactement la question du stage, transposée du côté biologique.
 
-Voici une structure typique du répertoire :
+## Contenu
 
-```plaintext
-Neurones_Mirroirs/
-├── Neurones_Mirroirs/      # Démarche scientifique sur la relation entre la cooperation et les neurones mirroirs et le comportement mimitique.
-├── Neurones_Mirroirs_Code/ # Implementation des NM et des Tests
-└── README.md               # Ce fichier
-```
-
-
-
-
+| Fichier | Description |
+|---|---|
+| [`Neurones_Mirroirs.pdf`](Neurones_Mirroirs.pdf) | La démarche : lien entre neurones miroirs, comportement mimétique et coopération |
+| [`Neurones_Mirroirs_Code.ipynb`](Neurones_Mirroirs_Code.ipynb) | Implémentation et tests |
