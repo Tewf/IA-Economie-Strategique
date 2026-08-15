@@ -33,38 +33,36 @@ réellement atteints.
 | **Laboratoire** | GAEL, Grenoble Applied Economics Laboratory |
 | **Dates** | 23 janvier au 14 avril 2025 |
 
-## Ce qu'il a produit
+## Le stage, tel qu'il a été rendu
+
+Tout ce qui a été rendu en mai 2025 se trouve dans [`original/`](original/),
+octet pour octet. Rien n'y a été modifié, y compris ce qui est faux, que
+[ce dossier recense](original/README.md) au lieu de le corriger en silence.
+
+| | |
+|---|---|
+| [`RapportDeStageFinal.pdf`](original/RapportDeStageFinal.pdf) | Le rapport, neuf pages. À lire en premier |
+| [`Presentation.pdf`](original/Presentation.pdf) | Les diapositives de soutenance, 23 pages |
+| [`Litterature/`](original/Litterature/) | L'état de l'art, sous forme de résumés rédigés à partir des articles et non des articles eux-mêmes |
+| [`Neurones_Mirroirs/`](original/Neurones_Mirroirs/) | Les neurones miroirs comme mécanisme de coopération par imitation, rédaction et simulation |
+
+## Ce qui a suivi, sur mon temps libre
+
+Le stage s'est terminé en avril 2025. Deux morceaux méritaient d'y revenir en
+dehors : un équilibre dont la dérivation n'implémentait pas la définition
+annoncée, et une simulation qu'on ne pouvait pas exécuter de bout en bout. Les
+deux sont refaits à côté de `original/` plutôt que par-dessus.
 
 | | |
 |---|---|
 | <img src="equilibrium/equilibrium_comparison.png" width="300" alt="Le match, et ce qu'il coûte"> | **[La stratégie bat Nash en tête-à-tête](equilibrium/)**, 3,5552 contre 3,1521. Elle le fait en cédant du gain absolu : face au même adversaire, jouer Nash rapporte 3,8889. Gagner l'écart et maximiser son propre total sont deux objectifs distincts, que la rédaction ne séparait pas. |
 | <img src="mirror_neurons/update_shape.png" width="300" alt="La mise à jour est logistique"> | **[L'imitation comme mise à jour de poids](mirror_neurons/)**. Observer une action multiplie son poids puis renormalise, et le Tit-for-Tat émerge sans avoir été programmé. Six figures, rejouées et graine fixée. |
 
-## Comment ce dépôt est organisé
-
-Deux couches. Le stage est conservé exactement tel qu'il a été rendu, et les
-corrections sont posées à côté plutôt que par-dessus.
-
-| | |
-|---|---|
-| [`original/`](original/) | Tout ce que le stage a rendu en mai 2025, octet pour octet : rapport, diapositives, bibliographie, notebooks. Rien de modifié, y compris ce qui est faux, que ce dossier recense |
-| [`equilibrium/`](equilibrium/) | L'analyse d'équilibre recalculée avec la bonne condition |
-| [`mirror_neurons/`](mirror_neurons/) | La simulation rejouée pour qu'elle se termine, avec graine fixée et figures légendées |
-
-Les corrections ne renversent pas les conclusions du stage. Le résultat en
+Rien de tout cela ne renverse les conclusions du stage. Le résultat en
 tête-à-tête tient et se reproduit exactement. Ce qui change, c'est que la
 dérivation derrière lui a été refaite avec une condition correcte sur un
 simplexe, que les affirmations non étayées par le code sont nommées, et que les
-résultats enfouis sont visibles.
-
-## Ordre de lecture
-
-1. [`original/RapportDeStageFinal.pdf`](original/RapportDeStageFinal.pdf), le
-   rapport, neuf pages
-2. [`equilibrium/`](equilibrium/) pour l'analyse et ce qui n'y allait pas
-3. [`mirror_neurons/`](mirror_neurons/) pour le modèle d'imitation
-4. [`original/Litterature/`](original/Litterature/) pour l'état de l'art, sous
-   forme de résumés rédigés à partir des articles et non des articles eux-mêmes
+figures portent enfin les légendes qu'elles calculaient puis jetaient.
 
 ## Crédits
 

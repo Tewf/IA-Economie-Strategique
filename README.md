@@ -32,37 +32,36 @@ reached.
 | **Laboratory** | GAEL, Grenoble Applied Economics Laboratory |
 | **Dates** | 23 January to 14 April 2025 |
 
-## What it produced
+## The internship, as delivered
+
+Everything submitted in May 2025 sits in [`original/`](original/), byte for
+byte. Nothing in there has been edited, including what is wrong with it, which
+[that folder records](original/README.md) rather than quietly repairing.
+
+| | |
+|---|---|
+| [`RapportDeStageFinal.pdf`](original/RapportDeStageFinal.pdf) | The report, nine pages. Start here |
+| [`Presentation.pdf`](original/Presentation.pdf) | The defence slides, 23 pages |
+| [`Litterature/`](original/Litterature/) | The state of the art, as summaries written from the papers rather than the papers themselves |
+| [`Neurones_Mirroirs/`](original/Neurones_Mirroirs/) | Mirror neurons as a mechanism for imitative cooperation, write-up and simulation |
+
+## What came after, in my own time
+
+The internship ended in April 2025. Two pieces of it were worth going back to
+outside of it: an equilibrium whose derivation did not implement the definition
+the write-up stated, and a simulation that could not be run from top to bottom.
+Both are redone beside `original/` rather than over it.
 
 | | |
 |---|---|
 | <img src="equilibrium/equilibrium_comparison.png" width="300" alt="The match, and what it cost"> | **[The strategy beats Nash head to head](equilibrium/)**, 3.5552 against 3.1521. It does so by giving up absolute payoff: facing the same opponent, simply playing Nash earns 3.8889. Winning the margin and maximising your own total are different objectives, and the write-up did not separate them. |
 | <img src="mirror_neurons/update_shape.png" width="300" alt="The weight update is logistic"> | **[Imitation as a weight update](mirror_neurons/)**. Observing an action multiplies its weight and renormalises, and Tit-for-Tat falls out without being programmed. Six figures, rerun and seeded. |
 
-## How this repository is arranged
-
-Two layers. The internship is preserved exactly as it was delivered, and the
-corrections sit beside it rather than on top of it.
-
-| | |
-|---|---|
-| [`original/`](original/) | Everything the internship submitted in May 2025, byte for byte: the report, the slides, the bibliography, the notebooks. Nothing edited, including what is wrong with it, which that folder lists |
-| [`equilibrium/`](equilibrium/) | The equilibrium analysis recomputed with the right condition |
-| [`mirror_neurons/`](mirror_neurons/) | The simulation rerun so it terminates, is seeded, and has labelled figures |
-
-The corrections do not overturn the internship's conclusions. The head-to-head
-result holds and reproduces exactly. What changed is that the derivation behind
-it has been redone with a condition that is correct on a simplex, the claims the
-code does not support are named, and the results that were buried are visible.
-
-## Reading order
-
-1. [`original/RapportDeStageFinal.pdf`](original/RapportDeStageFinal.pdf), the
-   report, nine pages
-2. [`equilibrium/`](equilibrium/) for the analysis and what was wrong with it
-3. [`mirror_neurons/`](mirror_neurons/) for the imitation model
-4. [`original/Litterature/`](original/Litterature/) for the state of the art, as
-   summaries written from the papers rather than the papers themselves
+None of it overturns what the internship concluded. The head-to-head result holds
+and reproduces exactly. What changed is that the derivation behind it has been
+redone with a condition that is correct on a simplex, the claims the code does
+not support are named, and the figures carry the labels they were computing and
+throwing away.
 
 ## Credits
 
