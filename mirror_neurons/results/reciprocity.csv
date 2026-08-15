@@ -1,0 +1,17 @@
+player,prober,reciprocity_index,agreement_rate
+Mirror Neuron,Random,0.123329,0.561404
+Tit For Tat,Random,1.000000,1.000000
+Cooperator,Random,0.000000,0.543860
+Defector,Random,0.000000,0.456140
+Random,Random,0.064215,0.531328
+Grudger,Random,0.000000,0.456140
+Win-Stay Lose-Shift,Random,-0.016129,0.491228
+Alternator,Random,0.058313,0.528822
+Mirror Neuron,Cooperator,nan,0.997494
+Tit For Tat,Cooperator,nan,1.000000
+Cooperator,Cooperator,nan,1.000000
+Defector,Cooperator,nan,0.000000
+Random,Cooperator,nan,0.543860
+Grudger,Cooperator,nan,1.000000
+Win-Stay Lose-Shift,Cooperator,nan,1.000000
+Alternator,Cooperator,nan,0.498747

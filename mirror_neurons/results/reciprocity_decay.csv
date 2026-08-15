@@ -1,0 +1,21 @@
+player,from_turn,to_turn,reciprocity_index
+Mirror Neuron,0,200,0.135482
+Mirror Neuron,200,400,0.107801
+Mirror Neuron,400,600,0.016569
+Mirror Neuron,600,800,0.041751
+Mirror Neuron,800,1000,0.000000
+Mirror Neuron,1000,1200,0.000000
+Mirror Neuron,1200,1400,0.000000
+Mirror Neuron,1400,1600,0.000000
+Mirror Neuron,1600,1800,0.000000
+Mirror Neuron,1800,2000,0.000000
+Tit For Tat,0,200,1.000000
+Tit For Tat,200,400,1.000000
+Tit For Tat,400,600,1.000000
+Tit For Tat,600,800,1.000000
+Tit For Tat,800,1000,1.000000
+Tit For Tat,1000,1200,1.000000
+Tit For Tat,1200,1400,1.000000
+Tit For Tat,1400,1600,1.000000
+Tit For Tat,1600,1800,1.000000
+Tit For Tat,1800,2000,1.000000

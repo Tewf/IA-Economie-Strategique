@@ -27,3 +27,18 @@ jobs:
       # and one of its notebooks does not terminate by design of its last cell.
       - name: The mirror-neuron simulation still runs end to end
         run: jupyter execute mirror_neurons/mirror_neurons_rerun.ipynb
+
+      # The notebook step above regenerates the figures beside it and nothing
+      # checks them, so they could drift from the code for months. The CSVs are
+      # the part that can be checked: the run is seeded and every float is
+      # written to six decimals, so a rerun that changes one has changed a
+      # result. Only the CSVs, deliberately. A PNG is rasterised through the
+      # host's own freetype, so two machines can draw the same figure into
+      # different bytes and turn this red for a font difference.
+      - name: The tournament reproduces the committed results
+        run: |
+          python mirror_neurons/run_tournament.py
+          git diff --exit-code --stat -- 'mirror_neurons/results/*.csv'
+
+      - name: The figures still draw from those CSVs
+        run: python mirror_neurons/plot_results.py
