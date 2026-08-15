@@ -4,3 +4,10 @@ matplotlib==3.11.1
 nbformat==5.11.0
 nbclient==0.11.0
 ipykernel==7.3.0
+
+# The opponents from the literature, and the match engine. Held at 4.13.1 on
+# purpose: 4.14.0 added a torch>=2.6 dependency for its neural-network
+# strategies, which none of the opponents here use, and which takes the install
+# from 669 MB to over 5 GB because pip resolves the CUDA build. Do not bump
+# without checking what it pulls in.
+axelrod==4.13.1

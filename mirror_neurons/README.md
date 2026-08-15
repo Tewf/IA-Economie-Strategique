@@ -55,3 +55,18 @@ Recorded because the write-up sits next to this and a reader will read both.
 
 Neither undermines the idea, which is a reasonable one. They are claims the code
 was never asked to check.
+
+## What comes next
+
+The first of those two is the gap worth closing: give the agent opponents that
+react. [Axelrod-Python](https://github.com/Axelrod-Python/Axelrod) supplies them
+from the literature, along with the match engine and the payoff bookkeeping.
+
+| | |
+|---|---|
+| [`hebbian_agent.py`](hebbian_agent.py) | The model, lifted out of the notebook so both callers play the same object |
+| [`axelrod_player.py`](axelrod_player.py) | It as an Axelrod player, plus a measure of how close its play is to Tit-for-Tat |
+| [`tournament_config.py`](tournament_config.py) | The seven opponents, the payoffs, the seed and the learning rates |
+| [`design-notes/`](design-notes/) | Where the games and opponents come from, and the two places the model does not reach |
+
+Scaffolding only. No tournament has been run and no result is committed here.
