@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IA et tarification stratégique</title>
-<meta name="description" content="Un stage de recherche au GAEL sur la question de savoir si des agents IA soutiennent la collusion tacite dans un jeu de prix répété : un agent Prolog de tournoi, une analyse d'équilibre, et l'imitation comme mise à jour de poids.">
+<meta name="description" content="Un stage de recherche au GAEL sur la question de savoir si des agents IA soutiennent la collusion tacite dans un jeu de prix répété : une analyse d'équilibre, et l'imitation comme mise à jour de poids.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ctext y=%2726%27 font-size=%2726%27%3E%F0%9F%93%89%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="site.css">
 </head>
@@ -35,29 +35,6 @@
 </header>
 
 <section>
-  <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/tournament">Le tournoi</a></h2>
-  <p class="result">7e et 8e sur 16, avril 2025, L2 MIASHS UGA</p>
-  <figure>
-    <img src="tournament/leaderboard.png" alt="Seize agents classés par score cumulé, échelle logarithmique">
-    <figcaption>Deux agents engagés face à treize autres étudiants. Noter l'échelle logarithmique : les trois premiers devancent de plus de cinquante ordres de grandeur.</figcaption>
-  </figure>
-  <p>
-    Le jeu : les deux joueurs choisissent simultanément un entier de 1 à 5. Si
-    les choix diffèrent d'exactement un, celui qui a choisi le
-    <strong>plus petit</strong> nombre prend la somme et l'autre rien ; sinon
-    chacun marque ce qu'il a choisi. Sous-coter d'une unité est récompensé, donc
-    chaque nombre invite à être sous-coté.
-  </p>
-  <p>
-    <code>stage_test</code> marque 6 163 877 et <code>nash_equilibrium</code>
-    1 490 429. Cet ordre est celui que prédit l'analyse d'équilibre. Le fait que
-    les deux perdent face à six agents adaptatifs l'est aussi, pour la raison
-    exposée dans la section suivante. Ce classement se trouvait page 1 d'un
-    journal de 636 pages.
-  </p>
-</section>
-
-<section>
   <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/equilibrium">L'équilibre</a></h2>
   <p class="result">Bat Nash en tête-à-tête, 3,5552 contre 3,1521</p>
   <figure>
@@ -73,9 +50,10 @@
   <p>
     La distinction que l'analyse d'origine ne faisait pas est à droite. Devancer
     un adversaire n'est pas maximiser son propre gain : cette stratégie gagne le
-    match en coûtant plus à l'adversaire qu'elle ne se coûte à elle-même. C'est
-    raisonnable en tête-à-tête et inadapté à un tournoi qui compte des points
-    cumulés, ce qui est précisément où elle finit 7e.
+    match en coûtant plus à l'adversaire qu'elle ne se coûte à elle-même. Les
+    deux objectifs se défendent, et lequel on vise dépend de ce qui est compté :
+    l'écart entre deux joueurs, ou ce que chacun emporte. La rédaction ne faisait
+    pas la distinction.
   </p>
   <p>
     La dérivation a été refaite. L'originale minimisait le gradient de gain au

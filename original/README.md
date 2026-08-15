@@ -15,8 +15,13 @@ terminate. The runnable versions are one level up.
 | `Presentation.pdf` | The defence slides, 23 pages |
 | `Litterature/` | Annotated bibliography, and four summaries written from the papers rather than the papers themselves |
 | `Neurones_Mirroirs/` | Mirror neurons as a mechanism for imitative cooperation, write-up and simulation |
-| `Projet_Prolog/` | The agents, the game, the equilibrium analysis and the full tournament log |
 | `NOTICE` | What in here is not the author's own work |
+
+One folder that was submitted alongside these is no longer here. `Projet_Prolog/`
+held a Prolog course project: two agents, a tournament entry and a 636-page match
+log. It was L2 coursework rather than internship work, and it was most of this
+repository by weight, so it now lives with the rest of the coursework. This
+repository is about what the internship itself produced.
 
 ## Known defects, recorded rather than repaired
 
@@ -49,17 +54,6 @@ degenerate computation. The accompanying `t = −0.065, p = 0.948` is fine.
   `legend()`, `xlabel()` or `ylabel()`, so four indistinguishable curves are
   plotted with the labels discarded.
 - There are no markdown cells at all.
-
-**In `Equilibrium_Analysis.ipynb`.**
-
-- Execution counts run `2, 3, 4, 5, 11, 12, 14`. The saved outputs cannot be
-  reproduced by running the notebook top to bottom.
-- The optimiser prints `Stationarity residual: 80.89` immediately under
-  `✅ Optimization successful.` It checks only that SLSQP converged, never that
-  the objective reached zero, which was its own stated criterion.
-- The objective it minimises does not correspond to the definition the write-up
-  gives. This is explained in `../equilibrium/`, which does not change the
-  conclusion the work reached.
 
 **In `Litterature/`.**
 

@@ -37,13 +37,8 @@ réellement atteints.
 
 | | |
 |---|---|
-| <img src="tournament/leaderboard.png" width="300" alt="Seize agents classés par score cumulé"> | **[7e et 8e sur 16](tournament/)** au tournoi d'avril 2025, L2 MIASHS UGA, face à treize agents d'autres étudiants. `stage_test` marque 6 163 877 et `nash_equilibrium` 1 490 429. Six agents les devancent, les trois premiers de plus de cinquante ordres de grandeur. |
-| <img src="equilibrium/equilibrium_comparison.png" width="300" alt="Le match, et ce qu'il coûte"> | **[La stratégie bat Nash en tête-à-tête](equilibrium/)**, 3,5552 contre 3,1521. Elle le fait en cédant du gain absolu : face au même adversaire, jouer Nash rapporte 3,8889. Gagner un match et marquer le plus de points sont deux objectifs distincts, d'où la 7e place. |
+| <img src="equilibrium/equilibrium_comparison.png" width="300" alt="Le match, et ce qu'il coûte"> | **[La stratégie bat Nash en tête-à-tête](equilibrium/)**, 3,5552 contre 3,1521. Elle le fait en cédant du gain absolu : face au même adversaire, jouer Nash rapporte 3,8889. Gagner l'écart et maximiser son propre total sont deux objectifs distincts, que la rédaction ne séparait pas. |
 | <img src="mirror_neurons/update_shape.png" width="300" alt="La mise à jour est logistique"> | **[L'imitation comme mise à jour de poids](mirror_neurons/)**. Observer une action multiplie son poids puis renormalise, et le Tit-for-Tat émerge sans avoir été programmé. Six figures, rejouées et graine fixée. |
-
-Les constantes des deux agents engagés sortent directement du notebook
-d'équilibre, arrondies. L'analyse et le Prolog soumis sont le même objet, ce qui
-est la meilleure preuve ici que le travail se tient de bout en bout.
 
 ## Comment ce dépôt est organisé
 
@@ -52,10 +47,9 @@ corrections sont posées à côté plutôt que par-dessus.
 
 | | |
 |---|---|
-| [`original/`](original/) | Tout ce qui a été rendu en mai 2025, octet pour octet : rapport, diapositives, bibliographie, agents Prolog, notebooks. Rien de modifié, y compris ce qui est faux, que ce dossier recense |
+| [`original/`](original/) | Tout ce que le stage a rendu en mai 2025, octet pour octet : rapport, diapositives, bibliographie, notebooks. Rien de modifié, y compris ce qui est faux, que ce dossier recense |
 | [`equilibrium/`](equilibrium/) | L'analyse d'équilibre recalculée avec la bonne condition |
 | [`mirror_neurons/`](mirror_neurons/) | La simulation rejouée pour qu'elle se termine, avec graine fixée et figures légendées |
-| [`tournament/`](tournament/) | Le classement, qui se trouvait page 1 d'un journal de 636 pages |
 
 Les corrections ne renversent pas les conclusions du stage. Le résultat en
 tête-à-tête tient et se reproduit exactement. Ce qui change, c'est que la
@@ -67,15 +61,17 @@ résultats enfouis sont visibles.
 
 1. [`original/RapportDeStageFinal.pdf`](original/RapportDeStageFinal.pdf), le
    rapport, neuf pages
-2. [`tournament/`](tournament/) pour ce que les agents ont fait
-3. [`equilibrium/`](equilibrium/) pour l'analyse qui les sous-tend
+2. [`equilibrium/`](equilibrium/) pour l'analyse et ce qui n'y allait pas
+3. [`mirror_neurons/`](mirror_neurons/) pour le modèle d'imitation
 4. [`original/Litterature/`](original/Litterature/) pour l'état de l'art, sous
    forme de résumés rédigés à partir des articles et non des articles eux-mêmes
 
 ## Crédits
 
-Les articles publiés sont référencés et non redistribués, et l'énoncé du projet
-Prolog appartient à son cours. Voir [NOTICE](original/NOTICE).
+Les articles publiés sont référencés et non redistribués. Voir
+[NOTICE](original/NOTICE), celui rendu avec le stage et conservé sans
+modification : il mentionne donc encore le projet Prolog du cours, qui a depuis
+quitté ce dépôt.
 
 Un manque à signaler : Ng (2023), *When communicative AIs are cooperative
 actors*, est résumé dans `original/Litterature/Summary/` et analysé dans le

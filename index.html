@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI and strategic pricing</title>
-<meta name="description" content="A GAEL research internship on whether AI agents sustain tacit collusion in repeated price competition: a Prolog tournament agent, an equilibrium analysis, and imitation as a Hebbian weight update.">
+<meta name="description" content="A GAEL research internship on whether AI agents sustain tacit collusion in repeated price competition: an equilibrium analysis, and imitation as a Hebbian weight update.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ctext y=%2726%27 font-size=%2726%27%3E%F0%9F%93%89%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="site.css">
 </head>
@@ -35,28 +35,6 @@
 </header>
 
 <section>
-  <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/tournament">The tournament</a></h2>
-  <p class="result">7th and 8th of 16, April 2025, L2 MIASHS UGA</p>
-  <figure>
-    <img src="tournament/leaderboard.png" alt="Sixteen agents ranked by cumulative score on a log scale">
-    <figcaption>Two agents entered against thirteen other students'. Note the log scale: the top three are more than fifty orders of magnitude ahead.</figcaption>
-  </figure>
-  <p>
-    The game: both players pick an integer from 1 to 5 at the same time. If the
-    picks differ by exactly one, whoever picked the <strong>smaller</strong>
-    number takes the sum and the other takes nothing; otherwise each scores what
-    they picked. Undercutting by one is rewarded, so every number invites being
-    undercut.
-  </p>
-  <p>
-    <code>stage_test</code> scored 6,163,877 and <code>nash_equilibrium</code>
-    1,490,429. That ordering is what the equilibrium analysis predicts. Both
-    losing to six adaptive agents is also what it predicts, for the reason in the
-    next section. These standings sat on page 1 of a 636-page log.
-  </p>
-</section>
-
-<section>
   <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/equilibrium">The equilibrium</a></h2>
   <p class="result">Beats Nash head to head, 3.5552 against 3.1521</p>
   <figure>
@@ -72,9 +50,9 @@
     The distinction the original analysis did not draw is on the right.
     Outscoring an opponent is not the same as maximising your own payoff: this
     strategy wins the match by costing the opponent more than it costs itself.
-    That is a reasonable thing to want head to head and the wrong thing to want
-    in a tournament scored on cumulative points, which is exactly where it
-    placed 7th.
+    Both are defensible objectives, and which one you want depends on whether
+    the outcome is scored on the margin between two players or on what each of
+    them takes home. The write-up did not draw the distinction.
   </p>
   <p>
     The derivation has been redone. The original minimised the squared payoff

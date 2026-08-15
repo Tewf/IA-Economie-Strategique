@@ -2,9 +2,9 @@
 
 ![The match, and what it cost](equilibrium_comparison.png)
 
-Corrects the analysis in
-[`../original/Projet_Prolog/Convergence des stratégies dans un jeu répété/`](../original/Projet_Prolog/).
-The original is preserved untouched and nothing here edits it.
+The equilibrium analysis the internship produced, redone with a condition that
+is correct on a simplex. The earlier derivation is quoted below precisely enough
+to check the criticism against it. Nothing here edits the original work.
 
 ```sh
 pip install -r requirements.txt
@@ -57,10 +57,10 @@ Outscoring an opponent is not the same as maximising your own payoff. Against a
 Nash opponent, playing Nash earns **3.8889**, while `stage_test` earns **3.5552**.
 It wins the match by costing the opponent more than it costs itself.
 
-That is a reasonable thing to want in a head-to-head and the wrong thing to want
-in a tournament scored on cumulative points, which is consistent with where
-these agents placed: 7th and 8th of 16, with the winners orders of magnitude
-ahead.
+Both objectives are defensible, and they are not the same objective. Which one
+you want depends on how the outcome is scored: on the margin between two
+players, or on what each of them takes home. This strategy optimises the first
+and pays for it in the second, and the write-up did not draw the distinction.
 
 ## The stated definition, implemented
 

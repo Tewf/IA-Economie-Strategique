@@ -36,13 +36,8 @@ reached.
 
 | | |
 |---|---|
-| <img src="tournament/leaderboard.png" width="300" alt="Sixteen agents ranked by cumulative score"> | **[7th and 8th of 16](tournament/)** in the April 2025 L2 MIASHS UGA tournament, against thirteen other students' agents. `stage_test` scored 6,163,877 and `nash_equilibrium` 1,490,429. Both were beaten by six agents, the top three by more than fifty orders of magnitude. |
-| <img src="equilibrium/equilibrium_comparison.png" width="300" alt="The match, and what it cost"> | **[The strategy beats Nash head to head](equilibrium/)**, 3.5552 against 3.1521. It does so by giving up absolute payoff: facing the same opponent, simply playing Nash earns 3.8889. Winning a match and scoring the most points are different objectives, which is why it placed 7th. |
+| <img src="equilibrium/equilibrium_comparison.png" width="300" alt="The match, and what it cost"> | **[The strategy beats Nash head to head](equilibrium/)**, 3.5552 against 3.1521. It does so by giving up absolute payoff: facing the same opponent, simply playing Nash earns 3.8889. Winning the margin and maximising your own total are different objectives, and the write-up did not separate them. |
 | <img src="mirror_neurons/update_shape.png" width="300" alt="The weight update is logistic"> | **[Imitation as a weight update](mirror_neurons/)**. Observing an action multiplies its weight and renormalises, and Tit-for-Tat falls out without being programmed. Six figures, rerun and seeded. |
-
-The two entered agents' constants come straight out of the equilibrium notebook,
-rounded. The analysis and the submitted Prolog are the same object, which is the
-clearest evidence here that the work joins up end to end.
 
 ## How this repository is arranged
 
@@ -51,10 +46,9 @@ corrections sit beside it rather than on top of it.
 
 | | |
 |---|---|
-| [`original/`](original/) | Everything submitted in May 2025, byte for byte: the report, the slides, the bibliography, the Prolog agents, the notebooks. Nothing edited, including what is wrong with it, which that folder lists |
+| [`original/`](original/) | Everything the internship submitted in May 2025, byte for byte: the report, the slides, the bibliography, the notebooks. Nothing edited, including what is wrong with it, which that folder lists |
 | [`equilibrium/`](equilibrium/) | The equilibrium analysis recomputed with the right condition |
 | [`mirror_neurons/`](mirror_neurons/) | The simulation rerun so it terminates, is seeded, and has labelled figures |
-| [`tournament/`](tournament/) | The standings, which were on page 1 of a 636-page log |
 
 The corrections do not overturn the internship's conclusions. The head-to-head
 result holds and reproduces exactly. What changed is that the derivation behind
@@ -65,15 +59,17 @@ code does not support are named, and the results that were buried are visible.
 
 1. [`original/RapportDeStageFinal.pdf`](original/RapportDeStageFinal.pdf), the
    report, nine pages
-2. [`tournament/`](tournament/) for what the agents actually did
-3. [`equilibrium/`](equilibrium/) for the analysis behind them
+2. [`equilibrium/`](equilibrium/) for the analysis and what was wrong with it
+3. [`mirror_neurons/`](mirror_neurons/) for the imitation model
 4. [`original/Litterature/`](original/Litterature/) for the state of the art, as
    summaries written from the papers rather than the papers themselves
 
 ## Credits
 
-Published papers are referenced rather than redistributed, and the Prolog
-project brief belongs to its course. See [NOTICE](original/NOTICE).
+Published papers are referenced rather than redistributed. See
+[NOTICE](original/NOTICE), which is the one submitted with the internship and is
+kept unedited, so it still lists the Prolog course project that has since moved
+out of this repository.
 
 One gap worth naming: Ng (2023), *When communicative AIs are cooperative
 actors*, is summarised in `original/Litterature/Summary/` and analysed in the

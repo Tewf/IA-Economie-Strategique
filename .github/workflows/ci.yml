@@ -30,7 +30,3 @@ jobs:
 
       - name: The mirror-neuron simulation still runs end to end
         run: jupyter execute mirror_neurons/mirror_neurons_rerun.ipynb
-
-      - name: The tournament chart still builds
-        working-directory: tournament
-        run: python plot_leaderboard.py
