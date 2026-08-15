@@ -21,7 +21,7 @@ description. Against a plain Cooperator it returns:
 
 Everything that ends up cooperating scores the same, whether it is reciprocating
 or simply agreeing. It measures convergence. It is kept in
-[`../reciprocity.py`](../reciprocity.py) as `agreement_rate`, named for what it
+[`../../reciprocity.py`](../../reciprocity.py) as `agreement_rate`, named for what it
 computes, and reported beside the real measure so the gap is visible rather than
 asserted.
 

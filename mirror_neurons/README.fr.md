@@ -10,10 +10,14 @@ matchs de 10 à 100 tours, l'agent termine huitième sur huit, derrière un tira
 à pile ou face.** Ce que la mise à jour implémente est un appariement de
 fréquences, et la forme close le dit avant même le premier tournoi.
 
+Depuis la racine du dépôt, car la mesure de réciprocité y réside et est
+partagée avec [`../llm/`](../llm/) :
+
 ```sh
 pip install -r requirements.txt
-python run_tournament.py && python plot_results.py   # environ 22 secondes
-jupyter execute mirror_neurons_rerun.ipynb
+export PYTHONPATH=.
+python mirror_neurons/run_tournament.py && python mirror_neurons/plot_results.py
+jupyter execute mirror_neurons/mirror_neurons_rerun.ipynb   # environ 22 secondes
 ```
 
 ## Les résultats

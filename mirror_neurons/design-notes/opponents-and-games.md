@@ -29,7 +29,7 @@ MIT licensed, with over 200 strategies from the literature and the tournament
 engine and payoff bookkeeping to go with them. Nothing below is written here.
 The pin is **4.13.1**, and deliberately not 4.14.0, which added a `torch`
 dependency for neural-network strategies none of this uses and takes the
-install past 5 GB; [`../requirements.txt`](../requirements.txt) records why.
+install past 5 GB; [`../../requirements.txt`](../../requirements.txt) records why.
 
 | Opponent | Why it is in the set |
 |---|---|

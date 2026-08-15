@@ -10,10 +10,14 @@ turns the agent finishes eighth of eight, behind a coin flip.** What the update
 implements is frequency matching, and the closed form says so before any
 tournament runs.
 
+From the repository root, since the reciprocity measure sits there and is shared
+with [`../llm/`](../llm/):
+
 ```sh
 pip install -r requirements.txt
-python run_tournament.py && python plot_results.py   # about 22 seconds
-jupyter execute mirror_neurons_rerun.ipynb
+export PYTHONPATH=.
+python mirror_neurons/run_tournament.py && python mirror_neurons/plot_results.py
+jupyter execute mirror_neurons/mirror_neurons_rerun.ipynb   # about 22 seconds
 ```
 
 ## The results
