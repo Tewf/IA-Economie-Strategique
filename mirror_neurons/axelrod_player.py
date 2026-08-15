@@ -50,19 +50,3 @@ class MirrorNeuronPlayer(axl.Player):
         if opponent.history:
             self.agent.observe_and_learn(TO_AGENT_ACTION[opponent.history[-1]])
         return self._random.random_choice(self.agent.weights["Cooperate"])
-
-
-def tit_for_tat_likeness(player_history, opponent_history):
-    """Share of rounds where the player replayed the opponent's previous action.
-
-    Not in Axelrod, because it is not a property of a match but of a claim: the
-    write-up says the agent approaches Tit-for-Tat as the learning rate grows.
-    Tit-for-Tat itself scores 1.0 here by construction, which is the check.
-
-    The first round is excluded, since there is no previous action to match.
-    """
-    if len(player_history) < 2:
-        return float("nan")
-    matched = sum(mine == theirs for mine, theirs
-                  in zip(player_history[1:], opponent_history[:-1]))
-    return matched / (len(player_history) - 1)
