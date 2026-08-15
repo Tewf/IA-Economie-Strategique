@@ -48,21 +48,22 @@ octet pour octet. Rien n'y a été modifié, y compris ce qui est faux, que
 
 ## Ce qui a suivi, sur mon temps libre
 
-Le stage s'est terminé en avril 2025. Deux morceaux méritaient d'y revenir en
-dehors : un équilibre dont la dérivation n'implémentait pas la définition
-annoncée, et une simulation qu'on ne pouvait pas exécuter de bout en bout. Les
-deux sont refaits à côté de `original/` plutôt que par-dessus.
+Le stage s'est terminé en avril 2025. La simulation des neurones miroirs ne
+pouvait pas s'exécuter de bout en bout : elle est refaite à côté de `original/`
+plutôt que par-dessus.
 
 | | |
 |---|---|
-| <img src="equilibrium/equilibrium_comparison.png" width="300" alt="Le match, et ce qu'il coûte"> | **[La stratégie bat Nash en tête-à-tête](equilibrium/)**, 3,5552 contre 3,1521. Elle le fait en cédant du gain absolu : face au même adversaire, jouer Nash rapporte 3,8889. Gagner l'écart et maximiser son propre total sont deux objectifs distincts, que la rédaction ne séparait pas. |
 | <img src="mirror_neurons/update_shape.png" width="300" alt="La mise à jour est logistique"> | **[L'imitation comme mise à jour de poids](mirror_neurons/)**. Observer une action multiplie son poids puis renormalise, et le Tit-for-Tat émerge sans avoir été programmé. Six figures, rejouées et graine fixée. |
 
-Rien de tout cela ne renverse les conclusions du stage. Le résultat en
-tête-à-tête tient et se reproduit exactement. Ce qui change, c'est que la
-dérivation derrière lui a été refaite avec une condition correcte sur un
-simplexe, que les affirmations non étayées par le code sont nommées, et que les
-figures portent enfin les légendes qu'elles calculaient puis jetaient.
+Cela ne renverse pas les conclusions du stage. Ce qui change, c'est que les
+affirmations non étayées par le code sont nommées, et que les figures portent
+enfin les légendes qu'elles calculaient puis jetaient.
+
+Une analyse d'équilibre se trouvait ici également. Elle est partie avec le
+projet Prolog du cours dont elle étudie le jeu, dans
+[University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
+Ce jeu n'apparaît pas dans le rapport de stage.
 
 ## Crédits
 

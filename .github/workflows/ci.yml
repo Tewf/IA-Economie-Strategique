@@ -21,12 +21,9 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -r equilibrium/requirements.txt
+          pip install -r mirror_neurons/requirements.txt
 
       # original/ is preserved, not maintained. Nothing there is expected to run,
       # and one of its notebooks does not terminate by design of its last cell.
-      - name: The equilibrium recomputes, and its checks still pass
-        run: jupyter execute equilibrium/equilibrium_recomputed.ipynb
-
       - name: The mirror-neuron simulation still runs end to end
         run: jupyter execute mirror_neurons/mirror_neurons_rerun.ipynb

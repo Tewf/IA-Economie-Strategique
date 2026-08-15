@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IA et tarification stratégique</title>
-<meta name="description" content="Un stage de recherche au GAEL sur la question de savoir si des agents IA soutiennent la collusion tacite dans un jeu de prix répété : une analyse d'équilibre, et l'imitation comme mise à jour de poids.">
+<meta name="description" content="Un stage de recherche au GAEL sur la question de savoir si des agents IA soutiennent la collusion tacite dans un jeu de prix répété, et l'imitation modélisée comme mise à jour de poids.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ctext y=%2726%27 font-size=%2726%27%3E%F0%9F%93%89%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="site.css">
 </head>
@@ -35,37 +35,6 @@
 </header>
 
 <section>
-  <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/equilibrium">L'équilibre</a></h2>
-  <p class="result">Bat Nash en tête-à-tête, 3,5552 contre 3,1521</p>
-  <figure>
-    <img src="equilibrium/equilibrium_comparison.png" alt="Le résultat en tête-à-tête, et le gain absolu qu'il coûte">
-    <figcaption>À gauche, l'affirmation : la stratégie devance Nash quand les deux se rencontrent. À droite, son coût : face au même adversaire, jouer Nash rapporte davantage.</figcaption>
-  </figure>
-  <p>
-    Le résultat en tête-à-tête tient et se reproduit exactement. Il n'a rien de
-    surprenant une fois énoncé correctement, car Nash est un concept de
-    <strong>sécurité</strong> qui garantit un plancher face à n'importe quel
-    adversaire, et non un concept de maximisation.
-  </p>
-  <p>
-    La distinction que l'analyse d'origine ne faisait pas est à droite. Devancer
-    un adversaire n'est pas maximiser son propre gain : cette stratégie gagne le
-    match en coûtant plus à l'adversaire qu'elle ne se coûte à elle-même. Les
-    deux objectifs se défendent, et lequel on vise dépend de ce qui est compté :
-    l'écart entre deux joueurs, ou ce que chacun emporte. La rédaction ne faisait
-    pas la distinction.
-  </p>
-  <p>
-    La dérivation a été refaite. L'originale minimisait le gradient de gain au
-    carré, ce qui sur un simplexe revient à demander que chaque action rapporte
-    zéro, donc à chercher les stratégies qui rapportent le moins. La condition
-    employée maintenant est que le regret soit nul pour les deux joueurs,
-    vérifiée sur la bataille des sexes et le dilemme du prisonnier avant de
-    toucher au vrai jeu.
-  </p>
-</section>
-
-<section>
   <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/mirror_neurons">L'imitation comme mise à jour de poids</a></h2>
   <p class="result">Le Tit-for-Tat sans que personne ne le programme</p>
   <div class="two">
@@ -94,18 +63,19 @@
     dossier recense au lieu de le corriger en silence.
   </p>
   <p>
-    Le stage s'est terminé en avril 2025. Les deux travaux ci-dessus ont été
-    refaits ensuite, sur mon temps libre, parce qu'aucun n'était achevé : un
-    équilibre dont la dérivation n'implémentait pas la définition annoncée, et
-    une simulation qu'on ne pouvait pas exécuter de bout en bout. Ils sont posés
-    à côté de <code>original/</code> plutôt que par-dessus.
+    Le stage s'est terminé en avril 2025. Le travail ci-dessus a été refait
+    ensuite, sur mon temps libre, parce qu'il n'était pas achevé : la simulation
+    ne pouvait pas s'exécuter de bout en bout. Il est posé à côté de
+    <code>original/</code> plutôt que par-dessus, et ne renverse pas les
+    conclusions du stage. Ce qui change, c'est que les affirmations non étayées
+    par le code sont nommées, et que les figures portent enfin les légendes
+    qu'elles calculaient puis jetaient.
   </p>
   <p>
-    Rien de tout cela ne renverse les conclusions du stage. Le résultat en
-    tête-à-tête tient. Ce qui change, c'est que la dérivation a été refaite avec
-    une condition correcte sur un simplexe, que les affirmations non étayées par
-    le code sont nommées, et que les figures portent enfin les légendes qu'elles
-    calculaient puis jetaient.
+    Une analyse d'équilibre se trouvait ici également. Elle est partie avec le
+    projet Prolog du cours dont elle étudie le jeu, dans
+    <a href="https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament">University-Coursework</a>.
+    Ce jeu n'apparaît pas dans le rapport de stage.
   </p>
 </section>
 

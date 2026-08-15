@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI and strategic pricing</title>
-<meta name="description" content="A GAEL research internship on whether AI agents sustain tacit collusion in repeated price competition: an equilibrium analysis, and imitation as a Hebbian weight update.">
+<meta name="description" content="A GAEL research internship on whether AI agents sustain tacit collusion in repeated price competition, and imitation modelled as a Hebbian weight update.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ctext y=%2726%27 font-size=%2726%27%3E%F0%9F%93%89%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="site.css">
 </head>
@@ -35,35 +35,6 @@
 </header>
 
 <section>
-  <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/equilibrium">The equilibrium</a></h2>
-  <p class="result">Beats Nash head to head, 3.5552 against 3.1521</p>
-  <figure>
-    <img src="equilibrium/equilibrium_comparison.png" alt="The head-to-head result, and the absolute payoff it costs">
-    <figcaption>Left, the claim: the strategy outscores Nash when they meet. Right, its cost: against that same opponent, simply playing Nash earns more.</figcaption>
-  </figure>
-  <p>
-    The head-to-head result holds and reproduces exactly. It is not surprising
-    once stated properly, because Nash is a <strong>safety</strong> concept that
-    guarantees a floor against any opponent, not a maximising one.
-  </p>
-  <p>
-    The distinction the original analysis did not draw is on the right.
-    Outscoring an opponent is not the same as maximising your own payoff: this
-    strategy wins the match by costing the opponent more than it costs itself.
-    Both are defensible objectives, and which one you want depends on whether
-    the outcome is scored on the margin between two players or on what each of
-    them takes home. The write-up did not draw the distinction.
-  </p>
-  <p>
-    The derivation has been redone. The original minimised the squared payoff
-    gradient, which on a simplex asks every action to pay zero, so it searched
-    for the strategies that pay least. The condition used now is that regret is
-    zero for both players, checked against Battle of the Sexes and the
-    Prisoner's Dilemma before going near the real game.
-  </p>
-</section>
-
-<section>
   <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/mirror_neurons">Imitation as a weight update</a></h2>
   <p class="result">Tit-for-Tat without anyone programming it</p>
   <div class="two">
@@ -92,18 +63,18 @@
     that folder records rather than quietly repairing.
   </p>
   <p>
-    The internship ended in April 2025. The two pieces above were redone
-    afterwards, in my own time, because neither was finished: an equilibrium
-    whose derivation did not implement the definition the write-up stated, and a
-    simulation that could not be run from top to bottom. They sit beside
-    <code>original/</code> rather than over it.
+    The internship ended in April 2025. The piece above was redone afterwards,
+    in my own time, because it was not finished: the simulation could not be run
+    from top to bottom. It sits beside <code>original/</code> rather than over
+    it, and does not overturn what the internship concluded. What changed is
+    that the claims the code does not support are named, and the figures carry
+    the labels they were computing and throwing away.
   </p>
   <p>
-    Neither overturns what the internship concluded. The head-to-head result
-    holds. What changed is that the derivation behind it has been redone with a
-    condition that is correct on a simplex, the claims the code does not support
-    are named, and the figures carry the labels they were computing and throwing
-    away.
+    An equilibrium analysis used to sit here too. It went with the Prolog course
+    project whose game it is about, in
+    <a href="https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament">University-Coursework</a>.
+    That game does not appear in the internship report.
   </p>
 </section>
 

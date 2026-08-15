@@ -47,21 +47,21 @@ byte. Nothing in there has been edited, including what is wrong with it, which
 
 ## What came after, in my own time
 
-The internship ended in April 2025. Two pieces of it were worth going back to
-outside of it: an equilibrium whose derivation did not implement the definition
-the write-up stated, and a simulation that could not be run from top to bottom.
-Both are redone beside `original/` rather than over it.
+The internship ended in April 2025. The mirror-neuron simulation could not be
+run from top to bottom, so it is redone beside `original/` rather than over it.
 
 | | |
 |---|---|
-| <img src="equilibrium/equilibrium_comparison.png" width="300" alt="The match, and what it cost"> | **[The strategy beats Nash head to head](equilibrium/)**, 3.5552 against 3.1521. It does so by giving up absolute payoff: facing the same opponent, simply playing Nash earns 3.8889. Winning the margin and maximising your own total are different objectives, and the write-up did not separate them. |
 | <img src="mirror_neurons/update_shape.png" width="300" alt="The weight update is logistic"> | **[Imitation as a weight update](mirror_neurons/)**. Observing an action multiplies its weight and renormalises, and Tit-for-Tat falls out without being programmed. Six figures, rerun and seeded. |
 
-None of it overturns what the internship concluded. The head-to-head result holds
-and reproduces exactly. What changed is that the derivation behind it has been
-redone with a condition that is correct on a simplex, the claims the code does
-not support are named, and the figures carry the labels they were computing and
-throwing away.
+It does not overturn what the internship concluded. What changed is that the
+claims the code does not support are named, and the figures carry the labels
+they were computing and throwing away.
+
+An equilibrium analysis used to sit here too. It went with the Prolog course
+project whose game it is about, in
+[University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
+That game does not appear in the internship report.
 
 ## Credits
 
