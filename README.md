@@ -52,11 +52,14 @@ run from top to bottom, so it is redone beside `original/` rather than over it.
 
 | | |
 |---|---|
-| <img src="mirror_neurons/update_shape.png" width="300" alt="The weight update is logistic"> | **[Imitation as a weight update](mirror_neurons/)**. Observing an action multiplies its weight and renormalises, and Tit-for-Tat falls out without being programmed. Six figures, rerun and seeded. |
+| <img src="mirror_neurons/results/standings.png" width="320" alt="The imitating agent finishes eighth of eight"> | **[Imitation as a weight update](mirror_neurons/)**. Observing an action multiplies its weight and renormalises. The report expects Tit-for-Tat to fall out of that without being programmed. Given seven opponents from the literature, **it does not: the agent finishes eighth of eight, behind a coin flip**, and the closed form says why. |
 
-It does not overturn what the internship concluded. What changed is that the
-claims the code does not support are named, and the figures carry the labels
-they were computing and throwing away.
+The rerun did not overturn what the internship concluded. Testing it against
+opponents that react did. What the update actually implements is frequency
+matching, whose state is a pair of counts and therefore cannot depend on the
+last round at all, and the reciprocity it shows early fades to exactly zero once
+the counts accumulate. The report's own mechanism is sound and its conclusion
+about that mechanism is not.
 
 An equilibrium analysis used to sit here too. It went with the Prolog course
 project whose game it is about, in
@@ -66,13 +69,11 @@ That game does not appear in the internship report.
 ## What is being built now
 
 Two folders, both continuing the report rather than starting something else.
-**Scaffolding at this stage: no experiment has been run and no result is
-committed.**
 
 | | |
 |---|---|
-| [`mirror_neurons/`](mirror_neurons/) | The agent given opponents that react. It currently plays three fixed policies, one of them a coin flip, which the folder already records as the reason resembling a human is never tested. [Axelrod](https://github.com/Axelrod-Python/Axelrod) supplies Tit-for-Tat, Grudger, Pavlov and the rest from the literature, and the claim being tested is the report's own: that Tit-for-Tat emerges from imitation without being programmed |
-| [`llm/`](llm/) | Homo silicus. The report cites Horton, Filippas and Manning (2023) and names the method in its conclusion without running it. Five open-weight models, run locally and offline, playing the games the report's own frame defines |
+| [`mirror_neurons/`](mirror_neurons/) | **Run, and the result is committed.** [Axelrod](https://github.com/Axelrod-Python/Axelrod) supplies Tit-for-Tat, Grudger, Pavlov and the rest from the literature, so the report's own claim could be put to them. Five CSVs, three figures, and a CI step that regenerates them and fails on any difference |
+| [`llm/`](llm/) | Homo silicus. The report cites Horton, Filippas and Manning (2023) and names the method in its conclusion without running it. Five open-weight models, run locally and offline, playing the games the report's own frame defines. **Scaffolding: nothing has been run yet** |
 
 The two are siblings on purpose. Both players expose the same two calls, so one
 harness can seat either, and the interesting comparison is between a mechanism

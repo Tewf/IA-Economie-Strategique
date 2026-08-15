@@ -36,37 +36,47 @@
 
 <section>
   <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/mirror_neurons">Imitation as a weight update</a></h2>
-  <p class="result">Tit-for-Tat without anyone programming it</p>
+  <p class="result">Eighth of eight, behind a coin flip</p>
   <div class="two">
     <figure>
-      <img src="mirror_neurons/opponents_sequential.png" alt="Cooperation tendency against three fixed opponents">
-      <figcaption>The agent against a cooperator, a defector and a coin flip.</figcaption>
+      <img src="mirror_neurons/results/standings.png" alt="The imitating agent finishes last of eight players">
+      <figcaption>Seven opponents from the literature, and the imitator last.</figcaption>
     </figure>
     <figure>
-      <img src="mirror_neurons/update_shape.png" alt="The weight update is logistic rather than concave">
-      <figcaption>The update is the logistic map, concave only above 0.5. The write-up calls it concave throughout.</figcaption>
+      <img src="mirror_neurons/results/reciprocity_decay.png" alt="The agent's reciprocity decays to zero while Tit-for-Tat holds at one">
+      <figcaption>Its reciprocity is a transient. Tit-for-Tat's is not.</figcaption>
     </figure>
   </div>
   <p>
     Mirror neurons fire both when you act and when you watch someone else act,
     which makes them a plausible substrate for imitation. The agent is that idea
     at its simplest: observing an action multiplies its weight and renormalises.
-    Nothing tells it to reciprocate.
+    Nothing tells it to reciprocate, and the report expects Tit-for-Tat to
+    emerge from the update anyway.
+  </p>
+  <p>
+    It does not. Written in closed form the rule is
+    <code>w<sub>i</sub> &prop; w<sub>i</sub>(0)(1+&eta;)<sup>n<sub>i</sub></sup></code>,
+    so the agent's whole state is a pair of counts and its next action cannot
+    depend on the order it saw them in. Tit-for-Tat is a function of the last
+    round alone, which this rule has no way to represent. What emerges instead
+    is frequency matching: reciprocity of 0.123 against Tit-for-Tat's 1.000,
+    decaying to exactly zero by turn 800 as the agent saturates into a constant
+    player. Raising the learning rate does not buy it back.
   </p>
 </section>
 
 <section>
   <h2>What is being built now</h2>
-  <p class="result">Scaffolding, with no experiment run yet</p>
+  <p class="result">One folder has run, the other has not</p>
   <p>
     Two folders, both continuing the report rather than starting something else.
-    <code>mirror_neurons/</code> gives the agent opponents that react: it plays
-    three fixed policies today, one of them a coin flip, which is the recorded
-    reason resembling a human is never tested.
-    <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> supplies
-    Tit-for-Tat, Grudger, Pavlov and the rest from the literature, and the claim
-    under test is the report's own: that Tit-for-Tat emerges from imitation
-    without being programmed.
+    <code>mirror_neurons/</code> is the one above, and it is done:
+    <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> supplied
+    Tit-for-Tat, Grudger, Pavlov and the rest from the literature, so the
+    report's own claim could be put to them. Five CSVs and three figures are
+    committed, and a CI step regenerates them on every push and fails on any
+    difference, so a figure cannot quietly drift from the code that drew it.
   </p>
   <p>
     <code>llm/</code> is homo silicus. The report cites Horton, Filippas and

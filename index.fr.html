@@ -36,38 +36,49 @@
 
 <section>
   <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/mirror_neurons">L'imitation comme mise à jour de poids</a></h2>
-  <p class="result">Le Tit-for-Tat sans que personne ne le programme</p>
+  <p class="result">Huitième sur huit, derrière un tirage à pile ou face</p>
   <div class="two">
     <figure>
-      <img src="mirror_neurons/opponents_sequential.png" alt="Tendance à la coopération face à trois adversaires fixes">
-      <figcaption>L'agent face à un coopérateur, un traître et un tirage à pile ou face.</figcaption>
+      <img src="mirror_neurons/results/standings.png" alt="L'agent imitateur termine dernier sur huit joueurs">
+      <figcaption>Sept adversaires issus de la littérature, et l'imitateur bon dernier.</figcaption>
     </figure>
     <figure>
-      <img src="mirror_neurons/update_shape.png" alt="La mise à jour est logistique et non concave">
-      <figcaption>La mise à jour est la carte logistique, concave seulement au-dessus de 0,5. La rédaction la dit concave partout.</figcaption>
+      <img src="mirror_neurons/results/reciprocity_decay.png" alt="La réciprocité de l'agent s'efface tandis que celle du Tit-for-Tat reste à un">
+      <figcaption>Sa réciprocité est transitoire. Celle du Tit-for-Tat ne l'est pas.</figcaption>
     </figure>
   </div>
   <p>
     Les neurones miroirs s'activent aussi bien quand on agit que quand on
     observe quelqu'un agir, ce qui en fait un substrat plausible de l'imitation.
     L'agent est cette idée au plus simple : observer une action multiplie son
-    poids puis renormalise. Rien ne lui dit de rendre la pareille.
+    poids puis renormalise. Rien ne lui dit de rendre la pareille, et le rapport
+    attend malgré tout que le Tit-for-Tat émerge de cette mise à jour.
+  </p>
+  <p>
+    Il n'en émerge pas. Écrite en forme close, la règle est
+    <code>w<sub>i</sub> &prop; w<sub>i</sub>(0)(1+&eta;)<sup>n<sub>i</sub></sup></code> :
+    tout l'état de l'agent tient en un couple de compteurs, et son action
+    suivante ne peut donc pas dépendre de l'ordre dans lequel il les a vus. Le
+    Tit-for-Tat est une fonction du seul dernier tour, que cette règle n'a aucun
+    moyen de représenter. Ce qui émerge est un appariement de fréquences :
+    une réciprocité de 0,123 contre 1,000 pour le Tit-for-Tat, qui retombe à
+    exactement zéro dès le tour 800, l'agent se figeant en joueur constant.
+    Augmenter le taux d'apprentissage ne la rachète pas.
   </p>
 </section>
 
 <section>
   <h2>Ce qui se construit maintenant</h2>
-  <p class="result">Des fondations, aucune expérience encore lancée</p>
+  <p class="result">Un dossier a tourné, l'autre pas encore</p>
   <p>
     Deux dossiers, qui prolongent le rapport plutôt que d'ouvrir autre chose.
-    <code>mirror_neurons/</code> donne à l'agent des adversaires qui réagissent :
-    il ne joue aujourd'hui que trois politiques fixes, dont un tirage à pile ou
-    face, ce qui est la raison recensée pour laquelle la ressemblance à un humain
-    n'est jamais testée.
-    <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> fournit
-    Tit-for-Tat, Grudger, Pavlov et les autres, issus de la littérature, et
-    l'affirmation mise à l'épreuve est celle du rapport : que le Tit-for-Tat
-    émerge de l'imitation sans avoir été programmé.
+    <code>mirror_neurons/</code> est celui du dessus, et il est terminé :
+    <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> a fourni
+    Tit-for-Tat, Grudger, Pavlov et les autres, issus de la littérature, ce qui
+    a permis de leur soumettre l'affirmation du rapport lui-même. Cinq CSV et
+    trois figures sont versionnés, et une étape d'intégration continue les
+    régénère à chaque poussée puis échoue à la moindre différence : une figure
+    ne peut donc pas s'écarter en silence du code qui l'a tracée.
   </p>
   <p>
     <code>llm/</code>, c'est l'homo silicus. Le rapport cite Horton, Filippas et
