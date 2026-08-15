@@ -55,8 +55,8 @@ d'Özkes et al. (2024), et le jeu du dictateur des diapositives de soutenance.
 
 | | |
 |---|---|
-| <img src="mirror_neurons/results/standings.png" width="320" alt="L'agent imitateur termine huitième sur huit"> | **[`mirror_neurons/`](mirror_neurons/), lancé et analysé.** Observer une action multiplie son poids puis renormalise, et le rapport attend que le Tit-for-Tat en émerge sans avoir été programmé. Face à sept adversaires issus de la littérature, **il n'en est rien : sur des matchs de 10 à 100 tours, l'agent termine huitième sur huit, derrière un tirage à pile ou face.** Ce que la mise à jour implémente est un appariement de fréquences, dont l'état tient en un couple de compteurs et ne peut donc pas dépendre du dernier tour. Il ne dépasse le tirage à pile ou face que sur des matchs de plusieurs centaines de tours, en se figeant en joueur constant plutôt qu'en rendant la pareille. |
-| | **[`llm/`](llm/), des fondations.** Homo silicus, que le rapport cite dans sa conclusion sans jamais l'appliquer. Cinq modèles à poids ouverts, localement et hors ligne, sur les mêmes jeux. Rien n'a encore été lancé. |
+| <img src="mirror_neurons/results/standings.png" width="320" alt="L'agent imitateur termine huitième sur huit"> | **[`mirror_neurons/`](mirror_neurons/README.fr.md), lancé et analysé.** Observer une action multiplie son poids puis renormalise, et le rapport attend que le Tit-for-Tat en émerge sans avoir été programmé. Face à sept adversaires issus de la littérature, **il n'en est rien : sur des matchs de 10 à 100 tours, l'agent termine huitième sur huit, derrière un tirage à pile ou face.** Ce que la mise à jour implémente est un appariement de fréquences, dont l'état tient en un couple de compteurs et ne peut donc pas dépendre du dernier tour. Il ne dépasse le tirage à pile ou face que sur des matchs de plusieurs centaines de tours, en se figeant en joueur constant plutôt qu'en rendant la pareille. |
+| | **[`llm/`](llm/README.fr.md), des fondations.** Homo silicus, que le rapport cite dans sa conclusion sans jamais l'appliquer. Cinq modèles à poids ouverts, localement et hors ligne, sur les mêmes jeux. Rien n'a encore été lancé. |
 
 **Sur la question posée en haut de cette page**, le mécanisme des neurones
 miroirs entretient la coopération tacite, sans jamais la rompre ni l'intensifier.
@@ -66,8 +66,8 @@ mutuelle ou sur la coopération mutuelle selon leur point de départ, et jamais
 sur autre chose. L'imitation est un cliquet sur la condition initiale plutôt
 qu'une voie vers la collusion, ce qui la sépare des Q-learners de Calvano et al.
 (2020), qui trouvent la collusion, eux, en lisant les gains.
-[La lecture complète](mirror_neurons/#what-it-adds-up-to), et ce qui la
-modifierait.
+[La lecture complète](mirror_neurons/README.fr.md#ce-que-tout-cela-donne), et
+ce qui la modifierait.
 
 Les deux dossiers sont frères à dessein. Les deux joueurs exposent les deux
 mêmes méthodes, donc un seul banc d'essai peut accueillir l'un ou l'autre, et la

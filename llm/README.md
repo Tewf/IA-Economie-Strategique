@@ -1,5 +1,7 @@
 # LLMs as players
 
+> [Lire en français](README.fr.md)
+
 > Scaffolding. Nothing here has been run as an experiment, and no result is
 > committed. What exists is the player, the panel, the scenario text and the
 > reasons for each.
