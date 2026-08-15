@@ -1,7 +1,7 @@
 # Littérature
 
-État de l'art du stage : est-ce que des agents artificiels — apprentissage par
-renforcement d'un côté, grands modèles de langage de l'autre — soutiennent la
+État de l'art du stage : est-ce que des agents artificiels (apprentissage par
+renforcement d'un côté, grands modèles de langage de l'autre) soutiennent la
 coopération dans des jeux répétés, et comment leur comportement se compare à
 celui des humains.
 
@@ -45,5 +45,5 @@ et ils sont accessibles chez leurs éditeurs. Ils sont cités ci-dessous.
 ```plaintext
 Litterature/
 ├── Summary/     # mes notes de lecture (4 articles)
-└── README.md    # ce fichier — la bibliographie
+└── README.md    # ce fichier : la bibliographie
 ```
