@@ -104,11 +104,46 @@ field of reciprocators. A serviceable policy, reached by ceasing to respond, and
 only after hundreds of rounds. The mechanism and the per-opponent freezing are
 in [`design-notes/saturation.md`](design-notes/saturation.md).
 
+## What it adds up to
+
+![Where two imitators end up, by where they began](results/self_play_lock_in.png)
+
+The internship asks whether algorithms **sustain** tacit cooperation, **break**
+it, or **intensify** it. Put to this mechanism, the answer is the first, and
+only the first.
+
+Two imitators facing each other are a positive feedback loop: whatever one
+plays becomes the other's evidence for playing it next. Over 100 runs at each
+starting weight, that loop has **two absorbing states and no third outcome**.
+From 0.05 it settles on mutual defection 100 times out of 100, averaging
+1.002 a turn. From 0.8, the value the internship used, it settles on mutual
+cooperation 100 times out of 100, averaging 2.995 against a ceiling of 3. The
+tipping point is 0.5, where it is close to a coin toss, and **not one run in
+700 ended anywhere but locked**.
+
+So a market of these agents keeps the regime it is dropped into and cannot leave
+it. **Imitation is a ratchet on the initial condition, not a route to
+collusion.** It will not invent a collusive price, and it will not compete its
+way out of one either. That is a narrower and more useful claim than the report
+makes, and it points at the difference from Calvano et al. (2020), whose
+Q-learners *do* find collusion: they read payoffs, and this agent by
+construction never does.
+
+Two readings, then, of the same mechanism. Against a mixed field it is the worst
+player on the board, because it can neither punish nor exploit. Against itself it
+is a perfect conformist. Both follow from the same closed form, and neither is
+Tit-for-Tat.
+
+**What would change the answer.** The action set here is Cooperate or Defect,
+not a price on a continuum. Both players start identical, so heterogeneous
+starts are untested. And the lock-in itself comes from log-odds that grow
+without bound: a learning rate that decayed, or a weight that was floored, would
+give an agent that keeps responding, and that is the version worth building next.
+
 None of this touches the idea, which is a reasonable one. Imitation as a Hebbian
-weight update is a plausible mechanism. It is simply not a mechanism for
-Tit-for-Tat, and it took opponents that react to see that. What the rerun had to
-fix before it could be asked, and the two other claims the simulation does not
-support, are in
+weight update is a plausible mechanism, and it does sustain cooperation. It is
+simply not a mechanism for Tit-for-Tat, and it took opponents that react to see
+that. What the rerun had to fix before any of it could be asked is in
 [`design-notes/what-the-rerun-corrected.md`](design-notes/what-the-rerun-corrected.md).
 
 Each module opens with the one sentence that says what it is for, so this is

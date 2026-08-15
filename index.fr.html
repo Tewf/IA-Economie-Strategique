@@ -86,6 +86,23 @@
     ne finit que troisième.
   </p>
   <p>
+    Sur la question posée en ouverture, le mécanisme <strong>entretient</strong>
+    la coopération tacite, sans jamais la rompre ni l'intensifier. Deux
+    imitateurs forment une boucle de rétroaction à deux états absorbants et rien
+    entre les deux : sur 700 parties, ils se sont figés sur la défection mutuelle
+    ou sur la coopération mutuelle selon leur point de départ, et jamais sur
+    autre chose. Depuis un poids initial de 0,05, c'est la défection mutuelle à
+    chaque fois, à 1,00 par tour ; depuis 0,8, la valeur retenue par le stage,
+    c'est la coopération mutuelle à chaque fois, à 2,995 pour un plafond de 3.
+    L'imitation est un cliquet sur la condition initiale plutôt qu'une voie vers
+    la collusion, ce qui la sépare des Q-learners de Calvano et al. (2020), qui
+    trouvent la collusion, eux, en lisant les gains.
+  </p>
+  <figure>
+    <img src="mirror_neurons/results/self_play_lock_in.png" alt="Deux imitateurs se figent sur le régime dans lequel ils ont commencé">
+    <figcaption>Deux imitateurs conservent le régime où on les a placés.</figcaption>
+  </figure>
+  <p>
     <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> a fourni les
     adversaires, le moteur de match et la comptabilité des gains : rien de tout
     cela n'est écrit ici. Chaque nombre ci-dessus est un CSV versionné, et une

@@ -5,7 +5,7 @@ number printed beside it. Run it after `run_tournament.py`:
 
     python plot_results.py
 
-Writes three PNGs into `results/`, next to the CSVs they came from.
+Writes five PNGs into `results/`, next to the CSVs they came from.
 """
 
 import csv
@@ -86,6 +86,25 @@ def plot_match_length():
     save(figure, "match_length_sweep.png")
 
 
+def plot_self_play():
+    """The internship's own question: what a market of imitators settles on."""
+    rows = read("self_play_lock_in.csv")
+    starts = [float(row["starting_weight_on_cooperate"]) for row in rows]
+    cooperation = [int(row["settled_on_mutual_cooperation"]) for row in rows]
+    defection = [int(row["settled_on_mutual_defection"]) for row in rows]
+    figure, axes = plt.subplots()
+    axes.bar(range(len(starts)), cooperation, color="#1f6feb",
+             label="settled on mutual cooperation")
+    axes.bar(range(len(starts)), defection, bottom=cooperation, color="#c1440e",
+             label="settled on mutual defection")
+    axes.set_xticks(range(len(starts)), [f"{s:g}" for s in starts])
+    axes.set_xlabel("starting weight on Cooperate, both players")
+    axes.set_ylabel("runs out of 100")
+    axes.set_title("Two imitators keep whatever they started with")
+    axes.legend(frameon=False, loc="center left", bbox_to_anchor=(1.02, 0.5))
+    save(figure, "self_play_lock_in.png")
+
+
 def plot_standings():
     """Eighth of eight, which is the finding rather than the failure."""
     rows = list(reversed(read("standings.csv")))
@@ -101,6 +120,7 @@ def plot_standings():
 if __name__ == "__main__":
     plot_decay()
     plot_match_length()
+    plot_self_play()
     plot_learning_rate_sweep()
     plot_standings()
-    print(f"wrote 4 figures to {RESULTS}")
+    print(f"wrote 5 figures to {RESULTS}")

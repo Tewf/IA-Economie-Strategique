@@ -141,6 +141,49 @@ def match_length_sweep():
     return rows
 
 
+"""Starting weights to test two imitators from, and how many draws each.
+
+The internship's question is about a market of algorithms rather than one
+algorithm against a fixed field, so the pairing that answers it is the agent
+against itself. 100 seeds is enough to separate "always" from "usually" at the
+resolution the conclusion claims.
+"""
+SELF_PLAY_STARTS = [0.05, 0.2, 0.35, 0.5, 0.65, 0.8, 0.95]
+SELF_PLAY_SEEDS = 100
+SELF_PLAY_TURNS = 200
+SETTLED = 0.9
+
+
+def self_play_lock_in():
+    """Where two imitators end up, as a function of where they began.
+
+    Both players observe only each other, so whatever one does becomes evidence
+    for the other doing it next. That is a positive feedback loop, and the
+    question is whether it has one attractor or two.
+    """
+    rows = []
+    for start in SELF_PLAY_STARTS:
+        settled_c = settled_d = 0
+        total = 0.0
+        for seed in range(SELF_PLAY_SEEDS):
+            match = axl.Match((MirrorNeuronPlayer(cooperation_rate=start),
+                               MirrorNeuronPlayer(cooperation_rate=start)),
+                              turns=SELF_PLAY_TURNS, game=GAME, seed=seed)
+            match.play()
+            tail = match.result[-20:]
+            both_c = sum(a == axl.Action.C and b == axl.Action.C
+                         for a, b in tail) / len(tail)
+            both_d = sum(a == axl.Action.D and b == axl.Action.D
+                         for a, b in tail) / len(tail)
+            settled_c += both_c > SETTLED
+            settled_d += both_d > SETTLED
+            total += match.final_score_per_turn()[0]
+        rows.append((start, settled_c, settled_d,
+                     SELF_PLAY_SEEDS - settled_c - settled_d,
+                     total / SELF_PLAY_SEEDS))
+    return rows
+
+
 def reciprocity_decay():
     """Where the little reciprocity the agent has actually comes from.
 

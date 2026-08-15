@@ -41,6 +41,10 @@ TABLES = [
      ["turns", "agent_rank", "agent_median_score", "random_rank",
       "random_median_score"],
      measurements.match_length_sweep),
+    ("self_play_lock_in.csv",
+     ["starting_weight_on_cooperate", "settled_on_mutual_cooperation",
+      "settled_on_mutual_defection", "unsettled", "mean_score_per_turn"],
+     measurements.self_play_lock_in),
 ]
 
 

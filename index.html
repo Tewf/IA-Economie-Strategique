@@ -84,6 +84,23 @@
     individual matches, seven of them, and still places third.
   </p>
   <p>
+    On the question this page opens with, the mechanism <strong>sustains</strong>
+    tacit cooperation and neither breaks nor intensifies it. Two imitators are a
+    feedback loop with two absorbing states and nothing between them: over 700
+    runs they locked onto mutual defection or mutual cooperation according to
+    where they started, and not once onto anything else. From a starting weight
+    of 0.05 it is mutual defection every time, worth 1.00 a turn; from 0.8, the
+    value the internship used, mutual cooperation every time, worth 2.995
+    against a ceiling of 3. Imitation is a ratchet on the initial condition
+    rather than a route to collusion, which is what separates it from the
+    Q-learners of Calvano et al. (2020) that do find collusion, and read payoffs
+    to do it.
+  </p>
+  <figure>
+    <img src="mirror_neurons/results/self_play_lock_in.png" alt="Two imitators settle on whichever regime they started in">
+    <figcaption>Two imitators keep whatever they were dropped into.</figcaption>
+  </figure>
+  <p>
     <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> supplied the
     opponents, the match engine and the payoff bookkeeping, so none of that was
     written here. Every number above is a committed CSV, and a CI step

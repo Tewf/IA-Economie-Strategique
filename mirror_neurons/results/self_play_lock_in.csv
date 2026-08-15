@@ -1,0 +1,8 @@
+starting_weight_on_cooperate,settled_on_mutual_cooperation,settled_on_mutual_defection,unsettled,mean_score_per_turn
+0.050000,0,100,0,1.001850
+0.200000,0,100,0,1.017950
+0.350000,3,97,0,1.103100
+0.500000,60,40,0,2.206750
+0.650000,95,5,0,2.888900
+0.800000,100,0,0,2.995050
+0.950000,100,0,0,2.999650

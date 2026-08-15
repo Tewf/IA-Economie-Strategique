@@ -57,11 +57,21 @@ and the Dictator game from the defence slides.
 | <img src="mirror_neurons/results/standings.png" width="320" alt="The imitating agent finishes eighth of eight"> | **[`mirror_neurons/`](mirror_neurons/), run and reported.** Observing an action multiplies its weight and renormalises, and the report expects Tit-for-Tat to fall out of that without being programmed. Given seven opponents from the literature, **it does not: over matches of 10 to 100 turns the agent finishes eighth of eight, behind a coin flip.** What the update implements is frequency matching, whose state is a pair of counts and so cannot depend on the last round at all. It passes the coin flip only in matches of several hundred turns, by freezing into a constant player rather than by reciprocating. |
 | | **[`llm/`](llm/), scaffolding.** Homo silicus, which the report cites in its conclusion without ever running. Five open-weight models, locally and offline, on the same games. Nothing has been run yet. |
 
-The two are siblings on purpose. Both players expose the same two calls, so one
-harness can seat either, and the interesting comparison is between a mechanism
-that can only imitate and one that can also talk and explain itself. Cheap talk
-and explainability are two of the eight terms the report defines, and they are
-the two the Hebbian agent has no way to reach.
+**On the question at the top of this page**, the mirror-neuron mechanism
+sustains tacit cooperation and neither breaks nor intensifies it. Two imitators
+are a feedback loop with two absorbing states and nothing in between: over 700
+runs they locked onto mutual defection or mutual cooperation according to where
+they started, and not once onto anything else. Imitation is a ratchet on the
+initial condition rather than a route to collusion, which is what separates it
+from the Q-learners of Calvano et al. (2020) that do find collusion, and read
+payoffs to do it. [The full reading](mirror_neurons/#what-it-adds-up-to),
+including what would change it.
+
+The two folders are siblings on purpose. Both players expose the same two calls,
+so one harness can seat either, and the interesting comparison is between a
+mechanism that can only imitate and one that can also talk and explain itself.
+Cheap talk and explainability are two of the eight terms the report defines, and
+they are the two the Hebbian agent has no way to reach.
 
 An equilibrium analysis used to sit here too. It went with the Prolog course
 project whose game it is about, in
