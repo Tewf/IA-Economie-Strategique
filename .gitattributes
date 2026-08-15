@@ -1,0 +1,7 @@
+# The language bar should reflect code, not the weight of embedded figures.
+# The notebooks here are mostly base64 PNG output; the algorithms they narrate
+# are small. The project page is the site, not the work.
+*.ipynb        linguist-documentation=true
+index.html     linguist-documentation=true
+index.fr.html  linguist-documentation=true
+site.css       linguist-documentation=true

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IA et tarification stratégique</title>
+<meta name="description" content="Un stage de recherche au GAEL sur la question de savoir si des agents IA soutiennent la collusion tacite dans un jeu de prix répété : un agent Prolog de tournoi, une analyse d'équilibre, et l'imitation comme mise à jour de poids.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ctext y=%2726%27 font-size=%2726%27%3E%F0%9F%93%89%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="lang"><a href="index.html">English version</a></div>
+  <h1>IA et tarification stratégique</h1>
+  <p class="tagline">Un stage de recherche au GAEL, de janvier à avril 2025.</p>
+  <p class="who">
+    Dans un jeu de prix répété, les joueurs humains convergent vers des prix
+    tacitement collusifs plutôt que vers l'équilibre concurrentiel. Savoir si les
+    algorithmes soutiennent ce comportement, le brisent ou l'intensifient est une
+    question ouverte en économie industrielle, aux conséquences directes pour la
+    politique de la concurrence. Encadré par Alexis Garapin (UGA) et Olivier
+    Bonroy (INRAE) au Grenoble Applied Economics Laboratory.
+  </p>
+  <p class="who">
+    Le stage ne tranche pas la question. Ce qu'il a produit est ci-dessous, avec
+    les chiffres réellement atteints.
+  </p>
+  <div class="badges">
+    <a href="https://github.com/Tewf/IA-Economie-Strategique">Dépôt</a>
+    <a href="original/RapportDeStageFinal.pdf">Le rapport</a>
+    <a href="original/Presentation.pdf">Les diapositives</a>
+  </div>
+</header>
+
+<section>
+  <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/tournament">Le tournoi</a></h2>
+  <p class="result">7e et 8e sur 16, avril 2025, L2 MIASHS UGA</p>
+  <figure>
+    <img src="tournament/leaderboard.png" alt="Seize agents classés par score cumulé, échelle logarithmique">
+    <figcaption>Deux agents engagés face à treize autres étudiants. Noter l'échelle logarithmique : les trois premiers devancent de plus de cinquante ordres de grandeur.</figcaption>
+  </figure>
+  <p>
+    Le jeu : les deux joueurs choisissent simultanément un entier de 1 à 5. Si
+    les choix diffèrent d'exactement un, celui qui a choisi le
+    <strong>plus petit</strong> nombre prend la somme et l'autre rien ; sinon
+    chacun marque ce qu'il a choisi. Sous-coter d'une unité est récompensé, donc
+    chaque nombre invite à être sous-coté.
+  </p>
+  <p>
+    <code>stage_test</code> marque 6 163 877 et <code>nash_equilibrium</code>
+    1 490 429. Cet ordre est celui que prédit l'analyse d'équilibre. Le fait que
+    les deux perdent face à six agents adaptatifs l'est aussi, pour la raison
+    exposée dans la section suivante. Ce classement se trouvait page 1 d'un
+    journal de 636 pages.
+  </p>
+</section>
+
+<section>
+  <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/equilibrium">L'équilibre</a></h2>
+  <p class="result">Bat Nash en tête-à-tête, 3,5552 contre 3,1521</p>
+  <figure>
+    <img src="equilibrium/equilibrium_comparison.png" alt="Le résultat en tête-à-tête, et le gain absolu qu'il coûte">
+    <figcaption>À gauche, l'affirmation : la stratégie devance Nash quand les deux se rencontrent. À droite, son coût : face au même adversaire, jouer Nash rapporte davantage.</figcaption>
+  </figure>
+  <p>
+    Le résultat en tête-à-tête tient et se reproduit exactement. Il n'a rien de
+    surprenant une fois énoncé correctement, car Nash est un concept de
+    <strong>sécurité</strong> qui garantit un plancher face à n'importe quel
+    adversaire, et non un concept de maximisation.
+  </p>
+  <p>
+    La distinction que l'analyse d'origine ne faisait pas est à droite. Devancer
+    un adversaire n'est pas maximiser son propre gain : cette stratégie gagne le
+    match en coûtant plus à l'adversaire qu'elle ne se coûte à elle-même. C'est
+    raisonnable en tête-à-tête et inadapté à un tournoi qui compte des points
+    cumulés, ce qui est précisément où elle finit 7e.
+  </p>
+  <p>
+    La dérivation a été refaite. L'originale minimisait le gradient de gain au
+    carré, ce qui sur un simplexe revient à demander que chaque action rapporte
+    zéro, donc à chercher les stratégies qui rapportent le moins. La condition
+    employée maintenant est que le regret soit nul pour les deux joueurs,
+    vérifiée sur la bataille des sexes et le dilemme du prisonnier avant de
+    toucher au vrai jeu.
+  </p>
+</section>
+
+<section>
+  <h2><a href="https://github.com/Tewf/IA-Economie-Strategique/tree/main/mirror_neurons">L'imitation comme mise à jour de poids</a></h2>
+  <p class="result">Le Tit-for-Tat sans que personne ne le programme</p>
+  <div class="two">
+    <figure>
+      <img src="mirror_neurons/opponents_sequential.png" alt="Tendance à la coopération face à trois adversaires fixes">
+      <figcaption>L'agent face à un coopérateur, un traître et un tirage à pile ou face.</figcaption>
+    </figure>
+    <figure>
+      <img src="mirror_neurons/update_shape.png" alt="La mise à jour est logistique et non concave">
+      <figcaption>La mise à jour est la carte logistique, concave seulement au-dessus de 0,5. La rédaction la dit concave partout.</figcaption>
+    </figure>
+  </div>
+  <p>
+    Les neurones miroirs s'activent aussi bien quand on agit que quand on
+    observe quelqu'un agir, ce qui en fait un substrat plausible de l'imitation.
+    L'agent est cette idée au plus simple : observer une action multiplie son
+    poids puis renormalise. Rien ne lui dit de rendre la pareille.
+  </p>
+</section>
+
+<section>
+  <h2>Comment le dépôt est organisé</h2>
+  <p>
+    Deux couches. Tout ce qui a été rendu en mai 2025 est conservé dans
+    <code>original/</code> octet pour octet, y compris ce qui est faux, que ce
+    dossier recense. Les corrections sont posées à côté plutôt que par-dessus.
+  </p>
+  <p>
+    Elles ne renversent pas les conclusions du stage. Le résultat en tête-à-tête
+    tient. Ce qui change, c'est que la dérivation a été refaite avec une
+    condition correcte sur un simplexe, que les affirmations non étayées par le
+    code sont nommées, et que les résultats enfouis sont visibles.
+  </p>
+</section>
+
+<footer>
+  Stage de recherche au GAEL, Grenoble Applied Economics Laboratory, UGA et
+  INRAE. Les articles publiés sont référencés et non redistribués ; voir le
+  <a href="original/NOTICE">NOTICE</a>.
+</footer>
+
+</div>
+</body>
+</html>
