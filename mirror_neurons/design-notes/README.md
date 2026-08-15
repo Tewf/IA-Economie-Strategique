@@ -6,6 +6,8 @@ carrying.
 
 | | |
 |---|---|
+| [`how-the-tournament-runs.md`](how-the-tournament-runs.md) | The round robin itself: how many players, how long, how often, what the payoffs are and what the ranking is over |
+| [`the-closed-form.md`](the-closed-form.md) | The algebra the whole result rests on, and the three consequences the recursion hides |
 | [`opponents-and-games.md`](opponents-and-games.md) | Which games and which opponents, and where each comes from in the internship's own literature |
 | [`what-the-agent-cannot-do.md`](what-the-agent-cannot-do.md) | The two places the model does not reach, sorted by what the agent has to observe |
 | [`measuring-reciprocity.md`](measuring-reciprocity.md) | Why the first measure was retired, and the two ways its replacement can still mislead |
