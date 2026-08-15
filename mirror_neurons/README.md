@@ -40,8 +40,7 @@ The measure this folder started with gave 1.000 to Tit-for-Tat and 1.000 to a
 constant cooperator alike, so it scored convergence rather than reciprocity.
 What replaces it is `P(cooperate | opponent cooperated last)` minus
 `P(cooperate | defected last)`, measured against Random, the one opponent that
-supplies both conditions. Why, and the two ways it can still mislead, are in
-[`design-notes/measuring-reciprocity.md`](design-notes/measuring-reciprocity.md).
+supplies both conditions.
 
 | Player | Reciprocity | The old measure |
 |---|---:|---:|
@@ -50,8 +49,10 @@ supplies both conditions. Why, and the two ways it can still mislead, are in
 | Random | 0.064 | 0.531 |
 | Cooperator, Defector, Grudger | 0.000 | 0.544, 0.456, 0.456 |
 
-[`run_tournament.py`](run_tournament.py) refuses to write a CSV unless
-Tit-for-Tat measures 1.0 and the constant players measure 0.0 first.
+It is memory-one, so it under-reports trigger strategies, and no CSV is written
+until it scores players whose reciprocity is known by construction. Both, and
+the reading of Grudger it refuses to make, are in
+[`design-notes/measuring-reciprocity.md`](design-notes/measuring-reciprocity.md).
 
 ## And the little it has, it loses
 
@@ -71,11 +72,6 @@ anything either player intends. Raising the learning rate does not help
 ([the sweep](results/learning_rate_sweep.png) peaks at 0.13 near `eta = 0.5`):
 it brings the saturation forward as fast as it strengthens the response.
 
-**One caveat, stated rather than buried.** This is a memory-one measure, so it
-under-reports trigger strategies: Grudger is genuinely reciprocal and scores
-0.000 here. It is the right measure for the claim under test, which is about
-Tit-for-Tat, and the wrong one for reciprocity in general.
-
 None of this touches the idea, which is a reasonable one. Imitation as a Hebbian
 weight update is a plausible mechanism. It is simply not a mechanism for
 Tit-for-Tat, and it took opponents that react to see that. What the rerun had to
@@ -83,13 +79,15 @@ fix before it could be asked, and the two other claims the simulation does not
 support, are in
 [`design-notes/what-the-rerun-corrected.md`](design-notes/what-the-rerun-corrected.md).
 
+Each module opens with the one sentence that says what it is for, so this is
+only the map between them: [`hebbian_agent.py`](hebbian_agent.py) is the model
+and [`axelrod_player.py`](axelrod_player.py) seats it against opponents;
+[`measurements.py`](measurements.py) produces the numbers,
+[`preflight_checks.py`](preflight_checks.py) decides whether they can be
+trusted, and [`run_tournament.py`](run_tournament.py) writes them out.
+
 | | |
 |---|---|
-| [`hebbian_agent.py`](hebbian_agent.py) | The model, unchanged from the internship |
-| [`axelrod_player.py`](axelrod_player.py) | It as an Axelrod player |
-| [`reciprocity.py`](reciprocity.py) | The two measures, and why one of them was retired |
-| [`run_tournament.py`](run_tournament.py) | Every number above, and the checks it refuses to write without |
-| [`plot_results.py`](plot_results.py) | The figures, drawn from the committed CSVs |
-| [`tournament_config.py`](tournament_config.py) | The opponents, payoffs, seed and learning rates |
-| [`results/`](results/) | Five CSVs and three figures. CI regenerates them and fails on any diff |
-| [`design-notes/`](design-notes/) | Where the opponents come from, and the game this agent cannot play at all |
+| [`results/`](results/) | Every CSV and figure this folder produced, from the tournament and from the notebook alike. CI regenerates the CSVs and fails on any difference |
+| [`design-notes/`](design-notes/) | The decisions behind all of it: where the opponents come from, how reciprocity is measured, what the rerun corrected, and the game this agent cannot play at all |
+| [`mirror_neurons_rerun.ipynb`](mirror_neurons_rerun.ipynb) | The original simulation, runnable, with the closed form derived and asserted |

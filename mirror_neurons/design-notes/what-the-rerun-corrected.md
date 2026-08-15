@@ -13,7 +13,11 @@ the original should know what was wrong with it and what was left alone.
 | The draws were unseeded | No run reproduced any other |
 | The write-up calls the weight's growth concave | It is the logistic map, so concave only above 0.5. It looks concave in the original figures because the weight starts at 0.8, already past the inflection |
 
-**The model itself is unchanged.** Everything corrected is around it.
+![The update is the logistic map, concave only above 0.5](../results/update_shape.png)
+
+**The model itself is unchanged.** Everything corrected is around it. The rerun's
+own figures, including the three whose legends the original computed and threw
+away, are in [`../results/`](../results/) beside the tournament's.
 
 ## Two claims the simulation does not support
 
