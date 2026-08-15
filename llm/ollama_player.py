@@ -5,29 +5,52 @@ this exposes them too and a harness can seat either kind of player without
 knowing which it has. What differs is what the two calls mean: the Hebbian agent
 updates a weight, this one appends a round to a transcript and asks a model.
 
-Every reply is kept whole in `self.transcript`, not just the action parsed out
-of it. The reasoning a model gives is the object of study here, not a by-product
-of getting the action, so discarding it would throw away the experiment.
+It adds two calls the Hebbian agent cannot have, `say` and `hear`, because cheap
+talk is one of the two things the report defines that only a talking player can
+do. A harness asks `can_talk` rather than assuming.
+
+Every reply is kept whole in `self.transcript`, reasoning included and kept
+apart from the answer. The reasoning is the object of study here, not a
+by-product of getting the action, so discarding it would throw away the
+experiment.
 """
 
 import json
 import urllib.request
 
-from panel_config import MAX_TOKENS, OLLAMA_HOST, REQUEST_TIMEOUT_SECONDS, SEED, TEMPERATURE
+from panel_config import (OLLAMA_HOST, PANEL, REQUEST_TIMEOUT_SECONDS,
+                          TEMPERATURE)
+
+ACTION_LINE = "ACTION:"
+
+
+class UnparseableReply(ValueError):
+    """The model named no action. A result about the model, not an error to hide."""
 
 
 class OllamaPlayer:
     """One model, one game, one running transcript."""
 
+    can_talk = True
+
     def __init__(self, model, system_prompt, actions=("Cooperate", "Defect"),
-                 temperature=TEMPERATURE, seed=SEED):
+                 temperature=TEMPERATURE, seed=0, max_tokens=None, think=None):
+        settings = PANEL.get(model, {})
         self.model = model
         self.system_prompt = system_prompt
         self.actions = list(actions)
         self.temperature = temperature
         self.seed = seed
-        self.history = []      # what the opponent has played, oldest first
-        self.transcript = []   # every reply in full, for the cheap-talk study
+        self.max_tokens = max_tokens or settings.get("max_tokens", 300)
+        self.think = settings.get("think", False) if think is None else think
+        self.history = []       # what the opponent played, oldest first
+        self.own_history = []   # what this player played, same order
+        self.heard = []         # messages received, one per round played
+        self.said = []          # messages sent
+        self.transcript = []    # every reply in full, reasoning kept separate
+        self.parse_fallbacks = 0
+
+    # The two calls the Hebbian agent also has.
 
     def observe_and_learn(self, opponent_action):
         """No weight to update. The round becomes context for the next call."""
@@ -35,40 +58,113 @@ class OllamaPlayer:
 
     def select_action(self):
         reply = self._ask(self._round_prompt())
-        self.transcript.append(reply)
-        return self._parse_action(reply)
+        action = self._parse_action(reply["content"])
+        self.own_history.append(action)
+        return action
+
+    # The two only a talking player has.
+
+    def say(self):
+        """One non-binding message, written before either side has acted."""
+        reply = self._ask(self._message_prompt())
+        message = reply["content"].strip()
+        self.said.append(message)
+        return message
+
+    def hear(self, message):
+        self.heard.append(message)
+
+    # Everything below is how the two are built.
+
+    def _rounds_so_far(self):
+        """Both sides of every completed round, which is what a player remembers.
+
+        The opponent's history alone is not enough. A player that cannot see its
+        own past moves cannot know its score and cannot run any strategy that
+        refers to what it did, which is most of them.
+        """
+        lines = []
+        for index, theirs in enumerate(self.history):
+            mine = self.own_history[index] if index < len(self.own_history) else "?"
+            said = self.said[index] if index < len(self.said) else None
+            heard = self.heard[index] if index < len(self.heard) else None
+            line = f"Round {index + 1}: you chose {mine}, they chose {theirs}."
+            if said is not None and heard is not None:
+                line += f' Before choosing you said "{said}" and they said "{heard}".'
+            lines.append(line)
+        return lines
 
     def _round_prompt(self):
-        if not self.history:
-            return "This is the first round. Which action do you choose?"
-        played = ", ".join(self.history)
-        return (f"So far the other player has chosen, in order: {played}.\n"
-                f"Round {len(self.history) + 1}. Which action do you choose?")
+        rounds = self._rounds_so_far()
+        heading = ("This is the first round." if not rounds
+                   else "\n".join(rounds))
+        pending = ""
+        if len(self.heard) > len(self.history):
+            pending = (f'\nBefore this round they said: "{self.heard[-1]}"'
+                       f'\nYou said: "{self.said[-1]}"')
+        return (f"{heading}{pending}\n\nRound {len(self.history) + 1}. "
+                f"Which action do you choose?")
+
+    def _message_prompt(self):
+        rounds = self._rounds_so_far()
+        heading = ("This is the first round." if not rounds
+                   else "\n".join(rounds))
+        return (f"{heading}\n\nBefore round {len(self.history) + 1} you may send "
+                f"the other player one short message. They are writing theirs at "
+                f"the same time, so neither of you can see the other's first. "
+                f"The message is not binding. Write only the message.")
 
     def _ask(self, user_message):
+        """One call, keeping the answer and any reasoning apart.
+
+        qwen3 returns its reasoning in `message.thinking` rather than in
+        `content`. Reading only `content`, which this file used to do, silently
+        discarded the reasoning on the one model that produces it explicitly.
+        """
         body = json.dumps({
             "model": self.model,
             "messages": [{"role": "system", "content": self.system_prompt},
                          {"role": "user", "content": user_message}],
             "stream": False,
+            "think": self.think,
             "options": {"temperature": self.temperature, "seed": self.seed,
-                        "num_predict": MAX_TOKENS},
+                        "num_predict": self.max_tokens},
         }).encode()
         request = urllib.request.Request(
             f"{OLLAMA_HOST}/api/chat", data=body,
             headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
-            return json.load(response)["message"]["content"]
+        with urllib.request.urlopen(request,
+                                    timeout=REQUEST_TIMEOUT_SECONDS) as response:
+            message = json.load(response)["message"]
+        reply = {"content": message.get("content", ""),
+                 "thinking": message.get("thinking", ""),
+                 "prompt": user_message}
+        self.transcript.append(reply)
+        return reply
 
     def _parse_action(self, reply):
-        """First action named in the reply wins.
+        """The action on the ACTION line, or the first one named anywhere.
 
-        Raises rather than defaulting. A model that answered nothing usable is a
-        result about that model, and silently scoring it as a defection would
-        report the parser's opinion as the model's.
+        Every prompt asks for the action on its own first line, so that line is
+        the answer and anything later is commentary. Reading the whole reply
+        instead scores "I will not Defect, I choose Cooperate" as a defection.
+        The loose reading is kept as a fallback because a model that ignores the
+        format still made a choice, and each use is counted so the write-up can
+        say how often the format held.
         """
-        positions = [(reply.upper().find(a.upper()), a) for a in self.actions]
-        found = sorted((p, a) for p, a in positions if p >= 0)
-        if not found:
-            raise ValueError(f"{self.model} named no action in: {reply!r}")
-        return found[0][1]
+        for line in reply.splitlines():
+            stripped = line.strip()
+            if stripped.upper().startswith(ACTION_LINE):
+                named = self._first_named(stripped[len(ACTION_LINE):])
+                if named:
+                    return named
+        named = self._first_named(reply)
+        if named:
+            self.parse_fallbacks += 1
+            return named
+        raise UnparseableReply(f"{self.model} named no action in: {reply!r}")
+
+    def _first_named(self, text):
+        found = sorted((text.upper().find(a.upper()), a) for a in self.actions
+                       if text.upper().find(a.upper()) >= 0)
+        return found[0][1] if found else None

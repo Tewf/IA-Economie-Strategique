@@ -19,10 +19,12 @@ Defect.
 
 The points you receive in a round depend on both choices:
 
+<!-- payoffs:start -->
 - You both choose Cooperate: you get 3 points, they get 3 points.
 - You both choose Defect: you get 1 point, they get 1 point.
 - You choose Defect and they choose Cooperate: you get 5 points, they get 0.
 - You choose Cooperate and they choose Defect: you get 0 points, they get 5.
+<!-- payoffs:end -->
 
 The game runs for an unknown number of rounds. After each round you are told
 what the other player chose. Your aim is to end with as many points as possible.
@@ -30,9 +32,8 @@ what the other player chose. Your aim is to end with as many points as possible.
 Answer in exactly this format, and nothing else:
 
 ```
-ACTION: Cooperate
+ACTION: <Cooperate or Defect>
 REASON: <one or two sentences>
 ```
 
-Replace `Cooperate` with `Defect` if that is your choice. Give the action on the
-first line before you explain it.
+Give the action on the first line before you explain it.
