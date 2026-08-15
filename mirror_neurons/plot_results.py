@@ -69,6 +69,23 @@ def plot_learning_rate_sweep():
     save(figure, "learning_rate_sweep.png")
 
 
+def plot_match_length():
+    """Where "behind a coin flip" stops being true, and why that is not progress."""
+    rows = read("match_length_sweep.csv")
+    turns = [int(row["turns"]) for row in rows]
+    figure, axes = plt.subplots()
+    axes.plot(turns, [float(row["agent_median_score"]) for row in rows],
+              marker="o", color="#c1440e", label="Mirror Neuron")
+    axes.plot(turns, [float(row["random_median_score"]) for row in rows],
+              marker="o", color="#6e7781", label="Random")
+    axes.set_xscale("log")
+    axes.set_xlabel("turns per match")
+    axes.set_ylabel("median score per turn")
+    axes.set_title("The imitator overtakes the coin flip only by freezing")
+    axes.legend(frameon=False)
+    save(figure, "match_length_sweep.png")
+
+
 def plot_standings():
     """Eighth of eight, which is the finding rather than the failure."""
     rows = list(reversed(read("standings.csv")))
@@ -77,12 +94,13 @@ def plot_standings():
     axes.barh(names, [float(row["median_score"]) for row in rows],
               color=["#c1440e" if name == AGENT else "#c9d1d9" for name in names])
     axes.set_xlabel("median score per turn")
-    axes.set_title("The imitator finishes last, behind a coin flip")
+    axes.set_title("At 100 turns a match, the imitator finishes last")
     save(figure, "standings.png")
 
 
 if __name__ == "__main__":
     plot_decay()
+    plot_match_length()
     plot_learning_rate_sweep()
     plot_standings()
-    print(f"wrote 3 figures to {RESULTS}")
+    print(f"wrote 4 figures to {RESULTS}")

@@ -111,6 +111,36 @@ def learning_rate_sweep():
     return rows
 
 
+"""Match lengths to sweep. 20 is the horizon most of the report's own reading
+sits at, and 500 is long enough for the agent to have frozen against almost
+every opponent."""
+MATCH_LENGTHS = [5, 10, 20, 50, 100, 200, 500]
+
+
+def match_length_sweep():
+    """Whether finishing last survives changing how long a match is.
+
+    It does not, and the reversal is the point. The agent saturates into a
+    constant player, and a constant is worth more than a coin flip against a
+    field full of reciprocators, so its ranking improves with length for a
+    reason that has nothing to do with reciprocating.
+    """
+    rows = []
+    for turns in MATCH_LENGTHS:
+        players = [MirrorNeuronPlayer()] + [s() for s in OPPONENTS]
+        plain_name = {str(player): player.name for player in players}
+        results = axl.Tournament(players, game=GAME, turns=turns,
+                                 repetitions=REPETITIONS, seed=SEED
+                                 ).play(progress_bar=False)
+        ranked = {plain_name.get(row.Name, row.Name): (row.Rank + 1,
+                                                       row.Median_score)
+                  for row in results.summarise()}
+        agent_rank, agent_score = ranked["Mirror Neuron"]
+        random_rank, random_score = ranked["Random"]
+        rows.append((turns, agent_rank, agent_score, random_rank, random_score))
+    return rows
+
+
 def reciprocity_decay():
     """Where the little reciprocity the agent has actually comes from.
 

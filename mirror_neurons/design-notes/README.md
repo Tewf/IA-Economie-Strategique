@@ -9,6 +9,7 @@ carrying.
 | [`opponents-and-games.md`](opponents-and-games.md) | Which games and which opponents, and where each comes from in the internship's own literature |
 | [`what-the-agent-cannot-do.md`](what-the-agent-cannot-do.md) | The two places the model does not reach, sorted by what the agent has to observe |
 | [`measuring-reciprocity.md`](measuring-reciprocity.md) | Why the first measure was retired, and the two ways its replacement can still mislead |
+| [`saturation.md`](saturation.md) | Why the agent stops responding, and why that makes its ranking climb with match length |
 | [`what-the-rerun-corrected.md`](what-the-rerun-corrected.md) | What was wrong with the original simulation, and the claims it does not support |
 
 The short version: the iterated Prisoner's Dilemma needs no modelling decision

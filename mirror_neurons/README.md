@@ -3,9 +3,11 @@
 ![Median score per turn, eight players](results/standings.png)
 
 The report's claim is that Tit-for-Tat emerges from imitation without being
-programmed. Given opponents that react, it does not. **The agent finishes eighth
-of eight, behind a coin flip**, and the reciprocity it appears to have is a
-transient of the opening rounds.
+programmed. Given opponents that react, it does not. **Over matches of 10 to
+100 turns the agent finishes eighth of eight, behind a coin flip**, and the
+reciprocity it appears to have is a transient of the opening rounds. It climbs
+out of last place only in matches several hundred turns long, and then for a
+reason that is not reciprocity at all.
 
 ```sh
 pip install -r requirements.txt
@@ -82,13 +84,25 @@ falls as the match runs. Measured in windows, the agent goes 0.135, 0.108,
 0.017, 0.042 and then **exactly 0.000 from turn 800 onward**, while Tit-for-Tat
 holds 1.000 in every window.
 
-Exactly zero, because the agent saturates. The count difference in what it
-observes is a random walk, and once that walk pushes the log-odds past roughly
-plus or minus 13 the agent becomes a constant player, which is by definition
-unreciprocal. Which constant it becomes is decided by the walk rather than by
-anything either player intends. Raising the learning rate does not help
-([the sweep](results/learning_rate_sweep.png) peaks at 0.13 near `eta = 0.5`):
-it brings the saturation forward as fast as it strengthens the response.
+Exactly zero is saturation, not noise. The counts it observes drift as a random
+walk, and once the log-odds go far enough the agent is a constant player, whose
+two conditional probabilities are identically equal. Raising the learning rate
+does not buy the reciprocity back.
+
+![Median score per turn against match length](results/match_length_sweep.png)
+
+**Which is why the standing depends on how long a match runs, and quoting one
+length as the result was wrong of this write-up.** The agent is worst at **20
+turns**, scoring 2.000 against the coin flip's 2.211, and stays last through
+100. By 200 it has passed the coin flip; by 500 it is sixth and the coin flip
+is last.
+
+That reversal is the agent stopping, not improving. Frequency matching converges
+on whatever the opponent plays most, so it freezes into cooperating with
+cooperators and defecting against defectors, which beats a coin flip against a
+field of reciprocators. A serviceable policy, reached by ceasing to respond, and
+only after hundreds of rounds. The mechanism and the per-opponent freezing are
+in [`design-notes/saturation.md`](design-notes/saturation.md).
 
 None of this touches the idea, which is a reasonable one. Imitation as a Hebbian
 weight update is a plausible mechanism. It is simply not a mechanism for

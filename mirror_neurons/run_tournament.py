@@ -37,6 +37,10 @@ TABLES = [
     ("reciprocity_decay.csv",
      ["player", "from_turn", "to_turn", "reciprocity_index"],
      measurements.reciprocity_decay),
+    ("match_length_sweep.csv",
+     ["turns", "agent_rank", "agent_median_score", "random_rank",
+      "random_median_score"],
+     measurements.match_length_sweep),
 ]
 
 

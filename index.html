@@ -65,6 +65,16 @@
     player. Raising the learning rate does not buy it back.
   </p>
   <p>
+    How long a match runs decides the standing, so one length on its own is not
+    the result. The agent is worst at 20 turns, scoring 2.000 against the coin
+    flip's 2.211, and stays last through 100. By 500 it is sixth and the coin
+    flip is last, not because it has learned anything but because it has
+    stopped: in the closing turns of a long match it is frozen against six of
+    the seven opponents, cooperating always with the cooperative ones and
+    defecting always against the rest. A constant is worth more than a coin
+    flip to a field full of reciprocators.
+  </p>
+  <p>
     The tournament is a round robin: eight players, each meeting every other and
     itself over 100 turns, repeated 20 times because two of them draw their
     moves at random. Payoffs are the standard 3 for mutual cooperation, 1 for
