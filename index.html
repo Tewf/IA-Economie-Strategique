@@ -64,20 +64,18 @@
     decaying to exactly zero by turn 800 as the agent saturates into a constant
     player. Raising the learning rate does not buy it back.
   </p>
+  <p>
+    <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> supplied the
+    opponents, the match engine and the payoff bookkeeping, so none of that was
+    written here. Every number above is a committed CSV, and a CI step
+    regenerates them on each push and fails on any difference, so a figure
+    cannot quietly drift from the code that drew it.
+  </p>
 </section>
 
 <section>
-  <h2>What is being built now</h2>
-  <p class="result">One folder has run, the other has not</p>
-  <p>
-    Two folders, both continuing the report rather than starting something else.
-    <code>mirror_neurons/</code> is the one above, and it is done:
-    <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> supplied
-    Tit-for-Tat, Grudger, Pavlov and the rest from the literature, so the
-    report's own claim could be put to them. Five CSVs and three figures are
-    committed, and a CI step regenerates them on every push and fails on any
-    difference, so a figure cannot quietly drift from the code that drew it.
-  </p>
+  <h2>What comes next</h2>
+  <p class="result">The other half of the report has not run yet</p>
   <p>
     <code>llm/</code> is homo silicus. The report cites Horton, Filippas and
     Manning (2023) and names the method in its conclusion without running it.

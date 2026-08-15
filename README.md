@@ -47,33 +47,15 @@ byte. Nothing in there has been edited, including what is wrong with it, which
 
 ## What came after, in my own time
 
-The internship ended in April 2025. The mirror-neuron simulation could not be
-run from top to bottom, so it is redone beside `original/` rather than over it.
+The internship ended in April 2025. Two folders continue the report rather than
+starting something else, and both play the report's own games: the Prisoner's
+Dilemma iterated and sequential, the Ultimatum game from Özkes et al. (2024),
+and the Dictator game from the defence slides.
 
 | | |
 |---|---|
-| <img src="mirror_neurons/results/standings.png" width="320" alt="The imitating agent finishes eighth of eight"> | **[Imitation as a weight update](mirror_neurons/)**. Observing an action multiplies its weight and renormalises. The report expects Tit-for-Tat to fall out of that without being programmed. Given seven opponents from the literature, **it does not: the agent finishes eighth of eight, behind a coin flip**, and the closed form says why. |
-
-The rerun did not overturn what the internship concluded. Testing it against
-opponents that react did. What the update actually implements is frequency
-matching, whose state is a pair of counts and therefore cannot depend on the
-last round at all, and the reciprocity it shows early fades to exactly zero once
-the counts accumulate. The report's own mechanism is sound and its conclusion
-about that mechanism is not.
-
-An equilibrium analysis used to sit here too. It went with the Prolog course
-project whose game it is about, in
-[University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
-That game does not appear in the internship report.
-
-## What is being built now
-
-Two folders, both continuing the report rather than starting something else.
-
-| | |
-|---|---|
-| [`mirror_neurons/`](mirror_neurons/) | **Run, and the result is committed.** [Axelrod](https://github.com/Axelrod-Python/Axelrod) supplies Tit-for-Tat, Grudger, Pavlov and the rest from the literature, so the report's own claim could be put to them. Five CSVs, three figures, and a CI step that regenerates them and fails on any difference |
-| [`llm/`](llm/) | Homo silicus. The report cites Horton, Filippas and Manning (2023) and names the method in its conclusion without running it. Five open-weight models, run locally and offline, playing the games the report's own frame defines. **Scaffolding: nothing has been run yet** |
+| <img src="mirror_neurons/results/standings.png" width="320" alt="The imitating agent finishes eighth of eight"> | **[`mirror_neurons/`](mirror_neurons/), run and reported.** Observing an action multiplies its weight and renormalises, and the report expects Tit-for-Tat to fall out of that without being programmed. Given seven opponents from the literature, **it does not: the agent finishes eighth of eight, behind a coin flip.** What the update implements is frequency matching, whose state is a pair of counts and so cannot depend on the last round at all. |
+| | **[`llm/`](llm/), scaffolding.** Homo silicus, which the report cites in its conclusion without ever running. Five open-weight models, locally and offline, on the same games. Nothing has been run yet. |
 
 The two are siblings on purpose. Both players expose the same two calls, so one
 harness can seat either, and the interesting comparison is between a mechanism
@@ -81,10 +63,10 @@ that can only imitate and one that can also talk and explain itself. Cheap talk
 and explainability are two of the eight terms the report defines, and they are
 the two the Hebbian agent has no way to reach.
 
-The games are the report's: the Prisoner's Dilemma in its iterated and
-sequential forms, the Ultimatum game from Özkes et al. (2024), and the Dictator
-game from the defence slides. Nothing outside what the internship actually
-studied has been added.
+An equilibrium analysis used to sit here too. It went with the Prolog course
+project whose game it is about, in
+[University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
+That game does not appear in the internship report.
 
 ## Credits
 

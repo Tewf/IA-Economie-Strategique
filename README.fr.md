@@ -48,35 +48,15 @@ octet pour octet. Rien n'y a été modifié, y compris ce qui est faux, que
 
 ## Ce qui a suivi, sur mon temps libre
 
-Le stage s'est terminé en avril 2025. La simulation des neurones miroirs ne
-pouvait pas s'exécuter de bout en bout : elle est refaite à côté de `original/`
-plutôt que par-dessus.
+Le stage s'est terminé en avril 2025. Deux dossiers prolongent le rapport plutôt
+que d'ouvrir autre chose, et tous deux jouent les jeux du rapport : le dilemme
+du prisonnier sous ses formes itérée et séquentielle, le jeu de l'ultimatum
+d'Özkes et al. (2024), et le jeu du dictateur des diapositives de soutenance.
 
 | | |
 |---|---|
-| <img src="mirror_neurons/results/standings.png" width="320" alt="L'agent imitateur termine huitième sur huit"> | **[L'imitation comme mise à jour de poids](mirror_neurons/)**. Observer une action multiplie son poids puis renormalise. Le rapport attend que le Tit-for-Tat en émerge sans avoir été programmé. Face à sept adversaires issus de la littérature, **il n'en est rien : l'agent termine huitième sur huit, derrière un tirage à pile ou face**, et la forme close dit pourquoi. |
-
-La reprise n'a pas renversé les conclusions du stage. Les confronter à des
-adversaires qui réagissent, si. Ce que la mise à jour implémente réellement est
-un appariement de fréquences, dont l'état tient en un couple de compteurs et ne
-peut donc pas dépendre du dernier tour, et la réciprocité qu'elle montre au
-début s'efface jusqu'à exactement zéro une fois les compteurs accumulés. Le
-mécanisme que propose le rapport est plausible ; la conclusion qu'il en tire ne
-l'est pas.
-
-Une analyse d'équilibre se trouvait ici également. Elle est partie avec le
-projet Prolog du cours dont elle étudie le jeu, dans
-[University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
-Ce jeu n'apparaît pas dans le rapport de stage.
-
-## Ce qui se construit maintenant
-
-Deux dossiers, qui prolongent le rapport plutôt que d'ouvrir autre chose.
-
-| | |
-|---|---|
-| [`mirror_neurons/`](mirror_neurons/) | **Lancé, et le résultat est versionné.** [Axelrod](https://github.com/Axelrod-Python/Axelrod) fournit Tit-for-Tat, Grudger, Pavlov et les autres, issus de la littérature, ce qui a permis de soumettre à ces adversaires l'affirmation du rapport lui-même. Cinq CSV, trois figures, et une étape d'intégration continue qui les régénère et échoue à la moindre différence |
-| [`llm/`](llm/) | Homo silicus. Le rapport cite Horton, Filippas et Manning (2023) et nomme la méthode dans sa conclusion sans jamais l'appliquer. Cinq modèles à poids ouverts, exécutés localement et hors ligne, sur les jeux que le cadre du rapport définit. **Fondations : rien n'a encore été lancé** |
+| <img src="mirror_neurons/results/standings.png" width="320" alt="L'agent imitateur termine huitième sur huit"> | **[`mirror_neurons/`](mirror_neurons/), lancé et analysé.** Observer une action multiplie son poids puis renormalise, et le rapport attend que le Tit-for-Tat en émerge sans avoir été programmé. Face à sept adversaires issus de la littérature, **il n'en est rien : l'agent termine huitième sur huit, derrière un tirage à pile ou face.** Ce que la mise à jour implémente est un appariement de fréquences, dont l'état tient en un couple de compteurs et ne peut donc pas dépendre du dernier tour. |
+| | **[`llm/`](llm/), des fondations.** Homo silicus, que le rapport cite dans sa conclusion sans jamais l'appliquer. Cinq modèles à poids ouverts, localement et hors ligne, sur les mêmes jeux. Rien n'a encore été lancé. |
 
 Les deux sont frères à dessein. Les deux joueurs exposent les deux mêmes
 méthodes, donc un seul banc d'essai peut accueillir l'un ou l'autre, et la
@@ -85,10 +65,10 @@ qui sait aussi parler et se justifier. Le cheap talk et l'explicabilité sont
 deux des huit notions que le rapport définit, et les deux que l'agent hebbien
 n'a aucun moyen d'atteindre.
 
-Les jeux sont ceux du rapport : le dilemme du prisonnier sous ses formes itérée
-et séquentielle, le jeu de l'ultimatum d'Özkes et al. (2024), et le jeu du
-dictateur des diapositives de soutenance. Rien n'a été ajouté en dehors de ce
-que le stage a réellement étudié.
+Une analyse d'équilibre se trouvait ici également. Elle est partie avec le
+projet Prolog du cours dont elle étudie le jeu, dans
+[University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
+Ce jeu n'apparaît pas dans le rapport de stage.
 
 ## Crédits
 
