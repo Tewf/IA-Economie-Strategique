@@ -63,6 +63,28 @@ project whose game it is about, in
 [University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
 That game does not appear in the internship report.
 
+## What is being built now
+
+Two folders, both continuing the report rather than starting something else.
+**Scaffolding at this stage: no experiment has been run and no result is
+committed.**
+
+| | |
+|---|---|
+| [`mirror_neurons/`](mirror_neurons/) | The agent given opponents that react. It currently plays three fixed policies, one of them a coin flip, which the folder already records as the reason resembling a human is never tested. [Axelrod](https://github.com/Axelrod-Python/Axelrod) supplies Tit-for-Tat, Grudger, Pavlov and the rest from the literature, and the claim being tested is the report's own: that Tit-for-Tat emerges from imitation without being programmed |
+| [`llm/`](llm/) | Homo silicus. The report cites Horton, Filippas and Manning (2023) and names the method in its conclusion without running it. Five open-weight models, run locally and offline, playing the games the report's own frame defines |
+
+The two are siblings on purpose. Both players expose the same two calls, so one
+harness can seat either, and the interesting comparison is between a mechanism
+that can only imitate and one that can also talk and explain itself. Cheap talk
+and explainability are two of the eight terms the report defines, and they are
+the two the Hebbian agent has no way to reach.
+
+The games are the report's: the Prisoner's Dilemma in its iterated and
+sequential forms, the Ultimatum game from Özkes et al. (2024), and the Dictator
+game from the defence slides. Nothing outside what the internship actually
+studied has been added.
+
 ## Credits
 
 Published papers are referenced rather than redistributed. See

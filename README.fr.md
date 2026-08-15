@@ -65,6 +65,29 @@ projet Prolog du cours dont elle étudie le jeu, dans
 [University-Coursework](https://github.com/Tewf/University-Coursework/tree/main/Bachelor/SecondSemestreLanguage/Prolog/StrategyTournament).
 Ce jeu n'apparaît pas dans le rapport de stage.
 
+## Ce qui se construit maintenant
+
+Deux dossiers, qui prolongent le rapport plutôt que d'ouvrir autre chose.
+**À ce stade, ce sont des fondations : aucune expérience n'a été lancée et aucun
+résultat n'est versionné.**
+
+| | |
+|---|---|
+| [`mirror_neurons/`](mirror_neurons/) | L'agent face à des adversaires qui réagissent. Il ne joue aujourd'hui que trois politiques fixes, dont un tirage à pile ou face, ce que le dossier recense déjà comme la raison pour laquelle la ressemblance à un humain n'est jamais testée. [Axelrod](https://github.com/Axelrod-Python/Axelrod) fournit Tit-for-Tat, Grudger, Pavlov et les autres, issus de la littérature, et l'affirmation mise à l'épreuve est celle du rapport : que le Tit-for-Tat émerge de l'imitation sans avoir été programmé |
+| [`llm/`](llm/) | Homo silicus. Le rapport cite Horton, Filippas et Manning (2023) et nomme la méthode dans sa conclusion sans jamais l'appliquer. Cinq modèles à poids ouverts, exécutés localement et hors ligne, sur les jeux que le cadre du rapport définit |
+
+Les deux sont frères à dessein. Les deux joueurs exposent les deux mêmes
+méthodes, donc un seul banc d'essai peut accueillir l'un ou l'autre, et la
+comparaison intéressante oppose un mécanisme qui ne sait qu'imiter à un autre
+qui sait aussi parler et se justifier. Le cheap talk et l'explicabilité sont
+deux des huit notions que le rapport définit, et les deux que l'agent hebbien
+n'a aucun moyen d'atteindre.
+
+Les jeux sont ceux du rapport : le dilemme du prisonnier sous ses formes itérée
+et séquentielle, le jeu de l'ultimatum d'Özkes et al. (2024), et le jeu du
+dictateur des diapositives de soutenance. Rien n'a été ajouté en dehors de ce
+que le stage a réellement étudié.
+
 ## Crédits
 
 Les articles publiés sont référencés et non redistribués. Voir

@@ -56,6 +56,35 @@
 </section>
 
 <section>
+  <h2>What is being built now</h2>
+  <p class="result">Scaffolding, with no experiment run yet</p>
+  <p>
+    Two folders, both continuing the report rather than starting something else.
+    <code>mirror_neurons/</code> gives the agent opponents that react: it plays
+    three fixed policies today, one of them a coin flip, which is the recorded
+    reason resembling a human is never tested.
+    <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> supplies
+    Tit-for-Tat, Grudger, Pavlov and the rest from the literature, and the claim
+    under test is the report's own: that Tit-for-Tat emerges from imitation
+    without being programmed.
+  </p>
+  <p>
+    <code>llm/</code> is homo silicus. The report cites Horton, Filippas and
+    Manning (2023) and names the method in its conclusion without running it.
+    Five open-weight models, run locally and offline, play the games the
+    report's own frame defines: the Prisoner's Dilemma iterated and sequential,
+    the Ultimatum game, and the Dictator game.
+  </p>
+  <p>
+    The two are siblings on purpose. Both players expose the same two calls, so
+    one harness can seat either, and the comparison worth making is between a
+    mechanism that can only imitate and one that can also talk and explain
+    itself. Cheap talk and explainability are two of the eight terms the report
+    defines, and the two the Hebbian agent has no way to reach.
+  </p>
+</section>
+
+<section>
   <h2>How the repository is arranged</h2>
   <p>
     Two layers. Everything the internship submitted in May 2025 is preserved in
