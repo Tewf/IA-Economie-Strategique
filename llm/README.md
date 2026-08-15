@@ -19,7 +19,7 @@ transcript and asks a model.
 | | |
 |---|---|
 | [`ollama_player.py`](ollama_player.py) | The player. Talks to Ollama over HTTP, keeps every reply whole |
-| [`models.py`](models.py) | The five local models, their sizes, and the sampling settings |
+| [`panel_config.py`](panel_config.py) | The five local models, their sizes, and the sampling settings |
 | [`prompts/`](prompts/) | One scenario per game. In this method the prompt is the experiment |
 | [`design-notes/`](design-notes/) | What the method can and cannot show, and why cheap talk and explainability are the point |
 
@@ -28,7 +28,7 @@ transcript and asks a model.
 Ollama has to be up. Nothing leaves the machine and nothing costs anything.
 
 ```sh
-curl -s 127.0.0.1:11434/api/tags     # the panel in models.py should all be here
+curl -s 127.0.0.1:11434/api/tags     # every model in panel_config.py should be here
 python -c "import ollama_player"     # stdlib only, no install needed
 ```
 

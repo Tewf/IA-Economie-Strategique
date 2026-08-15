@@ -13,7 +13,7 @@ of getting the action, so discarding it would throw away the experiment.
 import json
 import urllib.request
 
-from models import MAX_TOKENS, OLLAMA_HOST, REQUEST_TIMEOUT_SECONDS, SEED, TEMPERATURE
+from panel_config import MAX_TOKENS, OLLAMA_HOST, REQUEST_TIMEOUT_SECONDS, SEED, TEMPERATURE
 
 
 class OllamaPlayer:
