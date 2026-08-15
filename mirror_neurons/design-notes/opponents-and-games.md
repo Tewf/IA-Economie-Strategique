@@ -24,10 +24,12 @@ coin flip. That is the recorded gap. None of them reacts, so nothing the agent
 does changes what it faces, and the folder README already says resembling a
 human is never tested.
 
-[Axelrod-Python](https://github.com/Axelrod-Python/Axelrod) 4.14.0 supplies the
-rest, MIT licensed, with over 200 strategies from the literature and the
-tournament engine and payoff bookkeeping to go with them. Nothing below is
-written here.
+[Axelrod-Python](https://github.com/Axelrod-Python/Axelrod) supplies the rest,
+MIT licensed, with over 200 strategies from the literature and the tournament
+engine and payoff bookkeeping to go with them. Nothing below is written here.
+The pin is **4.13.1**, and deliberately not 4.14.0, which added a `torch`
+dependency for neural-network strategies none of this uses and takes the
+install past 5 GB; [`../requirements.txt`](../requirements.txt) records why.
 
 | Opponent | Why it is in the set |
 |---|---|
@@ -46,7 +48,12 @@ memory-carrying strategy responds to.
 ## What to measure
 
 Cooperation rate and score come free from Axelrod. The one that matters is not
-in the library: how close the agent's play is to Tit-for-Tat, measured as the
-share of rounds in which its action equals the opponent's previous action. The
-report claims that as the learning rate grows the agent approaches Tit-for-Tat.
-That is a measurable claim and it has never been measured.
+in the library, and the first attempt at it was wrong: measuring the share of
+rounds in which the agent's action equals the opponent's previous action scores
+a constant cooperator as highly as Tit-for-Tat, so it separates nothing. What
+replaced it, and the two ways the replacement can still mislead, are in
+[`measuring-reciprocity.md`](measuring-reciprocity.md).
+
+The claim being measured is unchanged: the report says that as the learning rate
+grows the agent approaches Tit-for-Tat. [The sweep](../results/learning_rate_sweep.png)
+is that claim tested, and it fails.

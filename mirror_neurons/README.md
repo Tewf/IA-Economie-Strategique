@@ -13,6 +13,26 @@ python run_tournament.py && python plot_results.py   # about 8 seconds
 jupyter execute mirror_neurons_rerun.ipynb
 ```
 
+## How the tournament runs
+
+A round robin: eight players, the agent and
+[seven opponents from the literature](design-notes/opponents-and-games.md),
+each meeting every other **and itself** over **100 turns**, repeated **20
+times** because two of the eight draw their moves at random, this agent and
+the coin flip, so a single pass would be one sample. Payoffs are Axelrod's
+standard Prisoner's Dilemma, **3 for mutual cooperation, 1 for mutual
+defection, 5 for defecting on a cooperator and 0 for being defected on**, which
+is also what [the LLM prompt](../llm/prompts/prisoners_dilemma.md) states, so a
+language model and this agent play the same game.
+
+A player is ranked by its **median score per turn across all its matches**, so
+the ranking rewards holding up against the whole field rather than beating any
+one opponent. That distinction does work here: Defector wins the most
+individual matches, seven, and still places third, while Tit-for-Tat wins none
+and places first. The agent wins one and places last. Every match starts the
+agent fresh, and the settings and seed are in
+[`tournament_config.py`](tournament_config.py).
+
 ## What emerges is frequency matching, not Tit-for-Tat
 
 Observing an action multiplies its weight by `1 + eta` and renormalises. The
@@ -34,13 +54,11 @@ never cited in the report that needed it. It also gives `eta = sqrt(2) - 1` a
 reading, since it makes the odds double every two net observations, though not
 the empirical grounding the report claims for it.
 
-## The measure had to be replaced first
-
-The measure this folder started with gave 1.000 to Tit-for-Tat and 1.000 to a
-constant cooperator alike, so it scored convergence rather than reciprocity.
-What replaces it is `P(cooperate | opponent cooperated last)` minus
-`P(cooperate | defected last)`, measured against Random, the one opponent that
-supplies both conditions.
+Measuring it needed a new number first. The one this folder started with gave
+1.000 to Tit-for-Tat and 1.000 to a constant cooperator alike, so it scored
+convergence rather than reciprocity. What replaces it is
+`P(cooperate | opponent cooperated last)` minus `P(cooperate | defected last)`,
+against Random, the one opponent supplying both conditions.
 
 | Player | Reciprocity | The old measure |
 |---|---:|---:|

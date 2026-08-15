@@ -65,6 +65,15 @@
     player. Raising the learning rate does not buy it back.
   </p>
   <p>
+    The tournament is a round robin: eight players, each meeting every other and
+    itself over 100 turns, repeated 20 times because two of them draw their
+    moves at random. Payoffs are the standard 3 for mutual cooperation, 1 for
+    mutual defection, 5 for defecting on a cooperator and 0 for being defected
+    on, and a player is ranked by its median score per turn across every match.
+    That rewards doing well against the whole field: Defector wins the most
+    individual matches, seven of them, and still places third.
+  </p>
+  <p>
     <a href="https://github.com/Axelrod-Python/Axelrod">Axelrod</a> supplied the
     opponents, the match engine and the payoff bookkeeping, so none of that was
     written here. Every number above is a committed CSV, and a CI step
