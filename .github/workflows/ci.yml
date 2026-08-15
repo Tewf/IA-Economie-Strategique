@@ -10,6 +10,11 @@ jobs:
   notebooks:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # reciprocity.py sits at the root because both experiment folders import it,
+    # and a script's sys.path starts at its own directory rather than at the
+    # working directory, so the root has to be put on the path explicitly.
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +26,7 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -r mirror_neurons/requirements.txt
+          pip install -r requirements.txt
 
       # original/ is preserved, not maintained. Nothing there is expected to run,
       # and one of its notebooks does not terminate by design of its last cell.
@@ -42,3 +47,18 @@ jobs:
 
       - name: The figures still draw from those CSVs
         run: python mirror_neurons/plot_results.py
+
+      # Everything about the LLM harness that is logic rather than model: the
+      # talk exchange really being simultaneous, the scoring, the answer format,
+      # the bots behaving as themselves, and a killed run resuming without
+      # repeating or losing a match. No Ollama, no GPU, nothing downloaded.
+      - name: The LLM harness passes its offline checks
+        run: python llm/preflight_checks.py
+
+      # The raw log costs hours on a GPU and cannot be regenerated here, so what
+      # gets checked is everything derived from it. Inert until the first run
+      # lands a matches.jsonl, and guarding from the moment it does.
+      - name: The LLM tables still derive from the committed log
+        run: |
+          python llm/run_analysis.py
+          git diff --exit-code --stat -- 'llm/results/*.csv'
