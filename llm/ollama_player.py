@@ -16,6 +16,7 @@ experiment.
 """
 
 import json
+import time
 import urllib.request
 
 from panel_config import (OLLAMA_HOST, PANEL, REQUEST_TIMEOUT_SECONDS,
@@ -133,12 +134,17 @@ class OllamaPlayer:
         request = urllib.request.Request(
             f"{OLLAMA_HOST}/api/chat", data=body,
             headers={"Content-Type": "application/json"})
+        started = time.monotonic()
         with urllib.request.urlopen(request,
                                     timeout=REQUEST_TIMEOUT_SECONDS) as response:
             message = json.load(response)["message"]
+        # Timed per call, because the first call to a cold model also pays to
+        # load it from disk. A long run pays that once per model; a rate that
+        # smears it over three calls prices the grid at several times its cost.
         reply = {"content": message.get("content", ""),
                  "thinking": message.get("thinking", ""),
-                 "prompt": user_message}
+                 "prompt": user_message,
+                 "seconds": round(time.monotonic() - started, 3)}
         self.transcript.append(reply)
         return reply
 

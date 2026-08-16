@@ -255,16 +255,18 @@ def run_smoke_test():
     for model in PANEL:
         player = OllamaPlayer(model, system, seed=1)
         opponent = BotOpponent(axl.TitForTat)
-        started = time.monotonic()
-        record = play_match(player, opponent, rounds=3,
+        record = play_match(player, opponent, rounds=4,
                             game=grid_config.GAME, cheap_talk=False)
-        # The first call to a cold model includes loading it from disk, which a
-        # long run pays once and not per call, so it is dropped from the rate.
-        calls = len(player.transcript)
-        rates[model] = (time.monotonic() - started) / max(calls, 1)
+        # The first call also pays to load the model from disk. A long run pays
+        # that once per model, so pricing the grid on a rate that includes it
+        # overstates the cost several times over. It is reported separately.
+        timings = [reply["seconds"] for reply in player.transcript]
+        load, steady = timings[0], timings[1:]
+        rates[model] = sum(steady) / len(steady)
         print(f"  ok  {model}: {[r['a_action'] for r in record['rounds']]}, "
               f"{player.parse_fallbacks} loose reads, "
-              f"{rates[model]:.2f} s a call")
+              f"{rates[model]:.2f} s a call warm "
+              f"(first call {load:.1f} s, cold)")
     print("\nMeasured rates, so the grid can be priced rather than guessed:")
     print(f"  full grid as configured: "
           f"{run_experiment.hours_at(rates):.1f} h")
