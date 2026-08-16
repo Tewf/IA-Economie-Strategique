@@ -16,8 +16,10 @@ against a mechanism that provably cannot escape.
 |---|---|
 | [`already-established.md`](already-established.md) | Where this design matches the field's protocol, and the two claims it must therefore not make |
 | [`the-memory-curse.md`](the-memory-curse.md) | The field's name for the question, the paper that half-answers it, and the baseline to report against |
-| [`the-pairing-already-exists.md`](the-pairing-already-exists.md) | Whether seating models beside classical strategies is new, and the one layer of that answer still resting on a secondary source |
+| [`the-pairing-already-exists.md`](the-pairing-already-exists.md) | Whether seating models beside classical strategies is new. It is not, and one layer of that answer took a second pass to get right |
 | [`what-is-left-to-run.md`](what-is-left-to-run.md) | The narrow question that survives all of the above, and why it needs this grid |
 
-Split out of a single 184-line note on 2026-08-17, under the length rule. Every
-sentence is carried over unchanged; nothing here is new.
+Split out of a single 184-line note on 2026-08-17, under the length rule. The
+argument is unchanged; only [`the-pairing-already-exists.md`](the-pairing-already-exists.md)
+gained anything, and what it gained is the primary source the single note was
+still waiting on.

@@ -73,7 +73,9 @@ Les deux dossiers sont frères à dessein, et la portée de ce rapprochement est
 étroite : ce rapport a proposé ce mécanisme et affirmé que le Tit-for-Tat en
 émerge, donc les deux moitiés éprouvent cette affirmation sur les mêmes
 adversaires avec une seule mesure. Asseoir des modèles de langage à côté de
-stratégies classiques n'est pas en soi une nouveauté. Les deux joueurs exposent
+stratégies classiques n'est pas en soi une nouveauté, et
+[Payne et Alloui-Cros (2025)](https://arxiv.org/abs/2507.02618) revendiquent le
+premier tournoi de ce genre. Les deux joueurs exposent
 les deux mêmes méthodes, donc un seul banc d'essai peut accueillir l'un ou l'autre, et la
 comparaison intéressante oppose un mécanisme qui ne sait qu'imiter à un autre
 qui sait aussi parler et se justifier. Le cheap talk et l'explicabilité sont
