@@ -1,7 +1,13 @@
 """Play the grid and append each finished match to the raw log.
 
-    python llm/run_experiment.py          # needs Ollama, hours of GPU
-    python llm/run_experiment.py --plan   # prints the grid and stops, no GPU
+    python llm/run_experiment.py --plan            # the grid and its cost, no GPU
+    python llm/run_experiment.py --stages          # what each model has left
+    python llm/run_experiment.py --model gemma3:4b # play one stage, then stop
+    python llm/run_experiment.py                   # the lot, hours of GPU
+
+**Run it one stage at a time.** A stage is one model, thirty to sixty minutes,
+and the grid loops model-outermost so stopping between them costs nothing. Three
+hours unattended is what cooked the machine.
 
 **Resumable by construction.** Each match is keyed, the key is written with the
 match, and a key already in the log is skipped. A crash at hour three costs the
@@ -13,7 +19,10 @@ turns it into tables, so a mistake in the analysis costs a rerun of a few
 seconds of arithmetic instead of a night on the card.
 """
 
+import contextlib
+import datetime
 import json
+import os
 import pathlib
 import sys
 import time
@@ -26,12 +35,17 @@ from ollama_player import OllamaPlayer, UnparseableReply
 from panel_config import BASE_SEED, PANEL
 
 LOG = pathlib.Path(__file__).parent / "results" / "matches.jsonl"
+OWNER = pathlib.Path(__file__).parent / "results" / ".running"
 GAME_NAME = "prisoners_dilemma"
 
 # Floors below which the run stops rather than pressing on. Chosen from what
 # the machine looked like when it died: swap at zero and RAM exhausted.
 MINIMUM_MEMORY_GIB = 1.5
 MINIMUM_SWAP_GIB = 1.0
+# The machine idles near 52 C. One pinned core from any other session puts
+# it at 79-87 C, so anything above this means the grid does not fit beside
+# whatever else is running.
+MAXIMUM_TEMPERATURE_C = 70
 
 # The pair is handed one finished round before it starts, which is the closest
 # thing a language model has to the Hebbian agent's starting weight: a regime it
@@ -94,17 +108,52 @@ def headroom():
     return fields["MemAvailable"], fields["SwapFree"]
 
 
-def check_headroom():
-    """Refuse to start another match if memory is running out.
+def package_temperature_c():
+    """Hottest CPU package the kernel reports, or None if no sensor says.
 
-    What took this machine down on 2026-08-15 was host RAM, not VRAM: swap hit
-    zero, the OOM killer fired, and the GPU fell off the bus behind it. The card
-    reported 7.6 GiB free the whole time, so watching VRAM would not have caught
-    it. This watches the thing that actually ran out.
+    Read from `coretemp` rather than a thermal zone, because the zones on this
+    board include the battery and the wifi card and the numbers are not
+    comparable.
+    """
+    hottest = None
+    for chip in pathlib.Path("/sys/class/hwmon").iterdir():
+        try:
+            if (chip / "name").read_text().strip() != "coretemp":
+                continue
+            for label in chip.glob("temp*_label"):
+                if not label.read_text().startswith("Package"):
+                    continue
+                reading = int((chip / label.name.replace("_label", "_input")
+                               ).read_text())
+                hottest = max(hottest or 0, reading // 1000)
+        except OSError:
+            continue
+    return hottest
+
+
+def throttle_count():
+    """Times the package has been throttled since boot, or None."""
+    counter = pathlib.Path("/sys/devices/system/cpu/cpu0/thermal_throttle/"
+                           "package_throttle_count")
+    return int(counter.read_text()) if counter.exists() else None
+
+
+def check_headroom():
+    """Refuse to start another match if the machine is running out of anything.
+
+    Memory, because that is what took the machine down on 2026-08-15: swap hit
+    zero, the OOM killer fired, and the GPU fell off the bus behind it while the
+    card still reported 7.6 GiB free. Watching VRAM would not have caught it.
+
+    Temperature, because this chassis has none to spare. It idles at 52 C and
+    one pinned core from any other session holds it at 79-87 C, so a package
+    above the ceiling means something else is running and the grid does not fit
+    beside it. Checked every match and not only at the start, so a stage that
+    heats up under a neighbour stops instead of running on throttled and
+    reporting timings that mean nothing.
 
     Stopping is cheap because the run is resumable: every finished match is
-    already in the log, so an abort costs the match in flight and the operator
-    can restart once whatever is eating memory has gone.
+    already in the log, so an abort costs the match in flight.
     """
     memory, swap = headroom()
     if memory < MINIMUM_MEMORY_GIB or swap < MINIMUM_SWAP_GIB:
@@ -112,6 +161,69 @@ def check_headroom():
             f"stopping with {memory:.1f} GiB RAM and {swap:.1f} GiB swap free, "
             f"below the {MINIMUM_MEMORY_GIB}/{MINIMUM_SWAP_GIB} GiB floor. "
             f"Finished matches are in the log; rerun to resume.")
+    temperature = package_temperature_c()
+    if temperature is not None and temperature > MAXIMUM_TEMPERATURE_C:
+        raise OutOfHeadroom(
+            f"stopping at {temperature} C package, above the "
+            f"{MAXIMUM_TEMPERATURE_C} C ceiling. Something else is running: "
+            f"this machine idles near 52 C. Finished matches are in the log.")
+
+
+class AlreadyRunning(RuntimeError):
+    """Another stage owns the card. Two at once is how the log got raced."""
+
+
+def _owner_is_alive(owner):
+    try:
+        os.kill(int(owner["pid"]), 0)
+    except (OSError, ValueError, KeyError):
+        return False
+    return True
+
+
+def read_owner(marker=OWNER):
+    """Who is running a stage right now, or None."""
+    if not marker.exists():
+        return None
+    try:
+        owner = json.loads(marker.read_text())
+    except json.JSONDecodeError:
+        return None
+    return owner if _owner_is_alive(owner) else None
+
+
+@contextlib.contextmanager
+def owning_the_run(stage, marker=OWNER):
+    """Claim the run, and say on disk and on screen who holds it.
+
+    On 2026-08-16 the grid was launched three times and killed twice inside
+    seventeen minutes, by a session and by that session's own subagent, neither
+    able to see the other. Two separate failures, and this addresses both.
+
+    It refuses a second launch while one is live, which is the overlap that
+    produced the race. And it names the owner where anyone reaching for a
+    `pkill` will look, because the agent that killed this was right that
+    something hot needed stopping and wrong that it could decide alone.
+    """
+    live = read_owner(marker)
+    if live is not None:
+        raise AlreadyRunning(
+            f"stage {live.get('stage')} is already running as PID {live['pid']}, "
+            f"started {live.get('started')} by {live.get('owner')}. "
+            f"Wait for it, or ask its owner to stop it. Do not kill it blind.")
+    marker.parent.mkdir(exist_ok=True)
+    marker.write_text(json.dumps({
+        "pid": os.getpid(), "stage": stage,
+        "started": datetime.datetime.now().isoformat(timespec="seconds"),
+        "owner": os.environ.get("CLAUDE_SESSION_ID", "unknown session"),
+        "note": "ask the owner before killing this; it holds the GPU for ~an hour",
+    }, indent=2) + "\n")
+    print(f"owner: PID {os.getpid()} holds stage {stage}. "
+          f"{marker} names it; ask before killing.")
+    try:
+        yield
+    finally:
+        marker.unlink(missing_ok=True)
 
 
 def _close_any_partial_line(log):
@@ -168,8 +280,46 @@ def play_one(spec, make=make_players):
             **record}
 
 
-def run(specs=None, make=make_players, log=LOG):
-    """Play everything not already in the log, appending as each finishes."""
+def stages(log=LOG):
+    """Each model, and how many of its matches are still to play.
+
+    One model is one stage. `build_grid` loops model-outermost, so stopping
+    between them costs nothing and a stage is the natural unit of exposure:
+    thirty to sixty minutes rather than three hours.
+    """
+    done = already_done(log)
+    remaining = {}
+    for spec in build_grid():
+        if key_of(spec) not in done:
+            remaining[spec["model"]] = remaining.get(spec["model"], 0) + 1
+    return remaining
+
+
+def run_stage(model, log=LOG):
+    """Play one model's matches and stop, holding the run against a second launch."""
+    remaining = stages(log)
+    if model not in remaining:
+        raise SystemExit(f"nothing left for {model!r}. Stages: {list(remaining)}")
+    before = throttle_count()
+    with owning_the_run(model):
+        print(f"stage {model}: {remaining[model]} matches to play, "
+              f"package {package_temperature_c()} C, throttles so far {before}")
+        run([spec for spec in build_grid() if spec["model"] == model], log=log)
+    after = throttle_count()
+    if before is not None and after is not None:
+        print(f"stage {model} done. Package throttled {after - before} times "
+              f"during it ({before} to {after}), now {package_temperature_c()} C.")
+
+
+def run(specs=None, make=make_players, log=LOG, gate=check_headroom):
+    """Play everything not already in the log, appending as each finishes.
+
+    `gate` is what decides the machine can take another match. It defaults
+    to the real check and is replaced by a no-op in the offline checks,
+    which drive stub players and touch neither the card nor the CPU: a
+    thermal gate there would fail the test suite whenever some other
+    session happened to be busy, which is exactly backwards.
+    """
     specs = build_grid() if specs is None else specs
     done = already_done(log)
     todo = [spec for spec in specs if key_of(spec) not in done]
@@ -178,7 +328,7 @@ def run(specs=None, make=make_players, log=LOG):
     log.parent.mkdir(exist_ok=True)
     _close_any_partial_line(log)
     for index, spec in enumerate(todo, start=1):
-        check_headroom()
+        gate()
         # A model that answers with prose where an action was asked loses its
         # match, and that is a result about the model. Recording it and carrying
         # on is the difference between a reported failure rate and a run that
@@ -241,5 +391,29 @@ def describe(specs=None):
     print(f"already done: {len(already_done())}")
 
 
+def show_stages():
+    """What is left, by stage, and whether the machine will let one start."""
+    remaining = stages()
+    print(f"{sum(remaining.values())} matches left, by stage:")
+    for model, count in remaining.items():
+        print(f"  {model:24} {count:>3}")
+    live = read_owner()
+    if live:
+        print(f"\nrunning now: stage {live.get('stage')} as PID {live['pid']}")
+    try:
+        check_headroom()
+        print(f"\nthe machine will allow a stage to start "
+              f"({package_temperature_c()} C).")
+    except OutOfHeadroom as refusal:
+        print(f"\nthe machine will refuse a stage right now: {refusal}")
+
+
 if __name__ == "__main__":
-    describe() if "--plan" in sys.argv else run()
+    if "--plan" in sys.argv:
+        describe()
+    elif "--stages" in sys.argv:
+        show_stages()
+    elif "--model" in sys.argv:
+        run_stage(sys.argv[sys.argv.index("--model") + 1])
+    else:
+        run()

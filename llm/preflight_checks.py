@@ -15,6 +15,7 @@ format still returns text.
 """
 
 import json
+import os
 import pathlib
 import sys
 import tempfile
@@ -174,6 +175,10 @@ def seeds_are_stable_across_processes():
     assert seed != other, "both seats of a match got the same seed"
 
 
+def _no_gate():
+    """Stub players load no model and heat nothing, so nothing is gated."""
+
+
 def _stub_pair(spec):
     """Two scripted players, so the runner can be exercised with no model."""
     a = StubPlayer(f"{spec['model']}-a", ALTERNATING)
@@ -194,10 +199,10 @@ def the_run_resumes_where_it_stopped():
     with tempfile.TemporaryDirectory() as folder:
         log = pathlib.Path(folder) / "matches.jsonl"
         specs = run_experiment.build_grid()[:6]
-        run_experiment.run(specs[:2], make=_stub_pair, log=log)
+        run_experiment.run(specs[:2], make=_stub_pair, log=log, gate=_no_gate)
         with open(log, "a") as handle:
             handle.write('{"key": "half-written and then kil')
-        run_experiment.run(specs, make=_stub_pair, log=log)
+        run_experiment.run(specs, make=_stub_pair, log=log, gate=_no_gate)
         keys = sorted(run_experiment.already_done(log))
         assert len(keys) == 6, f"expected 6 matches, log holds {len(keys)}"
         assert len(set(keys)) == 6, "a match was played twice on resume"
@@ -216,6 +221,60 @@ def an_opening_reaches_both_players():
     assert fresh.own_history == [] and fresh.history == []
 
 
+def one_stage_at_a_time_and_the_owner_is_named():
+    """A second launch must be refused, and the owner findable without guessing.
+
+    On 2026-08-16 the grid was launched three times and killed twice in
+    seventeen minutes, by a session and by that session's own subagent. Neither
+    could see the other, and the second kill needed `-9` because the first had
+    been answered with `setsid nohup`. The overlap is what this refuses; the
+    owner file is so the next agent reaching for a `pkill` can ask instead.
+    """
+    with tempfile.TemporaryDirectory() as folder:
+        marker = pathlib.Path(folder) / ".running"
+        assert run_experiment.read_owner(marker) is None, "claimed an empty marker"
+        with run_experiment.owning_the_run("stage-under-test", marker):
+            held = run_experiment.read_owner(marker)
+            assert held is not None and held["pid"] == os.getpid(), held
+            assert held["stage"] == "stage-under-test", held
+            assert "ask the owner" in held["note"], "the marker does not say to ask"
+            try:
+                with run_experiment.owning_the_run("second", marker):
+                    raise AssertionError("a second stage was allowed to start")
+            except run_experiment.AlreadyRunning as refusal:
+                assert str(os.getpid()) in str(refusal), (
+                    "the refusal does not name the PID to ask about")
+        assert not marker.exists(), "the marker outlived the run that wrote it"
+
+    stale = pathlib.Path(tempfile.mkdtemp()) / ".running"
+    stale.write_text(json.dumps({"pid": 2 ** 22, "stage": "long gone"}))
+    assert run_experiment.read_owner(stale) is None, (
+        "a marker from a dead process would block every future stage")
+
+
+def the_machine_is_checked_before_the_card_is_touched():
+    """Temperature belongs in the gate, not just memory.
+
+    Memory is what killed the machine in August; heat is what nearly did the
+    next day. One pinned core from another session holds this package at
+    79-87 C against a 52 C idle, so the ceiling is really a test for "is anyone
+    else working".
+    """
+    assert run_experiment.MAXIMUM_TEMPERATURE_C == 70
+    reading = run_experiment.package_temperature_c()
+    assert reading is None or 20 < reading < 110, f"implausible reading {reading}"
+    original = run_experiment.MAXIMUM_TEMPERATURE_C
+    run_experiment.MAXIMUM_TEMPERATURE_C = -1
+    try:
+        run_experiment.check_headroom()
+    except run_experiment.OutOfHeadroom as refusal:
+        assert "C package" in str(refusal), refusal
+    else:
+        raise AssertionError("the temperature ceiling never fires")
+    finally:
+        run_experiment.MAXIMUM_TEMPERATURE_C = original
+
+
 def the_analysis_is_deterministic_and_covers_every_cell():
     """Derive the tables twice from one log and get identical bytes.
 
@@ -229,7 +288,7 @@ def the_analysis_is_deterministic_and_covers_every_cell():
         grid = run_experiment.build_grid()
         sample = [spec for spec in grid if spec["cell"] == "self_play"][:8]
         sample += [spec for spec in grid if spec["cell"] == "vs_bot"][:4]
-        run_experiment.run(sample, make=_stub_pair, log=log)
+        run_experiment.run(sample, make=_stub_pair, log=log, gate=_no_gate)
 
         first, second = scratch / "one", scratch / "two"
         run_analysis.main(log=log, results=first)
@@ -257,6 +316,8 @@ OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            a_message_turn_is_not_an_action_turn, bots_behave_as_themselves,
            a_bot_is_never_asked_to_talk, seeds_are_stable_across_processes,
            the_run_resumes_where_it_stopped, an_opening_reaches_both_players,
+           one_stage_at_a_time_and_the_owner_is_named,
+           the_machine_is_checked_before_the_card_is_touched,
            the_analysis_is_deterministic_and_covers_every_cell,
            an_empty_log_derives_nothing_and_says_so]
 
