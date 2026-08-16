@@ -89,7 +89,8 @@ match en cours.
 | [`panel_config.py`](panel_config.py) · [`grid_config.py`](grid_config.py) | Les cinq modèles et leur échantillonnage ; les matchs à jouer |
 | [`prompt_loader.py`](prompt_loader.py) | Rend une invite en contrebalançant l'ordre des gains d'une répétition à l'autre |
 | [`run_experiment.py`](run_experiment.py) · [`run_analysis.py`](run_analysis.py) · [`plot_results.py`](plot_results.py) | Jouer la grille ; dériver les tables ; tracer les figures |
-| [`preflight_checks.py`](preflight_checks.py) | Douze vérifications hors ligne et le test de fumée. Refuse de démarrer tant que le banc d'essai n'a pas fait ses preuves |
+| [`machine_gate.py`](machine_gate.py) · [`run_ownership.py`](run_ownership.py) | Si cette machine peut encaisser un match de plus, et qui tient la carte pendant ce temps. Les deux sont autant des comptes rendus d'incident que du code |
+| [`preflight_checks.py`](preflight_checks.py) | Seize vérifications hors ligne et le test de fumée. Refuse de démarrer tant que le banc d'essai n'a pas fait ses preuves |
 | [`prompts/`](prompts/) | Un scénario par jeu. Dans cette méthode, l'invite est l'expérience |
 | [`design-notes/`](design-notes/) | Ce que la méthode peut montrer et ce qu'elle ne peut pas, et pourquoi le cheap talk et l'explicabilité sont l'enjeu |
 

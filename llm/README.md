@@ -81,7 +81,8 @@ the log is skipped, so a crash costs the match in flight and nothing more.
 | [`panel_config.py`](panel_config.py) · [`grid_config.py`](grid_config.py) | The five models and how they are sampled; what matches get played |
 | [`prompt_loader.py`](prompt_loader.py) | Renders a prompt, counterbalancing the payoff order across repetitions |
 | [`run_experiment.py`](run_experiment.py) · [`run_analysis.py`](run_analysis.py) · [`plot_results.py`](plot_results.py) | Play the grid; derive the tables; draw the figures |
-| [`preflight_checks.py`](preflight_checks.py) | Twelve offline checks and the online smoke test. Refuses to start until the harness is shown to work |
+| [`machine_gate.py`](machine_gate.py) · [`run_ownership.py`](run_ownership.py) | Whether this laptop can take another match, and who holds the card while it does. Both are incident reports as much as code |
+| [`preflight_checks.py`](preflight_checks.py) | Sixteen offline checks and the online smoke test. Refuses to start until the harness is shown to work |
 | [`prompts/`](prompts/) | One scenario per game. In this method the prompt is the experiment |
 | [`design-notes/`](design-notes/) | What the method can and cannot show, and why cheap talk and explainability are the point |
 
