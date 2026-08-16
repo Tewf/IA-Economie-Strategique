@@ -52,7 +52,7 @@ stage, sur la coopération mutuelle 100 fois sur 100, à 2,995 pour un plafond d
 autrement que figée.**
 
 Un marché de tels agents conserve donc le régime dans lequel on l'a placé, sans
-pouvoir en sortir. **L'imitation est un cliquet sur la condition initiale, pas
+pouvoir en sortir. **Cette règle d'imitation est un cliquet sur la condition initiale, pas
 une voie vers la collusion.** Elle n'inventera pas un prix collusif et ne
 sortira pas non plus d'un tel prix par la concurrence. C'est plus étroit que ce
 qu'avance le rapport, et c'est ce qui sépare ce mécanisme des Q-learners de

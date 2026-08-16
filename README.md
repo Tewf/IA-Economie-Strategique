@@ -61,15 +61,19 @@ and the Dictator game from the defence slides.
 sustains tacit cooperation and neither breaks nor intensifies it. Two imitators
 are a feedback loop with two absorbing states and nothing in between: over 700
 runs they locked onto mutual defection or mutual cooperation according to where
-they started, and not once onto anything else. Imitation is a ratchet on the
-initial condition rather than a route to collusion, which is what separates it
+they started, and not once onto anything else. This imitation rule is a ratchet
+on the initial condition rather than a route to collusion, which separates it
 from the Q-learners of Calvano et al. (2020) that do find collusion, and read
 payoffs to do it. [The full reading](mirror_neurons/#what-it-adds-up-to),
 including what would change it.
 
-The two folders are siblings on purpose. Both players expose the same two calls,
-so one harness can seat either, and the interesting comparison is between a
-mechanism that can only imitate and one that can also talk and explain itself.
+The two folders are siblings on purpose, and the point of the pairing is narrow:
+this report proposed this mechanism and claimed Tit-for-Tat emerges from it, so
+both halves test that claim on shared opponents with one measure. Seating
+language models beside classical strategies is not itself new. Both players
+expose the same two calls, so one harness can seat either, and the comparison is
+between a mechanism that can only imitate and one that can also talk and explain
+itself.
 Cheap talk and explainability are two of the eight terms the report defines, and
 they are the two the Hebbian agent has no way to reach.
 

@@ -25,8 +25,17 @@ They have no channel for a message and nothing a message could act on.
 A language model has the channel for free. So: **hand two models a regime they
 did not choose, and see whether a non-binding message lets them leave it.** Each
 pair starts from a mutually cooperative round, a mutually defecting one, or
-nothing at all, with cheap talk and without. If talking breaks the ratchet, that
-is the thing the internship read about in Ng (2023) and could not build.
+nothing at all, with cheap talk and without.
+
+**Half of that is a replication, and is written up as one.** Injecting a
+synthetic cooperative history is the *memory sanitization* arm of
+[The Memory Curse](https://arxiv.org/abs/2605.08060), which found it restores
+cooperation, and cheap talk raising cooperation in language models is
+established besides. What is not found done is the defective mirror of that
+injection, crossed with the channel, against a mechanism that provably cannot
+escape. The claims this folder may and may not make, and the baseline to report
+against, are in
+[`design-notes/what-is-already-known.md`](design-notes/what-is-already-known.md).
 
 ## What runs, and what it costs
 

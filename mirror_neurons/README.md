@@ -51,7 +51,7 @@ out of 100, averaging 2.995 against a ceiling of 3. The tipping point is 0.5, an
 **not one run in 700 ended anywhere but locked.**
 
 So a market of these agents keeps the regime it is dropped into and cannot leave
-it. **Imitation is a ratchet on the initial condition, not a route to
+it. **This imitation rule is a ratchet on the initial condition, not a route to
 collusion.** It will not invent a collusive price and will not compete its way
 out of one. That is narrower than the report claims, and it is what separates
 this mechanism from the Q-learners of Calvano et al. (2020), which do find

@@ -28,9 +28,18 @@ Ils n'ont aucun canal pour un message, et rien sur quoi un message pourrait agir
 Un modèle de langage a ce canal gratuitement. Donc : **placer deux modèles dans
 un régime qu'ils n'ont pas choisi, et voir si un message non contraignant leur
 permet d'en sortir.** Chaque paire commence sur un tour de coopération mutuelle,
-un tour de défection mutuelle, ou rien du tout, avec et sans cheap talk. Si
-parler brise le cliquet, c'est très exactement ce que le stage a lu chez Ng
-(2023) sans pouvoir le construire.
+un tour de défection mutuelle, ou rien du tout, avec et sans cheap talk.
+
+**La moitié de cela est une réplication, et se présente comme telle.** Injecter
+un historique coopératif synthétique est le volet *memory sanitization* de
+[The Memory Curse](https://arxiv.org/abs/2605.08060), qui a montré qu'il
+restaure la coopération, et le fait que le cheap talk augmente la coopération
+des modèles de langage est établi par ailleurs. Ce qui reste introuvable, c'est
+l'injection symétrique, celle d'un historique de défection, croisée avec le
+canal, et mesurée contre un mécanisme qui ne peut démontrablement pas en sortir.
+Ce que ce dossier peut et ne peut pas affirmer, et la référence à laquelle se
+comparer, sont dans
+[`design-notes/what-is-already-known.md`](design-notes/what-is-already-known.md).
 
 ## Ce qui s'exécute, et ce que cela coûte
 

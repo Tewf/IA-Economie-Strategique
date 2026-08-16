@@ -63,14 +63,18 @@ miroirs entretient la coopération tacite, sans jamais la rompre ni l'intensifie
 Deux imitateurs forment une boucle de rétroaction à deux états absorbants et
 rien entre les deux : sur 700 parties, ils se sont figés sur la défection
 mutuelle ou sur la coopération mutuelle selon leur point de départ, et jamais
-sur autre chose. L'imitation est un cliquet sur la condition initiale plutôt
+sur autre chose. **Cette** règle d'imitation est un cliquet sur la condition initiale plutôt
 qu'une voie vers la collusion, ce qui la sépare des Q-learners de Calvano et al.
 (2020), qui trouvent la collusion, eux, en lisant les gains.
 [La lecture complète](mirror_neurons/README.fr.md#ce-que-tout-cela-donne), et
 ce qui la modifierait.
 
-Les deux dossiers sont frères à dessein. Les deux joueurs exposent les deux
-mêmes méthodes, donc un seul banc d'essai peut accueillir l'un ou l'autre, et la
+Les deux dossiers sont frères à dessein, et la portée de ce rapprochement est
+étroite : ce rapport a proposé ce mécanisme et affirmé que le Tit-for-Tat en
+émerge, donc les deux moitiés éprouvent cette affirmation sur les mêmes
+adversaires avec une seule mesure. Asseoir des modèles de langage à côté de
+stratégies classiques n'est pas en soi une nouveauté. Les deux joueurs exposent
+les deux mêmes méthodes, donc un seul banc d'essai peut accueillir l'un ou l'autre, et la
 comparaison intéressante oppose un mécanisme qui ne sait qu'imiter à un autre
 qui sait aussi parler et se justifier. Le cheap talk et l'explicabilité sont
 deux des huit notions que le rapport définit, et les deux que l'agent hebbien

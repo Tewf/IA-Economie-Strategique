@@ -91,7 +91,7 @@
     where they started, and not once onto anything else. From a starting weight
     of 0.05 it is mutual defection every time, worth 1.00 a turn; from 0.8, the
     value the internship used, mutual cooperation every time, worth 2.995
-    against a ceiling of 3. Imitation is a ratchet on the initial condition
+    against a ceiling of 3. This imitation rule is a ratchet on the initial condition
     rather than a route to collusion, which is what separates it from the
     Q-learners of Calvano et al. (2020) that do find collusion, and read payoffs
     to do it.
@@ -120,10 +120,13 @@
     the Ultimatum game, and the Dictator game.
   </p>
   <p>
-    The two are siblings on purpose. Both players expose the same two calls, so
-    one harness can seat either, and the comparison worth making is between a
-    mechanism that can only imitate and one that can also talk and explain
-    itself. Cheap talk and explainability are two of the eight terms the report
+    The two are siblings on purpose, and the point of the pairing is narrow:
+    this report proposed this mechanism and claimed Tit-for-Tat emerges from it,
+    so both halves test that claim on shared opponents with one measure. Seating
+    language models beside classical strategies is not itself new. Both players
+    expose the same two calls, so one harness can seat either, and the
+    comparison is between a mechanism that can only imitate and one that can
+    also talk and explain itself. Cheap talk and explainability are two of the eight terms the report
     defines, and the two the Hebbian agent has no way to reach.
   </p>
 </section>
