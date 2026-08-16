@@ -45,8 +45,24 @@ cooperation in 18 of 28 model-game settings**. Its *memory sanitization* arm
 holds prompt length constant and replaces the real history with **synthetic
 cooperative records**, which restores cooperation substantially.
 
-That is the `mutual_cooperation` opening, done already and by a stronger design.
-What is not done, as far as this search reached:
+**Read from the abstract, that looked like the `mutual_cooperation` opening
+already done. Read from the paper, it is not.** The overlap is real but much
+smaller, and the difference is the whole point of this grid:
+
+| | Memory sanitization | This grid's opening |
+|---|---|---|
+| Game | **Trust Game** | Prisoner's Dilemma |
+| History | 80 rounds, of which **78 are overwritten** | **one** fabricated round, then 30 real ones |
+| What it asks | is the curse caused by content or by length | does the regime a pair starts in capture it |
+| Direction | **repairs** a collapse that already happened | **sets** a starting point and lets real play accumulate |
+
+Theirs is a diagnostic: hold the window fixed, swap the content, see whether the
+number moves. Mine is an initial condition: seed one round and let the pair
+write the rest. A bulk overwrite that erases the record of a collapse says
+nothing about whether a pair is captured by where it began.
+
+So the honest position is that the cooperative injection has a close relative in
+the literature and must cite it, not that it is done. What is not done at all:
 
 - **The defective opening as the symmetric treatment.** Sanitization injects a
   good history to repair a collapse. Nobody found here injects a bad one to see
@@ -109,10 +125,25 @@ that make cooperation worse:
   *amplify* the collapse, and removing chain-of-thought often reduces it.
 
 Neither is a reason to change the design: the history is what makes an iterated
-game iterated, and the reason is what the explainability half measures. They are
-reasons to expect less cooperation than a short-context, action-only setup would
-give, and to say so beside any number that comes back low. Thirty rounds is also
-far short of the 500 where the effect was characterised.
+game iterated, and the reason is what the explainability half measures.
+
+**And read from the paper rather than the abstract, the warning is weaker than
+it first looked, for one specific reason.** The deliberation penalty is measured
+per model in the game that hurts it most, and *the Prisoner's Dilemma is not
+that game for anybody*. Mistral-7B, the one model on both panels, takes its
+worst hit in Public Goods at -49.7pp; Llama-3.3-70B takes -93.1pp in the Trust
+Game. The paper says plainly that capable models "often maintain 100%
+cooperation in structurally simpler games (like the Prisoner's Dilemma...)
+regardless of whether CoT is utilized", and calls that a ceiling effect that
+dilutes the finding.
+
+The Prisoner's Dilemma is where the curse is weakest. This grid runs 30 rounds
+against their 80-round condition, and the curve they report peaks at HL <= 5 and
+decays after, so 30 is on the falling part but nowhere near their far end.
+
+What that buys is a prediction rather than an excuse: cooperation here should be
+high, and the first real match agrees, qwen2.5 at 30 out of 30. If a number does
+come back low, the regime is the first thing to check and not the last.
 
 ## What is left, and it is the part worth running
 
