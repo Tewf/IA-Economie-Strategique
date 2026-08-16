@@ -39,6 +39,7 @@ from run_ownership import owning_the_run, read_owner
 
 RESULTS = pathlib.Path(__file__).parent / "results"
 LOG = RESULTS / "matches.jsonl"
+PROMPTS_USED = RESULTS / "prompts_used.json"
 GAME_NAME = "prisoners_dilemma"
 
 # The pair is handed one finished round before it starts, which is the closest
@@ -87,6 +88,30 @@ def already_done(log=LOG):
         except (json.JSONDecodeError, KeyError):
             continue
     return done
+
+
+def write_prompts_used(path=PROMPTS_USED):
+    """Pin the four system prompts a run was played on, once, beside the log.
+
+    In this method the prompt is the experiment, so it has to be in the record
+    and not only in the source that rendered it. Four texts cover the grid: an
+    action turn and a message turn, each in both payoff orderings, which is what
+    `grid_config.REPETITIONS` counterbalances. A match names its own by
+    `repetition` parity, so nothing has to be repeated per match.
+
+    This is deliberately the opposite of what the log used to do. It stored the
+    per-round user message, which is `OllamaPlayer._round_prompt` applied to
+    rounds the record already holds, 60 times a match and growing with the
+    match; prompt echoes were 94% of the log and the system prompt was absent.
+    """
+    path.parent.mkdir(exist_ok=True)
+    rendered = {
+        f"{asking_for}|{'even' if parity == 0 else 'odd'}_repetition":
+            prompt_loader.render(GAME_NAME, parity, asking_for)
+        for asking_for in ("action", "message") for parity in (0, 1)}
+    path.write_text(json.dumps({"game": GAME_NAME, "prompts": rendered},
+                               indent=2) + "\n")
+    return rendered
 
 
 def apply_opening(player, opening):
@@ -287,6 +312,8 @@ if __name__ == "__main__":
     elif "--stages" in sys.argv:
         show_stages()
     elif "--model" in sys.argv:
+        write_prompts_used()
         run_stage(sys.argv[sys.argv.index("--model") + 1])
     else:
+        write_prompts_used()
         run()

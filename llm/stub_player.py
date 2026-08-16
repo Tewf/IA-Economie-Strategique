@@ -48,8 +48,7 @@ class StubPlayer:
         # them for want of a REASON line.
         self.transcript.append({
             "content": f"ACTION: {action}\nREASON: I choose to {action} here.",
-            "thinking": "",
-            "prompt": f"round {len(self.own_history)}"})
+            "thinking": ""})
         return action
 
     def observe_and_learn(self, opponent_action):

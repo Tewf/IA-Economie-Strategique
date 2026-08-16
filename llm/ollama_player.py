@@ -127,6 +127,13 @@ class OllamaPlayer:
         qwen3 returns its reasoning in `message.thinking` rather than in
         `content`. Reading only `content`, which this file used to do, silently
         discarded the reasoning on the one model that produces it explicitly.
+
+        **The user message is not kept, and that is the whole size of the log.**
+        It is `_round_prompt` or `_message_prompt` applied to the rounds played
+        so far, so every byte of it is already in the record and grows with the
+        match: keeping it made prompt echoes 94% of a 39 MB log, of which the
+        one thing not recoverable, the system prompt that is the treatment, was
+        the part not stored at all. `run_experiment` writes that once per run.
         """
         body = json.dumps({
             "model": self.model,
@@ -149,7 +156,6 @@ class OllamaPlayer:
         # smears it over three calls prices the grid at several times its cost.
         reply = {"content": message.get("content", ""),
                  "thinking": message.get("thinking", ""),
-                 "prompt": user_message,
                  "seconds": round(time.monotonic() - started, 3)}
         self.transcript.append(reply)
         return reply

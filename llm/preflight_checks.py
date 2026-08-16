@@ -320,6 +320,40 @@ def an_empty_log_derives_nothing_and_says_so():
         assert not (scratch / "out").exists(), "wrote tables from an empty log"
 
 
+def the_log_records_the_prompt_once_and_never_echoes_it():
+    """What is kept is what cannot be recovered, and only that.
+
+    The per-round user message is `OllamaPlayer._round_prompt` applied to rounds
+    the record already holds, so storing it grew the log with the square of the
+    match: prompt echoes reached 94% of a projected 39 MB, and the system
+    prompt, which is the treatment and is not derivable from the record, was the
+    one thing not stored at all. This asserts the trade in both directions.
+    """
+    player = OllamaPlayer("stub", "system", message_prompt="messages")
+    player.transcript.append({"content": "ACTION: Cooperate", "thinking": "",
+                              "seconds": 0.1})
+    record = play_match(player, StubPlayer("b", ALWAYS_COOPERATE), rounds=0,
+                        game=grid_config.GAME, cheap_talk=False)
+    for seat in ("a_transcript", "b_transcript"):
+        for reply in record[seat]:
+            assert "prompt" not in reply, (
+                f"{seat} echoes the prompt back into the log, which is what made "
+                "it 39 MB of text already present in `rounds`")
+
+    with tempfile.TemporaryDirectory() as folder:
+        path = pathlib.Path(folder) / "prompts_used.json"
+        rendered = run_experiment.write_prompts_used(path)
+        assert set(rendered) == {"action|even_repetition", "action|odd_repetition",
+                                 "message|even_repetition",
+                                 "message|odd_repetition"}, sorted(rendered)
+        assert rendered["action|even_repetition"] != rendered["action|odd_repetition"], (
+            "the payoff counterbalancing is not visible in the pinned prompts")
+        assert rendered["action|even_repetition"] != rendered["message|even_repetition"], (
+            "the action turn and the message turn were pinned as the same text")
+        written = json.loads(path.read_text())
+        assert written["prompts"] == rendered and written["game"], written
+
+
 OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            a_player_sees_its_own_moves, the_answer_format_is_read_correctly,
            the_prompt_is_not_anchored_on_one_action,
@@ -329,7 +363,8 @@ OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            one_stage_at_a_time_and_the_owner_is_named,
            the_machine_is_checked_before_the_card_is_touched,
            the_analysis_is_deterministic_and_covers_every_cell,
-           an_empty_log_derives_nothing_and_says_so]
+           an_empty_log_derives_nothing_and_says_so,
+           the_log_records_the_prompt_once_and_never_echoes_it]
 
 
 def run_offline():
