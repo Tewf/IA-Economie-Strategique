@@ -35,7 +35,7 @@ established besides. What is not found done is the defective mirror of that
 injection, crossed with the channel, against a mechanism that provably cannot
 escape. The claims this folder may and may not make, and the baseline to report
 against, are in
-[`design-notes/what-is-already-known.md`](design-notes/what-is-already-known.md).
+[`design-notes/what-is-already-known/`](design-notes/what-is-already-known/).
 
 ## What runs, and what it costs
 
@@ -48,11 +48,11 @@ python llm/run_experiment.py              # the grid. Hours. Resumable
 python llm/run_analysis.py && python llm/plot_results.py   # offline
 ```
 
-275 matches of 30 rounds: 150 self-play across three openings and both
-conditions, and 125 against the five Axelrod strategies the Hebbian agent also
-faced. 17,250 model calls. The smoke test is what turns that into an honest
+220 matches of 30 rounds: 120 self-play across three openings and both
+conditions, and 100 against the five Axelrod strategies the Hebbian agent also
+faced. 13,800 model calls. The smoke test is what turns that into an honest
 estimate of hours, because it measures the per-model rate on this card rather
-than assuming one.
+than assuming one, and on 2026-08-17 it priced the grid at **3.3 h**.
 
 **Do not start the grid while anything else wants the GPU.** One model fits at a
 time and switching in a tight loop is what took this machine down on 2026-08-15.

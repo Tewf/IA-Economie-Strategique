@@ -39,7 +39,7 @@ l'injection symétrique, celle d'un historique de défection, croisée avec le
 canal, et mesurée contre un mécanisme qui ne peut démontrablement pas en sortir.
 Ce que ce dossier peut et ne peut pas affirmer, et la référence à laquelle se
 comparer, sont dans
-[`design-notes/what-is-already-known.md`](design-notes/what-is-already-known.md).
+[`design-notes/what-is-already-known/`](design-notes/what-is-already-known/).
 
 ## Ce qui s'exécute, et ce que cela coûte
 
@@ -52,11 +52,12 @@ python llm/run_experiment.py              # la grille. Des heures. Reprenable
 python llm/run_analysis.py && python llm/plot_results.py   # hors ligne
 ```
 
-275 matchs de 30 tours : 150 en auto-affrontement sur trois ouvertures et les
-deux conditions, et 125 contre les cinq stratégies Axelrod que l'agent hebbien a
-également affrontées. 17 250 appels de modèle. C'est le test de fumée qui
+220 matchs de 30 tours : 120 en auto-affrontement sur trois ouvertures et les
+deux conditions, et 100 contre les cinq stratégies Axelrod que l'agent hebbien a
+également affrontées. 13 800 appels de modèle. C'est le test de fumée qui
 transforme ce chiffre en estimation honnête, car il mesure la cadence par modèle
-sur cette carte au lieu de la supposer.
+sur cette carte au lieu de la supposer, et le 17 août 2026 il a chiffré la
+grille à **3,3 h**.
 
 **Ne pas lancer la grille si quoi que ce soit d'autre veut le GPU.** Un seul
 modèle tient à la fois, et enchaîner les changements en boucle serrée est ce qui
