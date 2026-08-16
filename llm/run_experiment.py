@@ -14,15 +14,14 @@ match, and a key already in the log is skipped. A crash at hour three costs the
 match in flight and nothing else, which matters because the last run of anything
 like this took the machine down.
 
+Whether the machine can take another match is [`machine_gate.py`](machine_gate.py),
+and who holds the card while it does is [`run_ownership.py`](run_ownership.py).
 Nothing here derives a result. The log is raw and stays raw: `measurements.py`
 turns it into tables, so a mistake in the analysis costs a rerun of a few
 seconds of arithmetic instead of a night on the card.
 """
 
-import contextlib
-import datetime
 import json
-import os
 import pathlib
 import sys
 import time
@@ -31,31 +30,16 @@ import grid_config
 import prompt_loader
 from bot_opponent import BotOpponent
 from iterated_game import play_match
+from machine_gate import (OutOfHeadroom, check_can_start, check_headroom,
+                          cool_down, instant_package_c, package_temperature_c,
+                          throttle_count)
 from ollama_player import OllamaPlayer, UnparseableReply
 from panel_config import BASE_SEED, PANEL
+from run_ownership import owning_the_run, read_owner
 
-LOG = pathlib.Path(__file__).parent / "results" / "matches.jsonl"
-OWNER = pathlib.Path(__file__).parent / "results" / ".running"
+RESULTS = pathlib.Path(__file__).parent / "results"
+LOG = RESULTS / "matches.jsonl"
 GAME_NAME = "prisoners_dilemma"
-
-# Floors below which the run stops rather than pressing on. Chosen from what
-# the machine looked like when it died: swap at zero and RAM exhausted.
-MINIMUM_MEMORY_GIB = 1.5
-MINIMUM_SWAP_GIB = 1.0
-# Two thresholds because there are two questions. 70 C asked once at the start
-# means "is anyone else working": the machine idles near 52 C and one pinned
-# core from another session holds it at 79-87 C. 90 C asked every match means
-# "is the machine in trouble": the grid heats the package by itself, so the
-# start number would abort the work it exists to protect. Critical is 100 C.
-MAXIMUM_START_TEMPERATURE_C = 70
-MAXIMUM_RUNNING_TEMPERATURE_C = 90
-# The grid on its own holds this package at 93 C, measured twice by a
-# neighbouring session while nothing else ran. There is no fan control on this
-# board and thermald has never engaged, so the only lever left is to ask for
-# less: cool back to this before starting the next match. It trades wall clock
-# for the difference between 93 C and something survivable.
-COOLDOWN_TARGET_C = 80
-COOLDOWN_MAXIMUM_SECONDS = 120
 
 # The pair is handed one finished round before it starts, which is the closest
 # thing a language model has to the Hebbian agent's starting weight: a regime it
@@ -105,225 +89,6 @@ def already_done(log=LOG):
     return done
 
 
-class OutOfHeadroom(RuntimeError):
-    """Stopped before the machine ran out, not after."""
-
-
-def headroom():
-    """Available RAM and free swap, in GiB, as the kernel reports them."""
-    fields = {}
-    for line in pathlib.Path("/proc/meminfo").read_text().splitlines():
-        name, _, value = line.partition(":")
-        fields[name] = int(value.split()[0]) / (1024 ** 2)
-    return fields["MemAvailable"], fields["SwapFree"]
-
-
-def _instant_package_c():
-    """One reading of the CPU package, or None if no sensor says.
-
-    Read from `coretemp` rather than a thermal zone, because the zones on this
-    board include the battery and the wifi card and the numbers are not
-    comparable.
-    """
-    hottest = None
-    for chip in pathlib.Path("/sys/class/hwmon").iterdir():
-        try:
-            if (chip / "name").read_text().strip() != "coretemp":
-                continue
-            for label in chip.glob("temp*_label"):
-                if not label.read_text().startswith("Package"):
-                    continue
-                reading = int((chip / label.name.replace("_label", "_input")
-                               ).read_text())
-                hottest = max(hottest or 0, reading // 1000)
-        except OSError:
-            continue
-    return hottest
-
-
-def package_temperature_c(samples=4, interval=0.3):
-    """The settled package temperature: the lowest of several quick readings.
-
-    **A single reading here measures whatever just ran, including this process.**
-    Importing `axelrod` costs 5.5 s of CPU and takes the package from 47 C to
-    79 C, which decays back inside two seconds. A gate that read once after its
-    own imports would refuse every stage forever, on the heat it had just made
-    itself.
-
-    The floor across a short window is the honest number. A neighbour pinning a
-    core holds it at 79-87 C in every sample; a transient of our own is gone by
-    the second one.
-    """
-    readings = []
-    for index in range(samples):
-        if index:
-            time.sleep(interval)
-        reading = _instant_package_c()
-        if reading is not None:
-            readings.append(reading)
-    return min(readings) if readings else None
-
-
-def throttle_count():
-    """Times the package has been throttled since boot, or None."""
-    counter = pathlib.Path("/sys/devices/system/cpu/cpu0/thermal_throttle/"
-                           "package_throttle_count")
-    return int(counter.read_text()) if counter.exists() else None
-
-
-def cool_down(target=None, limit=COOLDOWN_MAXIMUM_SECONDS):
-    """Wait for the package to settle before asking the machine for more.
-
-    Two stages aborted at 93 C, and the second time a neighbouring session
-    measured `ollama` at 92% CPU as the only load: the grid reaches that on its
-    own. Running flat out is not available on this chassis, so the run pauses
-    between matches instead. Bounded, because a machine that will not cool is a
-    reason to stop rather than to wait forever.
-    """
-    target = COOLDOWN_TARGET_C if target is None else target
-    waited = 0
-    while waited < limit:
-        reading = package_temperature_c(samples=2, interval=0.2)
-        if reading is None or reading <= target:
-            return waited, reading
-        time.sleep(5)
-        waited += 5
-    return waited, package_temperature_c(samples=2, interval=0.2)
-
-
-def check_headroom():
-    """Refuse to start another match if the machine is running out of anything.
-
-    Memory, because that is what took the machine down on 2026-08-15: swap hit
-    zero, the OOM killer fired, and the GPU fell off the bus behind it while the
-    card still reported 7.6 GiB free. Watching VRAM would not have caught it.
-
-    Temperature, because this chassis has none to spare. It idles at 52 C and
-    one pinned core from any other session holds it at 79-87 C, so a package
-    above the ceiling means something else is running and the grid does not fit
-    beside it. Checked every match and not only at the start, so a stage that
-    heats up under a neighbour stops instead of running on throttled and
-    reporting timings that mean nothing.
-
-    Stopping is cheap because the run is resumable: every finished match is
-    already in the log, so an abort costs the match in flight.
-    """
-    memory, swap = headroom()
-    if memory < MINIMUM_MEMORY_GIB or swap < MINIMUM_SWAP_GIB:
-        raise OutOfHeadroom(
-            f"stopping with {memory:.1f} GiB RAM and {swap:.1f} GiB swap free, "
-            f"below the {MINIMUM_MEMORY_GIB}/{MINIMUM_SWAP_GIB} GiB floor. "
-            f"Finished matches are in the log; rerun to resume.")
-    temperature = package_temperature_c(samples=2)
-    if temperature is not None and temperature > MAXIMUM_RUNNING_TEMPERATURE_C:
-        raise OutOfHeadroom(
-            f"stopping at {temperature} C package, above the "
-            f"{MAXIMUM_RUNNING_TEMPERATURE_C} C abort ceiling. Something joined "
-            f"the machine mid-stage. Finished matches are in the log.")
-
-
-def check_can_start():
-    """A stricter gate, asked once, before a stage claims the card.
-
-    Two different questions need two different numbers, and one threshold for
-    both was wrong. **Is anyone else working?** is the start question, and 70 C
-    answers it: this machine idles near 52 C and one pinned core from another
-    session holds it at 79-87 C. **Is the machine in trouble?** is the running
-    question, and 70 C cannot answer it, because the grid legitimately heats the
-    package itself; aborting on that would stop the very work it is guarding.
-    """
-    check_headroom()
-    temperature = package_temperature_c()
-    if temperature is not None and temperature > MAXIMUM_START_TEMPERATURE_C:
-        raise OutOfHeadroom(
-            f"not starting at {temperature} C package, above the "
-            f"{MAXIMUM_START_TEMPERATURE_C} C start ceiling. This machine idles "
-            f"near 52 C, so something else is running and the grid does not fit "
-            f"beside it. Ask whoever owns it, or wait.")
-
-
-def _session_name():
-    """Something a person or another agent can act on.
-
-    A marker that says "ask the owner" and then reads `unknown session` is half
-    a mechanism: the session next door had to find the owner from a chat message
-    instead of from the file. The variable is CLAUDE_CODE_SESSION_ID, not
-    CLAUDE_SESSION_ID, which is why the first version was always empty.
-    """
-    session = os.environ.get("CLAUDE_CODE_SESSION_ID")
-    return f"claude session {session}" if session else f"pid {os.getppid()} (no session id)"
-
-
-class AlreadyRunning(RuntimeError):
-    """Another stage owns the card. Two at once is how the log got raced."""
-
-
-def _owner_is_alive(owner):
-    try:
-        os.kill(int(owner["pid"]), 0)
-    except (OSError, ValueError, KeyError):
-        return False
-    return True
-
-
-def read_owner(marker=OWNER):
-    """Who is running a stage right now, or None."""
-    if not marker.exists():
-        return None
-    try:
-        owner = json.loads(marker.read_text())
-    except json.JSONDecodeError:
-        return None
-    return owner if _owner_is_alive(owner) else None
-
-
-@contextlib.contextmanager
-def owning_the_run(stage, marker=OWNER):
-    """Claim the run, and say on disk and on screen who holds it.
-
-    On 2026-08-16 the grid was launched three times and killed twice inside
-    seventeen minutes, by a session and by that session's own subagent, neither
-    able to see the other. Two separate failures, and this addresses both.
-
-    It refuses a second launch while one is live, which is the overlap that
-    produced the race. And it names the owner where anyone reaching for a
-    `pkill` will look, because the agent that killed this was right that
-    something hot needed stopping and wrong that it could decide alone.
-    """
-    live = read_owner(marker)
-    if live is not None:
-        raise AlreadyRunning(
-            f"stage {live.get('stage')} is already running as PID {live['pid']}, "
-            f"started {live.get('started')} by {live.get('owner')}. "
-            f"Wait for it, or ask its owner to stop it. Do not kill it blind.")
-    marker.parent.mkdir(exist_ok=True)
-    marker.write_text(json.dumps({
-        "pid": os.getpid(), "stage": stage,
-        "started": datetime.datetime.now().isoformat(timespec="seconds"),
-        "owner": _session_name(),
-        "note": "ask the owner before killing this; it holds the GPU for ~an hour",
-    }, indent=2) + "\n")
-    print(f"owner: PID {os.getpid()} holds stage {stage}. "
-          f"{marker} names it; ask before killing.")
-    try:
-        yield
-    finally:
-        marker.unlink(missing_ok=True)
-
-
-def _close_any_partial_line(log):
-    """End the log on a newline before appending to it.
-
-    A process killed mid-write leaves a line with no newline. Appending the next
-    record straight onto it would splice two matches into one unreadable line
-    and lose the good one too, so the broken half is terminated first and left
-    in place: `already_done` skips it, and it is evidence a run was interrupted.
-    """
-    if log.exists() and log.stat().st_size and not log.read_bytes().endswith(b"\n"):
-        with open(log, "a") as handle:
-            handle.write("\n")
-
-
 def apply_opening(player, opening):
     """Hand a player one finished round it did not play."""
     if OPENINGS[opening] is None:
@@ -366,7 +131,7 @@ def play_one(spec, make=make_players):
             # Sampled the instant the match ends, which is the closest cheap
             # proxy for its peak. Recorded so "the grid reaches 93 C on its own"
             # stays a measurement rather than becoming folklore.
-            "package_c_at_end": _instant_package_c(),
+            "package_c_at_end": instant_package_c(),
             **record}
 
 
@@ -400,6 +165,19 @@ def run_stage(model, log=LOG):
     if before is not None and after is not None:
         print(f"stage {model} done. Package throttled {after - before} times "
               f"during it ({before} to {after}), now {package_temperature_c()} C.")
+
+
+def _close_any_partial_line(log):
+    """End the log on a newline before appending to it.
+
+    A process killed mid-write leaves a line with no newline. Appending the next
+    record straight onto it would splice two matches into one unreadable line
+    and lose the good one too, so the broken half is terminated first and left
+    in place: `already_done` skips it, and it is evidence a run was interrupted.
+    """
+    if log.exists() and log.stat().st_size and not log.read_bytes().endswith(b"\n"):
+        with open(log, "a") as handle:
+            handle.write("\n")
 
 
 def run(specs=None, make=make_players, log=LOG, gate=check_headroom):
@@ -477,8 +255,8 @@ def describe(specs=None):
     for cell in ("self_play", "vs_bot"):
         print(f"  {cell}: {sum(s['cell'] == cell for s in specs)}")
     print("  calls per model: " + ", ".join(f"{m} {c}" for m, c in owed.items()))
-    # No rate has been measured on this card yet, so the spread is the honest
-    # answer until `preflight_checks.py --online` replaces it with one.
+    # Measured on this card by `preflight_checks.py --online`, so the spread is
+    # a bracket around a real rate rather than a guess.
     for label, rate in (("fast, 0.5 s a call", 0.5), ("1.0 s", 1.0),
                         ("slow, 2.0 s", 2.0)):
         flat = {model: rate for model in owed}

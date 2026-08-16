@@ -24,9 +24,11 @@ import time
 import axelrod as axl
 
 import grid_config
+import machine_gate
 import prompt_loader
 import run_analysis
 import run_experiment
+import run_ownership
 from bot_opponent import BotOpponent
 from iterated_game import play_match, play_round
 from ollama_player import OllamaPlayer, UnparseableReply
@@ -232,23 +234,23 @@ def one_stage_at_a_time_and_the_owner_is_named():
     """
     with tempfile.TemporaryDirectory() as folder:
         marker = pathlib.Path(folder) / ".running"
-        assert run_experiment.read_owner(marker) is None, "claimed an empty marker"
-        with run_experiment.owning_the_run("stage-under-test", marker):
-            held = run_experiment.read_owner(marker)
+        assert run_ownership.read_owner(marker) is None, "claimed an empty marker"
+        with run_ownership.owning_the_run("stage-under-test", marker):
+            held = run_ownership.read_owner(marker)
             assert held is not None and held["pid"] == os.getpid(), held
             assert held["stage"] == "stage-under-test", held
             assert "ask the owner" in held["note"], "the marker does not say to ask"
             try:
-                with run_experiment.owning_the_run("second", marker):
+                with run_ownership.owning_the_run("second", marker):
                     raise AssertionError("a second stage was allowed to start")
-            except run_experiment.AlreadyRunning as refusal:
+            except run_ownership.AlreadyRunning as refusal:
                 assert str(os.getpid()) in str(refusal), (
                     "the refusal does not name the PID to ask about")
         assert not marker.exists(), "the marker outlived the run that wrote it"
 
     stale = pathlib.Path(tempfile.mkdtemp()) / ".running"
     stale.write_text(json.dumps({"pid": 2 ** 22, "stage": "long gone"}))
-    assert run_experiment.read_owner(stale) is None, (
+    assert run_ownership.read_owner(stale) is None, (
         "a marker from a dead process would block every future stage")
 
 
@@ -260,27 +262,27 @@ def the_machine_is_checked_before_the_card_is_touched():
     79-87 C against a 52 C idle, so the ceiling is really a test for "is anyone
     else working".
     """
-    assert (run_experiment.MAXIMUM_RUNNING_TEMPERATURE_C
-            > run_experiment.MAXIMUM_START_TEMPERATURE_C), (
+    assert (machine_gate.MAXIMUM_RUNNING_TEMPERATURE_C
+            > machine_gate.MAXIMUM_START_TEMPERATURE_C), (
         "the running ceiling must be looser than the start ceiling, or the grid "
         "aborts on heat it makes itself")
-    assert run_experiment.MAXIMUM_RUNNING_TEMPERATURE_C < 100, (
+    assert machine_gate.MAXIMUM_RUNNING_TEMPERATURE_C < 100, (
         "the running ceiling must leave margin below the 100 C critical")
-    assert (run_experiment.COOLDOWN_TARGET_C
-            < run_experiment.MAXIMUM_RUNNING_TEMPERATURE_C), (
+    assert (machine_gate.COOLDOWN_TARGET_C
+            < machine_gate.MAXIMUM_RUNNING_TEMPERATURE_C), (
         "cooling to a temperature the gate would already reject is not cooling")
-    reading = run_experiment.package_temperature_c(samples=2, interval=0.05)
+    reading = machine_gate.package_temperature_c(samples=2, interval=0.05)
     assert reading is None or 20 < reading < 110, f"implausible reading {reading}"
-    original = run_experiment.MAXIMUM_START_TEMPERATURE_C
-    run_experiment.MAXIMUM_START_TEMPERATURE_C = -1
+    original = machine_gate.MAXIMUM_START_TEMPERATURE_C
+    machine_gate.MAXIMUM_START_TEMPERATURE_C = -1
     try:
-        run_experiment.check_can_start()
-    except run_experiment.OutOfHeadroom as refusal:
+        machine_gate.check_can_start()
+    except machine_gate.OutOfHeadroom as refusal:
         assert "start ceiling" in str(refusal), refusal
     else:
         raise AssertionError("the start ceiling never fires")
     finally:
-        run_experiment.MAXIMUM_START_TEMPERATURE_C = original
+        machine_gate.MAXIMUM_START_TEMPERATURE_C = original
 
 
 def the_analysis_is_deterministic_and_covers_every_cell():
