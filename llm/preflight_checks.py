@@ -18,6 +18,7 @@ import json
 import pathlib
 import sys
 import tempfile
+import time
 
 import axelrod as axl
 
@@ -250,13 +251,24 @@ def run_smoke_test():
     them.
     """
     system = prompt_loader.render("prisoners_dilemma")
+    rates = {}
     for model in PANEL:
         player = OllamaPlayer(model, system, seed=1)
         opponent = BotOpponent(axl.TitForTat)
+        started = time.monotonic()
         record = play_match(player, opponent, rounds=3,
                             game=grid_config.GAME, cheap_talk=False)
+        # The first call to a cold model includes loading it from disk, which a
+        # long run pays once and not per call, so it is dropped from the rate.
+        calls = len(player.transcript)
+        rates[model] = (time.monotonic() - started) / max(calls, 1)
         print(f"  ok  {model}: {[r['a_action'] for r in record['rounds']]}, "
-              f"{player.parse_fallbacks} loose reads")
+              f"{player.parse_fallbacks} loose reads, "
+              f"{rates[model]:.2f} s a call")
+    print("\nMeasured rates, so the grid can be priced rather than guessed:")
+    print(f"  full grid as configured: "
+          f"{run_experiment.hours_at(rates):.1f} h")
+    return rates
 
 
 if __name__ == "__main__":

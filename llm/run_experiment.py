@@ -153,17 +153,49 @@ def run(specs=None, make=make_players, log=LOG):
               f"{' in ' + str(record['seconds']) + 's' if 'seconds' in record else ''}")
 
 
-def describe():
+def calls_in(spec):
+    """Model calls one match costs. Cheap talk doubles it: a message and an action."""
+    if spec["condition"] == "with_cheap_talk":
+        return grid_config.ROUNDS * 4
+    return grid_config.ROUNDS * (2 if spec["cell"] == "self_play" else 1)
+
+
+def calls_per_model(specs=None):
+    """Calls each model owes, which is what an hours estimate has to be built on.
+
+    A total is not enough. The models do not answer at the same speed, and the
+    slowest one here is several times the fastest, so a grid priced on an
+    average is priced on a model that does not exist.
+    """
+    specs = build_grid() if specs is None else specs
+    owed = {}
+    for spec in specs:
+        owed[spec["model"]] = owed.get(spec["model"], 0) + calls_in(spec)
+    return owed
+
+
+def hours_at(rates, specs=None):
+    """Hours the grid would take, given seconds per call for each model."""
+    owed = calls_per_model(specs)
+    return sum(count * rates.get(model, 0) for model, count in owed.items()) / 3600
+
+
+def describe(specs=None):
     """The grid, without playing it or loading a model."""
-    specs = build_grid()
+    specs = build_grid() if specs is None else specs
     talking = sum(s["condition"] == "with_cheap_talk" for s in specs)
-    calls = sum(grid_config.ROUNDS * (4 if s["condition"] == "with_cheap_talk"
-                                      else 2 if s["cell"] == "self_play" else 1)
-                for s in specs)
+    owed = calls_per_model(specs)
     print(f"{len(specs)} matches, {talking} of them with cheap talk")
-    print(f"{grid_config.ROUNDS} rounds each, {calls} model calls in total")
+    print(f"{grid_config.ROUNDS} rounds each, {sum(owed.values())} model calls")
     for cell in ("self_play", "vs_bot"):
         print(f"  {cell}: {sum(s['cell'] == cell for s in specs)}")
+    print("  calls per model: " + ", ".join(f"{m} {c}" for m, c in owed.items()))
+    # No rate has been measured on this card yet, so the spread is the honest
+    # answer until `preflight_checks.py --online` replaces it with one.
+    for label, rate in (("fast, 0.5 s a call", 0.5), ("1.0 s", 1.0),
+                        ("slow, 2.0 s", 2.0)):
+        flat = {model: rate for model in owed}
+        print(f"  at {label:20} {hours_at(flat, specs):.1f} h")
     print(f"already done: {len(already_done())}")
 
 
