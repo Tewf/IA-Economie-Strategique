@@ -42,10 +42,13 @@ GAME_NAME = "prisoners_dilemma"
 # the machine looked like when it died: swap at zero and RAM exhausted.
 MINIMUM_MEMORY_GIB = 1.5
 MINIMUM_SWAP_GIB = 1.0
-# The machine idles near 52 C. One pinned core from any other session puts
-# it at 79-87 C, so anything above this means the grid does not fit beside
-# whatever else is running.
-MAXIMUM_TEMPERATURE_C = 70
+# Two thresholds because there are two questions. 70 C asked once at the start
+# means "is anyone else working": the machine idles near 52 C and one pinned
+# core from another session holds it at 79-87 C. 90 C asked every match means
+# "is the machine in trouble": the grid heats the package by itself, so the
+# start number would abort the work it exists to protect. Critical is 100 C.
+MAXIMUM_START_TEMPERATURE_C = 70
+MAXIMUM_RUNNING_TEMPERATURE_C = 90
 
 # The pair is handed one finished round before it starts, which is the closest
 # thing a language model has to the Hebbian agent's starting weight: a regime it
@@ -108,8 +111,8 @@ def headroom():
     return fields["MemAvailable"], fields["SwapFree"]
 
 
-def package_temperature_c():
-    """Hottest CPU package the kernel reports, or None if no sensor says.
+def _instant_package_c():
+    """One reading of the CPU package, or None if no sensor says.
 
     Read from `coretemp` rather than a thermal zone, because the zones on this
     board include the battery and the wifi card and the numbers are not
@@ -129,6 +132,29 @@ def package_temperature_c():
         except OSError:
             continue
     return hottest
+
+
+def package_temperature_c(samples=4, interval=0.3):
+    """The settled package temperature: the lowest of several quick readings.
+
+    **A single reading here measures whatever just ran, including this process.**
+    Importing `axelrod` costs 5.5 s of CPU and takes the package from 47 C to
+    79 C, which decays back inside two seconds. A gate that read once after its
+    own imports would refuse every stage forever, on the heat it had just made
+    itself.
+
+    The floor across a short window is the honest number. A neighbour pinning a
+    core holds it at 79-87 C in every sample; a transient of our own is gone by
+    the second one.
+    """
+    readings = []
+    for index in range(samples):
+        if index:
+            time.sleep(interval)
+        reading = _instant_package_c()
+        if reading is not None:
+            readings.append(reading)
+    return min(readings) if readings else None
 
 
 def throttle_count():
@@ -161,12 +187,32 @@ def check_headroom():
             f"stopping with {memory:.1f} GiB RAM and {swap:.1f} GiB swap free, "
             f"below the {MINIMUM_MEMORY_GIB}/{MINIMUM_SWAP_GIB} GiB floor. "
             f"Finished matches are in the log; rerun to resume.")
-    temperature = package_temperature_c()
-    if temperature is not None and temperature > MAXIMUM_TEMPERATURE_C:
+    temperature = package_temperature_c(samples=2)
+    if temperature is not None and temperature > MAXIMUM_RUNNING_TEMPERATURE_C:
         raise OutOfHeadroom(
             f"stopping at {temperature} C package, above the "
-            f"{MAXIMUM_TEMPERATURE_C} C ceiling. Something else is running: "
-            f"this machine idles near 52 C. Finished matches are in the log.")
+            f"{MAXIMUM_RUNNING_TEMPERATURE_C} C abort ceiling. Something joined "
+            f"the machine mid-stage. Finished matches are in the log.")
+
+
+def check_can_start():
+    """A stricter gate, asked once, before a stage claims the card.
+
+    Two different questions need two different numbers, and one threshold for
+    both was wrong. **Is anyone else working?** is the start question, and 70 C
+    answers it: this machine idles near 52 C and one pinned core from another
+    session holds it at 79-87 C. **Is the machine in trouble?** is the running
+    question, and 70 C cannot answer it, because the grid legitimately heats the
+    package itself; aborting on that would stop the very work it is guarding.
+    """
+    check_headroom()
+    temperature = package_temperature_c()
+    if temperature is not None and temperature > MAXIMUM_START_TEMPERATURE_C:
+        raise OutOfHeadroom(
+            f"not starting at {temperature} C package, above the "
+            f"{MAXIMUM_START_TEMPERATURE_C} C start ceiling. This machine idles "
+            f"near 52 C, so something else is running and the grid does not fit "
+            f"beside it. Ask whoever owns it, or wait.")
 
 
 class AlreadyRunning(RuntimeError):
@@ -300,6 +346,7 @@ def run_stage(model, log=LOG):
     remaining = stages(log)
     if model not in remaining:
         raise SystemExit(f"nothing left for {model!r}. Stages: {list(remaining)}")
+    check_can_start()
     before = throttle_count()
     with owning_the_run(model):
         print(f"stage {model}: {remaining[model]} matches to play, "
@@ -401,7 +448,7 @@ def show_stages():
     if live:
         print(f"\nrunning now: stage {live.get('stage')} as PID {live['pid']}")
     try:
-        check_headroom()
+        check_can_start()
         print(f"\nthe machine will allow a stage to start "
               f"({package_temperature_c()} C).")
     except OutOfHeadroom as refusal:
