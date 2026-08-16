@@ -285,6 +285,37 @@ def the_machine_is_checked_before_the_card_is_touched():
         machine_gate.MAXIMUM_START_TEMPERATURE_C = original
 
 
+def the_start_gate_outlasts_its_own_import_burn():
+    """A spike in the first readings must not refuse a stage on an idle machine.
+
+    This is a regression test for a real refusal. On 2026-08-17 stages two and
+    three were both turned away, at 95 C and 91 C, seconds apart, on a machine
+    whose settled temperature was 56 C. `import axelrod` plus reading the match
+    log costs 5.5 s of CPU and takes this package from 68 C to 89 C, decaying
+    to 52 C within one second; the gate sampled 0.3 s of that and believed it.
+
+    The scripted sensor below is that shape: hot while the burn is on, cool
+    after. A gate that reads the machine passes it; the gate as first written
+    reads 95 and refuses.
+    """
+    readings = iter([95, 93] + [56] * 40)
+    original = machine_gate.instant_package_c
+    machine_gate.instant_package_c = lambda: next(readings, 56)
+    try:
+        settled = machine_gate.settled_package_c(seconds=1.0, interval=0.01)
+        assert settled == 56, (
+            f"the settle window read {settled} C, so it is still inside the "
+            "import burn rather than past it")
+        machine_gate.check_headroom(settled)
+    finally:
+        machine_gate.instant_package_c = original
+
+    span = machine_gate.STARTUP_SETTLE_SECONDS
+    assert span >= 1.5, (
+        f"the start gate settles for {span}s, and the import burn measured on "
+        "this chassis lasts about one second. That is no margin at all")
+
+
 def the_analysis_is_deterministic_and_covers_every_cell():
     """Derive the tables twice from one log and get identical bytes.
 
@@ -362,6 +393,7 @@ OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            the_run_resumes_where_it_stopped, an_opening_reaches_both_players,
            one_stage_at_a_time_and_the_owner_is_named,
            the_machine_is_checked_before_the_card_is_touched,
+           the_start_gate_outlasts_its_own_import_burn,
            the_analysis_is_deterministic_and_covers_every_cell,
            an_empty_log_derives_nothing_and_says_so,
            the_log_records_the_prompt_once_and_never_echoes_it]

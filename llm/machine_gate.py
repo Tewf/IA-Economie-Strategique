@@ -30,6 +30,16 @@ MAXIMUM_RUNNING_TEMPERATURE_C = 90
 # for the difference between 93 C and something survivable.
 COOLDOWN_TARGET_C = 80
 COOLDOWN_MAXIMUM_SECONDS = 120
+# How long the start gate samples before it believes a number, and it is
+# measured rather than assumed. `import axelrod` plus reading a 44-match log
+# costs 5.5 s of CPU and takes this package from 68 C to 89 C, then back to
+# 52 C **within one second** of the last instruction. A gate that samples for
+# 0.3 s the moment its own imports finish is reading the burn and nothing else,
+# which is how stage two and stage three of the 2026-08-17 run were both
+# refused at 95 C and 91 C on an idle machine. Three seconds is that transient
+# with room to spare.
+STARTUP_SETTLE_SECONDS = 3.0
+SETTLE_INTERVAL_SECONDS = 0.3
 
 
 class OutOfHeadroom(RuntimeError):
@@ -91,6 +101,18 @@ def package_temperature_c(samples=4, interval=0.3):
     return min(readings) if readings else None
 
 
+def settled_package_c(seconds=STARTUP_SETTLE_SECONDS,
+                      interval=SETTLE_INTERVAL_SECONDS):
+    """The package temperature with this process's own startup burn excluded.
+
+    `package_temperature_c` already takes the floor of a window; this is that
+    window sized to the transient actually measured on this chassis rather than
+    to a default that predates the measurement.
+    """
+    return package_temperature_c(samples=max(2, round(seconds / interval)),
+                                 interval=interval)
+
+
 def throttle_count():
     """Times the package has been throttled since boot, or None."""
     counter = pathlib.Path("/sys/devices/system/cpu/cpu0/thermal_throttle/"
@@ -118,8 +140,13 @@ def cool_down(target=None, limit=COOLDOWN_MAXIMUM_SECONDS):
     return waited, package_temperature_c(samples=2, interval=0.2)
 
 
-def check_headroom():
+def check_headroom(temperature=None):
     """Refuse to start another match if the machine is running out of anything.
+
+    `temperature` is a settled reading the caller already paid for. Passing it
+    matters at the start of a stage, where measuring here instead would measure
+    the caller's own imports; mid-run the default is right, because a match is
+    only ever entered straight out of `cool_down`.
 
     Memory, because that is what took the machine down on 2026-08-15: swap hit
     zero, the OOM killer fired, and the GPU fell off the bus behind it while the
@@ -141,7 +168,8 @@ def check_headroom():
             f"stopping with {memory:.1f} GiB RAM and {swap:.1f} GiB swap free, "
             f"below the {MINIMUM_MEMORY_GIB}/{MINIMUM_SWAP_GIB} GiB floor. "
             f"Finished matches are in the log; rerun to resume.")
-    temperature = package_temperature_c(samples=2)
+    if temperature is None:
+        temperature = package_temperature_c(samples=2)
     if temperature is not None and temperature > MAXIMUM_RUNNING_TEMPERATURE_C:
         raise OutOfHeadroom(
             f"stopping at {temperature} C package, above the "
@@ -158,9 +186,16 @@ def check_can_start():
     session holds it at 79-87 C. **Is the machine in trouble?** is the running
     question, and 70 C cannot answer it, because the grid legitimately heats the
     package itself; aborting on that would stop the very work it is guarding.
+
+    **One reading, taken once, used for both ceilings.** The first version took
+    two: a 0.3 s one inside `check_headroom` against the 90 C running ceiling,
+    then a settled one against the 70 C start ceiling. The narrow one fired
+    first and always, because it landed on this process's own import burn, so
+    the settled reading it was supposed to defer to never ran and the refusal
+    blamed a neighbour that did not exist.
     """
-    check_headroom()
-    temperature = package_temperature_c()
+    temperature = settled_package_c()
+    check_headroom(temperature)
     if temperature is not None and temperature > MAXIMUM_START_TEMPERATURE_C:
         raise OutOfHeadroom(
             f"not starting at {temperature} C package, above the "
