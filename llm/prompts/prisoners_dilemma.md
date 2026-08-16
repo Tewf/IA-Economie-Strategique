@@ -29,6 +29,7 @@ The points you receive in a round depend on both choices:
 The game runs for an unknown number of rounds. After each round you are told
 what the other player chose. Your aim is to end with as many points as possible.
 
+<!-- answer-format:start -->
 Answer in exactly this format, and nothing else:
 
 ```
@@ -37,3 +38,12 @@ REASON: <one or two sentences>
 ```
 
 Give the action on the first line before you explain it.
+<!-- answer-format:end -->
+<!-- message-format:start -->
+You are being asked for a message to the other player, not for an action.
+
+Write one short sentence of ordinary prose and nothing else. Do not state which
+action you are about to choose, do not use the word Cooperate or the word
+Defect, and do not answer in the ACTION and REASON format. The other player is
+writing at the same moment and cannot see this before they choose.
+<!-- message-format:end -->

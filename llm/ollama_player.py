@@ -35,10 +35,16 @@ class OllamaPlayer:
     can_talk = True
 
     def __init__(self, model, system_prompt, actions=("Cooperate", "Defect"),
-                 temperature=TEMPERATURE, seed=0, max_tokens=None, think=None):
+                 temperature=TEMPERATURE, seed=0, max_tokens=None, think=None,
+                 message_prompt=None):
         settings = PANEL.get(model, {})
         self.model = model
         self.system_prompt = system_prompt
+        # A cheap-talk turn needs its own instructions. Left to the action
+        # prompt, a model obeys "answer in exactly this format" and sends an
+        # ACTION line as its message, which announces the move it is about to
+        # make and stops the choice being simultaneous at all.
+        self.message_prompt = message_prompt or system_prompt
         self.actions = list(actions)
         self.temperature = temperature
         self.seed = seed
@@ -58,7 +64,7 @@ class OllamaPlayer:
         self.history.append(opponent_action)
 
     def select_action(self):
-        reply = self._ask(self._round_prompt())
+        reply = self._ask(self._round_prompt(), self.system_prompt)
         action = self._parse_action(reply["content"])
         self.own_history.append(action)
         return action
@@ -67,8 +73,8 @@ class OllamaPlayer:
 
     def say(self):
         """One non-binding message, written before either side has acted."""
-        reply = self._ask(self._message_prompt())
-        message = reply["content"].strip()
+        reply = self._ask(self._message_prompt(), self.message_prompt)
+        message = reply["content"].strip().strip('"').strip()
         self.said.append(message)
         return message
 
@@ -115,7 +121,7 @@ class OllamaPlayer:
                 f"the same time, so neither of you can see the other's first. "
                 f"The message is not binding. Write only the message.")
 
-    def _ask(self, user_message):
+    def _ask(self, user_message, system):
         """One call, keeping the answer and any reasoning apart.
 
         qwen3 returns its reasoning in `message.thinking` rather than in
@@ -124,7 +130,7 @@ class OllamaPlayer:
         """
         body = json.dumps({
             "model": self.model,
-            "messages": [{"role": "system", "content": self.system_prompt},
+            "messages": [{"role": "system", "content": system},
                          {"role": "user", "content": user_message}],
             "stream": False,
             "think": self.think,

@@ -1,11 +1,18 @@
 """Read a prompt file and render the system prompt a model is actually given.
 
 The prompt files are prose so they can be reviewed, diffed and quoted as prose.
-Two things have to happen to one before it reaches a model, and both are here so
-that neither is done by hand and forgotten.
+Three things have to happen to one before it reaches a model, and all three are
+here so that none is done by hand and forgotten.
 
 Everything above the `---` rule in a prompt file is a note to the reader about
 why the scenario is worded as it is. Only what follows it is sent.
+
+**A message call and an action call need different instructions.** The scenario
+is shared, but the block telling a model to answer `ACTION: ... REASON: ...` is
+for the round where it acts. Sending that block on the cheap-talk turn made
+models answer it: the first run produced messages that were literal action
+declarations, which is not cheap talk but announcing your move before a
+simultaneous choice. The two blocks are marked in the file and selected here.
 """
 
 import pathlib
@@ -13,8 +20,14 @@ import re
 
 PROMPTS = pathlib.Path(__file__).parent / "prompts"
 NOTE_SEPARATOR = "\n---\n"
+BLOCKS = {"action": "answer-format", "message": "message-format"}
 PAYOFF_BLOCK = re.compile(r"<!-- payoffs:start -->\n(.*?)<!-- payoffs:end -->\n",
                           re.DOTALL)
+
+
+def _marked(name):
+    return re.compile(rf"<!-- {name}:start -->\n(.*?)<!-- {name}:end -->\n?",
+                      re.DOTALL)
 
 
 def load(game):
@@ -25,22 +38,34 @@ def load(game):
     return text.split(NOTE_SEPARATOR, 1)[1].strip()
 
 
-def render(game, repetition=0):
-    """The scenario with its payoff lines counterbalanced by repetition.
+def render(game, repetition=0, asking_for="action"):
+    """The scenario, plus the instruction for the call being made.
 
-    A list has a first item, and a model reading one is not indifferent to which
-    item that is: Fish, Gonczarowski and Shorrer (2024) moved prices with changes
-    no larger than this. Presenting mutual cooperation first in half the
-    repetitions and last in the other half means the ordering cannot be mistaken
-    for a result. Odd repetitions get the reversed order.
+    `asking_for` is "action" on a round where the model chooses, and "message"
+    on a cheap-talk turn. Getting this wrong does not fail, it quietly changes
+    the experiment, which is why `preflight_checks.py` asserts the two differ.
+
+    The payoff lines are counterbalanced by repetition. A list has a first item,
+    and a model reading one is not indifferent to which item that is: Fish,
+    Gonczarowski and Shorrer (2024) moved prices with changes no larger. Odd
+    repetitions get the reversed order.
     """
+    if asking_for not in BLOCKS:
+        raise ValueError(f"asking_for must be one of {sorted(BLOCKS)}")
     text = load(game)
+    for purpose, marker in BLOCKS.items():
+        pattern = _marked(marker)
+        if not pattern.search(text):
+            raise ValueError(f"{game}.md has no {marker} block")
+        # Keep the block this call needs, drop the one it does not.
+        text = (pattern.sub(lambda m: m.group(1), text, count=1)
+                if purpose == asking_for else pattern.sub("", text, count=1))
     match = PAYOFF_BLOCK.search(text)
-    if match is None:
-        return text
-    lines = [line for line in match.group(1).splitlines() if line.strip()]
-    ordered = lines if repetition % 2 == 0 else list(reversed(lines))
-    return PAYOFF_BLOCK.sub("\n".join(ordered) + "\n", text, count=1)
+    if match is not None:
+        lines = [line for line in match.group(1).splitlines() if line.strip()]
+        ordered = lines if repetition % 2 == 0 else list(reversed(lines))
+        text = PAYOFF_BLOCK.sub("\n".join(ordered) + "\n", text, count=1)
+    return text.strip()
 
 
 def payoff_orderings(game):

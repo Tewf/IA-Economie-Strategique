@@ -116,6 +116,30 @@ def the_prompt_is_not_anchored_on_one_action():
         "counterbalancing changed the text, not just the order")
 
 
+def a_message_turn_is_not_an_action_turn():
+    """The cheap-talk call must not carry the answer-format instruction.
+
+    It did, in the first run. The scenario ends with "answer in exactly this
+    format, and nothing else", the message call inherited it, and both models
+    sent each other a literal `ACTION: Defect` line as their message. That is
+    not a non-binding signal, it is announcing the move before a simultaneous
+    choice, and it would have been reported as cheap talk failing to sustain
+    cooperation when cheap talk had never been tested.
+    """
+    action = prompt_loader.render("prisoners_dilemma", 0, "action")
+    message = prompt_loader.render("prisoners_dilemma", 0, "message")
+    assert action != message, "both calls would be given the same instructions"
+    assert "ACTION: <Cooperate or Defect>" in action, "the action call lost its format"
+    assert "ACTION:" not in message, (
+        "the message call still tells the model to answer with an ACTION line")
+    for shared in ("you get 3 points", "unknown number of rounds"):
+        assert shared in action and shared in message, (
+            f"the two calls disagree about the game itself, missing: {shared}")
+    player = OllamaPlayer("phi3:mini", action, message_prompt=message)
+    assert player.system_prompt != player.message_prompt, (
+        "the player was built with one prompt for both kinds of call")
+
+
 def bots_behave_as_themselves():
     """Tit-for-Tat must mirror, and Grudger must never forgive."""
     opponent = ["Cooperate", "Cooperate", "Defect", "Cooperate", "Defect"]
@@ -229,7 +253,8 @@ def an_empty_log_derives_nothing_and_says_so():
 
 OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            a_player_sees_its_own_moves, the_answer_format_is_read_correctly,
-           the_prompt_is_not_anchored_on_one_action, bots_behave_as_themselves,
+           the_prompt_is_not_anchored_on_one_action,
+           a_message_turn_is_not_an_action_turn, bots_behave_as_themselves,
            a_bot_is_never_asked_to_talk, seeds_are_stable_across_processes,
            the_run_resumes_where_it_stopped, an_opening_reaches_both_players,
            the_analysis_is_deterministic_and_covers_every_cell,
@@ -250,10 +275,11 @@ def run_smoke_test():
     token budgets and surfaces unparseable replies before a long run inherits
     them.
     """
-    system = prompt_loader.render("prisoners_dilemma")
+    system = prompt_loader.render("prisoners_dilemma", 0, "action")
+    messages = prompt_loader.render("prisoners_dilemma", 0, "message")
     rates = {}
     for model in PANEL:
-        player = OllamaPlayer(model, system, seed=1)
+        player = OllamaPlayer(model, system, seed=1, message_prompt=messages)
         opponent = BotOpponent(axl.TitForTat)
         record = play_match(player, opponent, rounds=4,
                             game=grid_config.GAME, cheap_talk=False)

@@ -138,16 +138,19 @@ def apply_opening(player, opening):
 
 def make_players(spec):
     """The two players for one spec. The only place a model is constructed."""
-    system = prompt_loader.render(GAME_NAME, spec["repetition"])
+    system = prompt_loader.render(GAME_NAME, spec["repetition"], "action")
+    message_system = prompt_loader.render(GAME_NAME, spec["repetition"], "message")
     seed_of = (lambda seat: grid_config.player_seed(
         BASE_SEED, spec["condition"], spec["model"], spec["repetition"], seat))
-    player_a = OllamaPlayer(spec["model"], system, seed=seed_of("a"))
+    player_a = OllamaPlayer(spec["model"], system, seed=seed_of("a"),
+                            message_prompt=message_system)
     if spec["cell"] == "vs_bot":
         strategy = next(s for s in grid_config.BOT_OPPONENTS
                         if s.name == spec["opponent"])
         player_b = BotOpponent(strategy, seed=seed_of("b"))
     else:
-        player_b = OllamaPlayer(spec["model"], system, seed=seed_of("b"))
+        player_b = OllamaPlayer(spec["model"], system, seed=seed_of("b"),
+                                message_prompt=message_system)
     for player in (player_a, player_b):
         apply_opening(player, spec["opening"])
     return player_a, player_b
