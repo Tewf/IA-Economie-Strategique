@@ -5,6 +5,7 @@ mirror-neuron agent cannot.
 
 | | |
 |---|---|
+| [`what-is-already-known.md`](what-is-already-known.md) | What the literature has already settled, and the two claims this folder must therefore not make |
 | [`homo-silicus.md`](homo-silicus.md) | The method, and the four things it cannot show |
 | [`cheap-talk-and-explanation.md`](cheap-talk-and-explanation.md) | The two capabilities that make this a continuation of the internship rather than a new subject |
 
