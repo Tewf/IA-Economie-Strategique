@@ -28,6 +28,11 @@ from panel_config import BASE_SEED, PANEL
 LOG = pathlib.Path(__file__).parent / "results" / "matches.jsonl"
 GAME_NAME = "prisoners_dilemma"
 
+# Floors below which the run stops rather than pressing on. Chosen from what
+# the machine looked like when it died: swap at zero and RAM exhausted.
+MINIMUM_MEMORY_GIB = 1.5
+MINIMUM_SWAP_GIB = 1.0
+
 # The pair is handed one finished round before it starts, which is the closest
 # thing a language model has to the Hebbian agent's starting weight: a regime it
 # inherits rather than chooses. "neutral" hands it nothing.
@@ -74,6 +79,39 @@ def already_done(log=LOG):
         except (json.JSONDecodeError, KeyError):
             continue
     return done
+
+
+class OutOfHeadroom(RuntimeError):
+    """Stopped before the machine ran out, not after."""
+
+
+def headroom():
+    """Available RAM and free swap, in GiB, as the kernel reports them."""
+    fields = {}
+    for line in pathlib.Path("/proc/meminfo").read_text().splitlines():
+        name, _, value = line.partition(":")
+        fields[name] = int(value.split()[0]) / (1024 ** 2)
+    return fields["MemAvailable"], fields["SwapFree"]
+
+
+def check_headroom():
+    """Refuse to start another match if memory is running out.
+
+    What took this machine down on 2026-08-15 was host RAM, not VRAM: swap hit
+    zero, the OOM killer fired, and the GPU fell off the bus behind it. The card
+    reported 7.6 GiB free the whole time, so watching VRAM would not have caught
+    it. This watches the thing that actually ran out.
+
+    Stopping is cheap because the run is resumable: every finished match is
+    already in the log, so an abort costs the match in flight and the operator
+    can restart once whatever is eating memory has gone.
+    """
+    memory, swap = headroom()
+    if memory < MINIMUM_MEMORY_GIB or swap < MINIMUM_SWAP_GIB:
+        raise OutOfHeadroom(
+            f"stopping with {memory:.1f} GiB RAM and {swap:.1f} GiB swap free, "
+            f"below the {MINIMUM_MEMORY_GIB}/{MINIMUM_SWAP_GIB} GiB floor. "
+            f"Finished matches are in the log; rerun to resume.")
 
 
 def _close_any_partial_line(log):
@@ -137,6 +175,7 @@ def run(specs=None, make=make_players, log=LOG):
     log.parent.mkdir(exist_ok=True)
     _close_any_partial_line(log)
     for index, spec in enumerate(todo, start=1):
+        check_headroom()
         # A model that answers with prose where an action was asked loses its
         # match, and that is a result about the model. Recording it and carrying
         # on is the difference between a reported failure rate and a run that

@@ -13,11 +13,14 @@ import hashlib
 import axelrod as axl
 
 # 30 rounds, so a strategy has room to establish itself and then be tested, and
-# short enough that 5 repetitions of the whole grid is an evening rather than a
-# week. Axelrod's payoffs, so the numbers line up with the Hebbian tournament
+# short enough that the whole grid is an evening rather than a week. Axelrod's payoffs, so the numbers line up with the Hebbian tournament
 # exactly. Both are stated in `prompts/prisoners_dilemma.md` too.
 ROUNDS = 30
-REPETITIONS = 5
+# Four, not five. The payoff order alternates on even and odd repetitions, so
+# only an even count balances it: five gives a 3:2 skew and defeats half the
+# point of counterbalancing at all. Repetitions are part of the match key, so
+# raising this later replays nothing already done.
+REPETITIONS = 4
 GAME = axl.Game()
 
 # Cheap talk is the treatment Ng (2023) is built on: non-binding messages that
