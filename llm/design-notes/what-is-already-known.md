@@ -32,6 +32,57 @@ against 90-90 cooperation under the fixed one is a vivid instance of a known
 phenomenon, not a new one. It is worth reporting as evidence that the fix
 mattered, not as a finding about language models.
 
+## The field's word for the question is *path dependence*, and half of it is done
+
+Named properly, the question is not "lock-in" but **path dependence and
+sensitivity to initial conditions in repeated LLM interaction**. Under that name
+the literature has plenty, and one paper does something very close to a cell of
+this grid.
+
+[The Memory Curse](https://arxiv.org/abs/2605.08060) tests 7 models across 4
+games over 500 rounds and finds that **expanding accessible history degrades
+cooperation in 18 of 28 model-game settings**. Its *memory sanitization* arm
+holds prompt length constant and replaces the real history with **synthetic
+cooperative records**, which restores cooperation substantially.
+
+That is the `mutual_cooperation` opening, done already and by a stronger design.
+What is not done, as far as this search reached:
+
+- **The defective opening as the symmetric treatment.** Sanitization injects a
+  good history to repair a collapse. Nobody found here injects a bad one to see
+  whether a pair that could have cooperated is captured by it.
+- **Opening crossed with cheap talk.** Whether a channel lets a pair leave a
+  regime it was handed is a different question from whether a channel raises
+  cooperation from neutral, and the second does not imply the first.
+- **A non-linguistic floor.** Sensitivity to initial conditions is described in
+  this literature as *understudied*, and measured across random seeds rather
+  than against a mechanism that provably cannot escape. The Hebbian agent is
+  that floor: 700 runs out of 700 keeping the regime it was dropped into.
+
+**The baseline to report against is therefore the sanitization result**:
+a synthetic cooperative history restores cooperation. If this grid reproduces
+that and finds no matching capture from a synthetic defective history, the
+asymmetry is the finding. If both capture, it is a ratchet in a talking agent
+and it lines up with the imitator.
+
+## Two design choices that sit in the collapse-prone regime
+
+Worth stating before the run rather than discovering in the numbers, because
+both were chosen for other reasons and both are named in that paper as things
+that make cooperation worse:
+
+- **Every round of history is in every prompt.** `_rounds_so_far` replays both
+  sides of every finished round, messages included, so by round 30 the context
+  is long. That is the memory-curse condition.
+- **The prompt asks for a REASON.** Explicit deliberation is reported to
+  *amplify* the collapse, and removing chain-of-thought often reduces it.
+
+Neither is a reason to change the design: the history is what makes an iterated
+game iterated, and the reason is what the explainability half measures. They are
+reasons to expect less cooperation than a short-context, action-only setup would
+give, and to say so beside any number that comes back low. Thirty rounds is also
+far short of the 500 where the effect was characterised.
+
 ## What is left, and it is the part worth running
 
 The internship's question is not "do talking agents cooperate". It is whether
