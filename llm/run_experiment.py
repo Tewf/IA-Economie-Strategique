@@ -49,6 +49,13 @@ MINIMUM_SWAP_GIB = 1.0
 # start number would abort the work it exists to protect. Critical is 100 C.
 MAXIMUM_START_TEMPERATURE_C = 70
 MAXIMUM_RUNNING_TEMPERATURE_C = 90
+# The grid on its own holds this package at 93 C, measured twice by a
+# neighbouring session while nothing else ran. There is no fan control on this
+# board and thermald has never engaged, so the only lever left is to ask for
+# less: cool back to this before starting the next match. It trades wall clock
+# for the difference between 93 C and something survivable.
+COOLDOWN_TARGET_C = 80
+COOLDOWN_MAXIMUM_SECONDS = 120
 
 # The pair is handed one finished round before it starts, which is the closest
 # thing a language model has to the Hebbian agent's starting weight: a regime it
@@ -164,6 +171,26 @@ def throttle_count():
     return int(counter.read_text()) if counter.exists() else None
 
 
+def cool_down(target=None, limit=COOLDOWN_MAXIMUM_SECONDS):
+    """Wait for the package to settle before asking the machine for more.
+
+    Two stages aborted at 93 C, and the second time a neighbouring session
+    measured `ollama` at 92% CPU as the only load: the grid reaches that on its
+    own. Running flat out is not available on this chassis, so the run pauses
+    between matches instead. Bounded, because a machine that will not cool is a
+    reason to stop rather than to wait forever.
+    """
+    target = COOLDOWN_TARGET_C if target is None else target
+    waited = 0
+    while waited < limit:
+        reading = package_temperature_c(samples=2, interval=0.2)
+        if reading is None or reading <= target:
+            return waited, reading
+        time.sleep(5)
+        waited += 5
+    return waited, package_temperature_c(samples=2, interval=0.2)
+
+
 def check_headroom():
     """Refuse to start another match if the machine is running out of anything.
 
@@ -215,6 +242,18 @@ def check_can_start():
             f"beside it. Ask whoever owns it, or wait.")
 
 
+def _session_name():
+    """Something a person or another agent can act on.
+
+    A marker that says "ask the owner" and then reads `unknown session` is half
+    a mechanism: the session next door had to find the owner from a chat message
+    instead of from the file. The variable is CLAUDE_CODE_SESSION_ID, not
+    CLAUDE_SESSION_ID, which is why the first version was always empty.
+    """
+    session = os.environ.get("CLAUDE_CODE_SESSION_ID")
+    return f"claude session {session}" if session else f"pid {os.getppid()} (no session id)"
+
+
 class AlreadyRunning(RuntimeError):
     """Another stage owns the card. Two at once is how the log got raced."""
 
@@ -261,7 +300,7 @@ def owning_the_run(stage, marker=OWNER):
     marker.write_text(json.dumps({
         "pid": os.getpid(), "stage": stage,
         "started": datetime.datetime.now().isoformat(timespec="seconds"),
-        "owner": os.environ.get("CLAUDE_SESSION_ID", "unknown session"),
+        "owner": _session_name(),
         "note": "ask the owner before killing this; it holds the GPU for ~an hour",
     }, indent=2) + "\n")
     print(f"owner: PID {os.getpid()} holds stage {stage}. "
@@ -322,7 +361,12 @@ def play_one(spec, make=make_players):
     record = play_match(player_a, player_b, rounds=grid_config.ROUNDS,
                         game=grid_config.GAME,
                         cheap_talk=spec["condition"] == "with_cheap_talk")
-    return {**spec, "key": key_of(spec), "seconds": round(time.monotonic() - started, 2),
+    return {**spec, "key": key_of(spec),
+            "seconds": round(time.monotonic() - started, 2),
+            # Sampled the instant the match ends, which is the closest cheap
+            # proxy for its peak. Recorded so "the grid reaches 93 C on its own"
+            # stays a measurement rather than becoming folklore.
+            "package_c_at_end": _instant_package_c(),
             **record}
 
 
@@ -375,6 +419,10 @@ def run(specs=None, make=make_players, log=LOG, gate=check_headroom):
     log.parent.mkdir(exist_ok=True)
     _close_any_partial_line(log)
     for index, spec in enumerate(todo, start=1):
+        if index > 1:
+            waited, settled = cool_down()
+            if waited:
+                print(f"    cooled {waited}s to {settled} C")
         gate()
         # A model that answers with prose where an action was asked loses its
         # match, and that is a result about the model. Recording it and carrying
