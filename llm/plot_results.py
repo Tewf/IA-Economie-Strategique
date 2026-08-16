@@ -82,20 +82,35 @@ def plot_lock_in(rows):
 
 
 def plot_reciprocity_against_the_imitator(rows):
-    """Every model's reciprocity, with the Hebbian agent and Tit-for-Tat marked."""
+    """Every model's reciprocity, with the Hebbian agent and Tit-for-Tat marked.
+
+    **Undefined seats are dropped rather than averaged in.** Reciprocity is
+    `P(cooperate | they defected last)` subtracted from `P(cooperate | they
+    cooperated last)`, so a match in which nobody ever defects has no second
+    term and `measurements.reciprocity` writes `nan`. That is the honest value
+    and it happens here: under cheap talk these models cooperate throughout.
+    Averaging it in would make one NaN erase a model's whole bar, and a missing
+    bar reads as zero reciprocity rather than as no defection to react to.
+    """
     hebbian = read(HEBBIAN, "reciprocity.csv") or []
     marks = {row["player"]: float(row["reciprocity_index"])
              for row in hebbian if row["prober"] == "Random"
              and row["player"] in ("Mirror Neuron", "Tit For Tat")}
     models = sorted({row["model"] for row in rows})
-    values = [_mean([float(row["reciprocity_index"]) for row in rows
-                     if row["model"] == model]) for model in models]
+    values = [_mean([value for value in
+                     (float(row["reciprocity_index"]) for row in rows
+                      if row["model"] == model) if value == value])
+              for model in models]
+    undefined = [model for model, value in zip(models, values) if value != value]
     figure, axes = plt.subplots()
-    axes.barh(models, values, color=TALK)
+    axes.barh(models, [0 if value != value else value for value in values],
+              color=TALK)
     for name, value in marks.items():
         axes.axvline(value, ls="--", lw=1, c="#c1440e")
         axes.text(value, -0.6, f" {name} {value:.2f}", color="#c1440e", fontsize=8)
-    axes.set_xlabel("reciprocity index")
+    axes.set_xlabel("reciprocity index" if not undefined else
+                    f"reciprocity index. Undefined, so drawn at zero: "
+                    f"{', '.join(undefined)}")
     axes.set_title("Models against the imitator, on one measure")
     save(figure, "reciprocity_against_the_imitator.png")
 
