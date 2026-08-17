@@ -39,7 +39,8 @@ TABLES = [
      ["model", "rounds_naming_an_action", "rounds_agreeing", "agreement_rate"],
      lambda played, lost: measurements.reason_matches_action(played)),
     ("parse_health.csv",
-     ["model", "matches_played", "matches_lost", "loose_reads"],
+     ["model", "matches_played", "matches_lost", "loose_reads",
+      "mean_rounds_before_loss"],
      lambda played, lost: measurements.parse_health(played, lost)),
 ]
 

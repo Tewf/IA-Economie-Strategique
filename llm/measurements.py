@@ -181,7 +181,16 @@ def reason_matches_action(matches):
 
 
 def parse_health(matches, lost):
-    """How often the answer format held, and how often a match was lost to it."""
+    """How often the answer format held, how often a match was lost to it, and
+    how far the model got first.
+
+    The last column is what separates two different findings. A model that
+    names no action in round 1 of every match cannot hold the format at all; a
+    model that holds it for twenty rounds and then loses it is degrading as the
+    context grows, which is the memory-curse shape this folder is set up to
+    watch for. Reported as a mean over lost matches, and `nan` for a model that
+    lost none, because zero would read as "failed immediately".
+    """
     loose = collections.Counter()
     played = collections.Counter()
     for match in matches:
@@ -189,6 +198,9 @@ def parse_health(matches, lost):
         loose[match["model"]] += (match.get("a_parse_fallbacks", 0)
                                   + match.get("b_parse_fallbacks", 0))
     failed = collections.Counter(record["model"] for record in lost)
+    reached = collections.defaultdict(list)
+    for record in lost:
+        reached[record["model"]].append(record.get("rounds_completed", 0))
     models = sorted(set(played) | set(failed))
-    return [(model, played[model], failed[model], loose[model])
-            for model in models]
+    return [(model, played[model], failed[model], loose[model],
+             _mean(reached[model])) for model in models]

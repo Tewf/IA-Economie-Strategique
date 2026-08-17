@@ -25,6 +25,7 @@ import axelrod as axl
 
 import grid_config
 import machine_gate
+import measurements
 import prompt_loader
 import run_analysis
 import run_experiment
@@ -285,6 +286,38 @@ def the_machine_is_checked_before_the_card_is_touched():
         machine_gate.MAXIMUM_START_TEMPERATURE_C = original
 
 
+def a_lost_match_records_how_far_it_got():
+    """Losing the format in round 1 and losing it in round 20 are different findings.
+
+    phi3:mini answered an action turn with a cheap-talk message on 2026-08-17
+    and lost the match, which is a result about the model. The record said only
+    that it happened, so "cannot hold the format at all" and "loses it as the
+    context grows" were indistinguishable, and the second is the shape the
+    literature note says to watch for.
+    """
+    class FailsAfter(StubPlayer):
+        def select_action(self):
+            if len(self.own_history) >= 3:
+                raise UnparseableReply("named no action in: 'well, it depends'")
+            return super().select_action()
+
+    spec = next(s for s in run_experiment.build_grid()
+                if s["cell"] == "self_play" and s["condition"] == "without_cheap_talk")
+    record = run_experiment.play_one(
+        spec, make=lambda _: (FailsAfter("a", ALWAYS_COOPERATE),
+                              StubPlayer("b", ALWAYS_COOPERATE)))
+    assert "failed" in record, "a lost match was not recorded as lost"
+    assert record["rounds_completed"] == 3, record.get("rounds_completed")
+    assert "seconds" in record, "a lost match must still be timed"
+    assert "rounds" not in record, "a lost match must not report a scoreline"
+
+    health = measurements.parse_health([], [record])
+    assert health[0][2] == 1 and health[0][4] == 3, health
+    none_lost = measurements.parse_health([{"model": "m"}], [])
+    assert none_lost[0][4] != none_lost[0][4], (
+        "a model that lost nothing must read as undefined, not as zero rounds")
+
+
 def the_start_gate_outlasts_its_own_import_burn():
     """A spike in the first readings must not refuse a stage on an idle machine.
 
@@ -394,6 +427,7 @@ OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            one_stage_at_a_time_and_the_owner_is_named,
            the_machine_is_checked_before_the_card_is_touched,
            the_start_gate_outlasts_its_own_import_burn,
+           a_lost_match_records_how_far_it_got,
            the_analysis_is_deterministic_and_covers_every_cell,
            an_empty_log_derives_nothing_and_says_so,
            the_log_records_the_prompt_once_and_never_echoes_it]

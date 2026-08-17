@@ -145,13 +145,30 @@ def make_players(spec):
 
 def play_one(spec, make=make_players):
     """One match, as the record that gets appended. `make` is injectable so the
-    whole runner can be exercised with stub players and no GPU."""
+    whole runner can be exercised with stub players and no GPU.
+
+    A model that answers with prose where an action was asked loses the match,
+    and that is a result about the model rather than an error to hide. **How
+    far it got before that is what makes the result readable**: failing in
+    round 1 of every match is "cannot hold the format at all", and failing in
+    round 20 is "loses the format as the context grows", which are different
+    findings and the second is the one this folder's own literature note says
+    to watch for. phi3:mini produced the first such reply on 2026-08-17, a
+    cheap-talk message written on an action turn, and the record as it stood
+    could not tell the two apart.
+    """
     started = time.monotonic()
     player_a, player_b = make(spec)
-    record = play_match(player_a, player_b, rounds=grid_config.ROUNDS,
-                        game=grid_config.GAME,
-                        cheap_talk=spec["condition"] == "with_cheap_talk")
-    return {**spec, "key": key_of(spec),
+    common = {**spec, "key": key_of(spec)}
+    try:
+        record = play_match(player_a, player_b, rounds=grid_config.ROUNDS,
+                            game=grid_config.GAME,
+                            cheap_talk=spec["condition"] == "with_cheap_talk")
+    except UnparseableReply as failure:
+        record = {"failed": str(failure),
+                  "rounds_completed": min(len(player_a.own_history),
+                                          len(player_b.own_history))}
+    return {**common,
             "seconds": round(time.monotonic() - started, 2),
             # Sampled the instant the match ends, which is the closest cheap
             # proxy for its peak. Recorded so "the grid reaches 93 C on its own"
@@ -227,20 +244,17 @@ def run(specs=None, make=make_players, log=LOG, gate=check_headroom):
             if waited:
                 print(f"    cooled {waited}s to {settled} C")
         gate()
-        # A model that answers with prose where an action was asked loses its
-        # match, and that is a result about the model. Recording it and carrying
-        # on is the difference between a reported failure rate and a run that
-        # dies at hour three on its first bad reply.
-        try:
-            record = play_one(spec, make)
-            outcome = f"{record['a_total']}-{record['b_total']}"
-        except UnparseableReply as failure:
-            record = {**spec, "key": key_of(spec), "failed": str(failure)}
-            outcome = "UNPARSEABLE"
+        # Carrying on past a lost match is the difference between a reported
+        # failure rate and a run that dies at hour three on its first bad
+        # reply. `play_one` turns the loss into a record rather than raising.
+        record = play_one(spec, make)
+        outcome = (f"UNPARSEABLE after {record['rounds_completed']} rounds"
+                   if "failed" in record
+                   else f"{record['a_total']}-{record['b_total']}")
         with open(log, "a") as handle:
             handle.write(json.dumps(record) + "\n")
-        print(f"  [{index}/{len(todo)}] {record['key']} {outcome}"
-              f"{' in ' + str(record['seconds']) + 's' if 'seconds' in record else ''}")
+        print(f"  [{index}/{len(todo)}] {record['key']} {outcome} "
+              f"in {record['seconds']}s")
 
 
 def calls_in(spec):
