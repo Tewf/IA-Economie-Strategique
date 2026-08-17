@@ -158,6 +158,12 @@ the expensive half raw and the checkable half cheap.
 The same split makes the run resumable: each match is keyed and a key already in
 the log is skipped, so a crash costs the match in flight and nothing more.
 
+**[`results/README.md`](results/README.md) is the data dictionary**: every field
+of the raw log, every column of the seven tables, and the run conditions that have
+to be reported with a number for it to mean anything — the model digests and
+quantisation levels, the seeds, the hardware, and the confound in phi3:mini's
+build.
+
 ## The files
 
 | | |

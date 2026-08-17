@@ -173,6 +173,13 @@ Cette séparation rend aussi la campagne reprenable : chaque match a une clé, e
 une clé déjà présente dans le journal est ignorée. Une panne ne coûte que le
 match en cours.
 
+**[`results/README.md`](results/README.md) est le dictionnaire des données** :
+chaque champ du journal brut, chaque colonne des sept tables, et les conditions
+d'exécution qu'il faut rapporter avec un chiffre pour qu'il veuille dire quelque
+chose — les empreintes et les niveaux de quantification des modèles, les graines,
+le matériel, et le facteur confondant que porte le build de phi3:mini. Il est
+rédigé en anglais, comme les notes de conception et les prompts.
+
 ## Les fichiers
 
 | | |

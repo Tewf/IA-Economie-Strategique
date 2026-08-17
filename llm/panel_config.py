@@ -37,6 +37,12 @@ CONTEXT_TOKENS = 8192
 # Per model: what it is, gigabytes on disk, its token budget, and whether it is
 # asked to think. A reasoning model needs room for the reasoning plus the answer,
 # and 300 tokens truncates qwen3 mid-thought and yields an unparseable reply.
+#
+# A tag is not a version: Ollama resolves `qwen3:8b` to whatever build it last
+# pulled, so this file cannot identify what played. The digests and quantisation
+# levels the committed results were actually produced with are recorded beside
+# the data, in `results/README.md`, which is where a reader checking a
+# replication needs them.
 PANEL = {
     "qwen3:8b": {
         "description": "8.2B, the largest that fits, and the only one that "
