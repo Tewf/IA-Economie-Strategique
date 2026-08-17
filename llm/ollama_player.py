@@ -19,8 +19,8 @@ import json
 import time
 import urllib.request
 
-from panel_config import (OLLAMA_HOST, PANEL, REQUEST_TIMEOUT_SECONDS,
-                          TEMPERATURE)
+from panel_config import (CONTEXT_TOKENS, OLLAMA_HOST, PANEL,
+                          REQUEST_TIMEOUT_SECONDS, TEMPERATURE)
 
 ACTION_LINE = "ACTION:"
 
@@ -49,6 +49,7 @@ class OllamaPlayer:
         self.temperature = temperature
         self.seed = seed
         self.max_tokens = max_tokens or settings.get("max_tokens", 300)
+        self.context_tokens = settings.get("context_tokens", CONTEXT_TOKENS)
         self.think = settings.get("think", False) if think is None else think
         self.history = []       # what the opponent played, oldest first
         self.own_history = []   # what this player played, same order
@@ -142,7 +143,8 @@ class OllamaPlayer:
             "stream": False,
             "think": self.think,
             "options": {"temperature": self.temperature, "seed": self.seed,
-                        "num_predict": self.max_tokens},
+                        "num_predict": self.max_tokens,
+                        "num_ctx": self.context_tokens},
         }).encode()
         request = urllib.request.Request(
             f"{OLLAMA_HOST}/api/chat", data=body,
@@ -150,12 +152,18 @@ class OllamaPlayer:
         started = time.monotonic()
         with urllib.request.urlopen(request,
                                     timeout=REQUEST_TIMEOUT_SECONDS) as response:
-            message = json.load(response)["message"]
+            answer = json.load(response)
+        message = answer["message"]
         # Timed per call, because the first call to a cold model also pays to
         # load it from disk. A long run pays that once per model; a rate that
         # smears it over three calls prices the grid at several times its cost.
         reply = {"content": message.get("content", ""),
                  "thinking": message.get("thinking", ""),
+                 # How close this call came to the window. Recorded because a
+                 # prompt over `num_ctx` is cut rather than refused, and the cut
+                 # takes the system prompt first, so the only way to know the
+                 # experiment was still the experiment is to hold the number.
+                 "prompt_tokens": answer.get("prompt_eval_count"),
                  "seconds": round(time.monotonic() - started, 3)}
         self.transcript.append(reply)
         return reply

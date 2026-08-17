@@ -17,6 +17,7 @@ import pathlib
 
 from axelrod.action import Action
 
+from panel_config import CONTEXT_TOKENS
 from reciprocity import reciprocity_index
 
 LOG = pathlib.Path(__file__).parent / "results" / "matches.jsonl"
@@ -178,6 +179,30 @@ def reason_matches_action(matches):
                 counted[0] += named[0] == action.upper()
     return [(model, total, agreed, agreed / total if total else float("nan"))
             for model, (agreed, total) in sorted(grouped.items())]
+
+
+def context_headroom(matches, lost, limit=CONTEXT_TOKENS):
+    """The longest prompt each model actually sent, against the window it had.
+
+    This table exists because the failure it guards against is silent. Ollama
+    serves 4096 tokens by default and cuts anything longer instead of refusing
+    it, oldest tokens first, which is the system prompt: the match carries on
+    with the scenario and the answer format gone, and the log looks normal. It
+    happened on 2026-08-17 and cost a stage.
+
+    A `longest_prompt` at the limit means the run was truncated and the numbers
+    beside it describe a different experiment. Anything comfortably below it
+    means the prompt reached the model whole.
+    """
+    longest = collections.defaultdict(int)
+    for record in list(matches) + list(lost):
+        for seat in ("a", "b"):
+            for reply in record.get(f"{seat}_transcript", []):
+                seen = reply.get("prompt_tokens")
+                if seen:
+                    longest[record["model"]] = max(longest[record["model"]], seen)
+    return [(model, limit, longest[model], limit - longest[model])
+            for model in sorted(longest)]
 
 
 def parse_health(matches, lost):

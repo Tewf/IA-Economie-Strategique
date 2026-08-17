@@ -26,6 +26,7 @@ import axelrod as axl
 import grid_config
 import machine_gate
 import measurements
+import ollama_player
 import prompt_loader
 import run_analysis
 import run_experiment
@@ -33,7 +34,7 @@ import run_ownership
 from bot_opponent import BotOpponent
 from iterated_game import play_match, play_round
 from ollama_player import OllamaPlayer, UnparseableReply
-from panel_config import PANEL
+from panel_config import CONTEXT_TOKENS, PANEL
 from stub_player import StubPlayer
 
 ALTERNATING = ["Cooperate", "Defect"]
@@ -286,6 +287,61 @@ def the_machine_is_checked_before_the_card_is_touched():
         machine_gate.MAXIMUM_START_TEMPERATURE_C = original
 
 
+def every_call_asks_for_a_window_big_enough_to_hold_it():
+    """The context must be set on the request, and be larger than the prompt.
+
+    Ollama's default is 4096 whatever the model supports, and it does not
+    refuse an over-long prompt, it truncates it, oldest tokens first. The
+    oldest tokens are the system prompt, so the match continues with the
+    scenario and the answer format removed and nothing in the reply says so.
+    That is what happened to phi3:mini on 2026-08-17 and it cost a stage.
+
+    Checked on the wire rather than on the attribute, because the bug this
+    guards against is the option going missing from the request body.
+    """
+    sent = {}
+
+    class Response:
+        def read(self):
+            return json.dumps({"message": {"content": "ACTION: Cooperate"},
+                               "prompt_eval_count": 123}).encode()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+    def fake_urlopen(request, timeout=None):
+        sent.update(json.loads(request.data))
+        return Response()
+
+    original = ollama_player.urllib.request.urlopen
+    ollama_player.urllib.request.urlopen = fake_urlopen
+    try:
+        player = OllamaPlayer("phi3:mini", "system")
+        assert player.select_action() == "Cooperate"
+    finally:
+        ollama_player.urllib.request.urlopen = original
+
+    assert sent["options"].get("num_ctx"), (
+        "no num_ctx on the request, so Ollama serves its 4096 default and "
+        "truncates the system prompt out of any long match")
+    assert sent["options"]["num_ctx"] >= 8192, sent["options"]["num_ctx"]
+    assert player.transcript[-1]["prompt_tokens"] == 123, (
+        "the prompt length is not recorded, so a truncation would be invisible")
+
+    biggest_reply = max(entry["max_tokens"] for entry in PANEL.values())
+    assert CONTEXT_TOKENS > biggest_reply + 4500, (
+        f"a {CONTEXT_TOKENS} window has to hold the longest prompt this grid "
+        f"has produced, 4430 tokens, plus a {biggest_reply} token reply")
+
+    at_the_limit = [{"model": "m", "a_transcript":
+                     [{"prompt_tokens": CONTEXT_TOKENS}], "b_transcript": []}]
+    row = measurements.context_headroom(at_the_limit, [])[0]
+    assert row[3] == 0, f"a prompt at the window must report zero headroom: {row}"
+
+
 def a_lost_match_records_how_far_it_got():
     """Losing the format in round 1 and losing it in round 20 are different findings.
 
@@ -428,6 +484,7 @@ OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            the_machine_is_checked_before_the_card_is_touched,
            the_start_gate_outlasts_its_own_import_burn,
            a_lost_match_records_how_far_it_got,
+           every_call_asks_for_a_window_big_enough_to_hold_it,
            the_analysis_is_deterministic_and_covers_every_cell,
            an_empty_log_derives_nothing_and_says_so,
            the_log_records_the_prompt_once_and_never_echoes_it]

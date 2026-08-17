@@ -48,7 +48,11 @@ class StubPlayer:
         # them for want of a REASON line.
         self.transcript.append({
             "content": f"ACTION: {action}\nREASON: I choose to {action} here.",
-            "thinking": ""})
+            "thinking": "",
+            # Shaped like a real reply here too, and growing with the match,
+            # because `measurements.context_headroom` reads this field and a
+            # stub that omitted it would leave that table untested.
+            "prompt_tokens": 100 + 40 * len(self.own_history)})
         return action
 
     def observe_and_learn(self, opponent_action):

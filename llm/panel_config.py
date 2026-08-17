@@ -15,6 +15,25 @@ What matches get played is in `grid_config.py`. This file is only the players.
 
 OLLAMA_HOST = "http://127.0.0.1:11434"
 
+# **Set explicitly, because Ollama's default silently rewrites the experiment.**
+# Ollama serves a model at `num_ctx` 4096 regardless of what the model supports,
+# and a prompt over that is not refused, it is cut: `msg="truncating input
+# prompt" limit=4096 prompt=4430 keep=4`. `keep=4` is the whole problem. What
+# gets cut is the *oldest* part of the input, which is the system prompt, so a
+# long match quietly continues without the scenario or the answer format in it
+# at all, and the model's reply stops being an answer to the experiment.
+#
+# It bit phi3:mini on 2026-08-17, seven calls between 09:29 and 11:12. The
+# visible symptom was 53 s a call against 0.78 s measured, because a truncated
+# prefix invalidates the cache and re-evaluates 4096 tokens every turn; the
+# invisible one was matches recorded as the model failing to hold a format it
+# was no longer being shown. The two completed stages were checked against the
+# same journal and had none.
+#
+# 8192 covers the longest prompt seen here with room for the reply, and every
+# model in this panel still loads 100% on the card at that size.
+CONTEXT_TOKENS = 8192
+
 # Per model: what it is, gigabytes on disk, its token budget, and whether it is
 # asked to think. A reasoning model needs room for the reasoning plus the answer,
 # and 300 tokens truncates qwen3 mid-thought and yields an unparseable reply.
