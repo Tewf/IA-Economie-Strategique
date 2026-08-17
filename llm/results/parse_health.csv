@@ -1,0 +1,6 @@
+model,matches_played,matches_lost,loose_reads,mean_rounds_before_loss
+gemma3:4b,44,0,0,nan
+mistral:7b,44,0,938,nan
+phi3:mini,34,10,32,16.200000
+qwen2.5:7b-instruct,44,0,0,nan
+qwen3:8b,44,0,0,nan

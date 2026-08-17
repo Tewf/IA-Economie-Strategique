@@ -1,0 +1,26 @@
+model,bot,matches,model_score_per_turn,bot_score_per_turn,model_cooperation,reciprocity_index
+gemma3:4b,Alternator,4,1.500000,4.000000,1.000000,0.000000
+gemma3:4b,Defector,4,0.966667,1.133333,0.033333,nan
+gemma3:4b,Grudger,4,2.800000,2.758333,0.883333,nan
+gemma3:4b,Tit For Tat,4,2.800000,2.758333,0.883333,nan
+gemma3:4b,Win-Stay Lose-Shift,4,3.000000,2.708333,0.883333,nan
+mistral:7b,Alternator,4,1.500000,4.000000,1.000000,0.000000
+mistral:7b,Defector,4,0.408333,3.366667,0.591667,nan
+mistral:7b,Grudger,4,3.000000,3.000000,1.000000,nan
+mistral:7b,Tit For Tat,4,3.000000,3.000000,1.000000,nan
+mistral:7b,Win-Stay Lose-Shift,4,3.000000,3.000000,1.000000,nan
+phi3:mini,Alternator,4,1.983333,2.733333,0.650000,-0.147619
+phi3:mini,Defector,4,0.416667,3.333333,0.583333,nan
+phi3:mini,Grudger,4,0.725000,3.350000,0.633333,nan
+phi3:mini,Tit For Tat,4,2.425000,2.383333,0.583333,nan
+phi3:mini,Win-Stay Lose-Shift,4,2.066667,2.650000,0.608333,0.039286
+qwen2.5:7b-instruct,Alternator,4,2.200000,2.366667,0.533333,0.033333
+qwen2.5:7b-instruct,Defector,4,0.950000,1.200000,0.050000,nan
+qwen2.5:7b-instruct,Grudger,4,3.000000,3.000000,1.000000,nan
+qwen2.5:7b-instruct,Tit For Tat,4,3.000000,3.000000,1.000000,nan
+qwen2.5:7b-instruct,Win-Stay Lose-Shift,4,3.000000,3.000000,1.000000,nan
+qwen3:8b,Alternator,4,3.000000,0.500000,0.000000,0.000000
+qwen3:8b,Defector,4,1.000000,1.000000,0.000000,nan
+qwen3:8b,Grudger,4,1.133333,0.966667,0.000000,nan
+qwen3:8b,Tit For Tat,4,1.133333,0.966667,0.000000,nan
+qwen3:8b,Win-Stay Lose-Shift,4,3.000000,0.500000,0.000000,0.000000

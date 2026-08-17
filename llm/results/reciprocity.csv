@@ -1,0 +1,11 @@
+model,condition,seats_measured,reciprocity_index
+gemma3:4b,with_cheap_talk,24,nan
+gemma3:4b,without_cheap_talk,64,0.662368
+mistral:7b,with_cheap_talk,24,0.232323
+mistral:7b,without_cheap_talk,64,0.000000
+phi3:mini,with_cheap_talk,10,0.147368
+phi3:mini,without_cheap_talk,58,0.033570
+qwen2.5:7b-instruct,with_cheap_talk,24,nan
+qwen2.5:7b-instruct,without_cheap_talk,64,0.033333
+qwen3:8b,with_cheap_talk,24,nan
+qwen3:8b,without_cheap_talk,64,0.000000

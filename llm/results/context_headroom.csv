@@ -1,0 +1,4 @@
+model,context_tokens,longest_prompt,headroom
+mistral:7b,8192,2652,5540
+phi3:mini,8192,8023,169
+qwen3:8b,8192,1981,6211
