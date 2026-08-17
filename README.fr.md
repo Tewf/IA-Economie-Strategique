@@ -109,3 +109,23 @@ Un manque à signaler : Ng (2023), *When communicative AIs are cooperative
 actors*, est résumé dans `original/Litterature/Summary/` et analysé dans le
 rapport, mais n'apparaît pas dans la bibliographie de ce dossier. Celle-ci liste
 neuf articles ; celui-ci en est un dixième.
+
+## Citer ce dépôt, et le réutiliser
+
+Les métadonnées lisibles par machine sont dans [`CITATION.cff`](CITATION.cff) : le
+bouton **Cite this repository** de GitHub en produit une référence formatée. Merci
+de citer le dépôt plutôt qu'une figure : **les résultats sur les modèles de
+langage ne sont interprétables qu'avec les conditions d'exécution rapportées avec
+eux** — empreintes des modèles, niveaux de quantification, graines et matériel —
+qui figurent dans [`llm/results/README.md`](llm/results/README.md) avec le schéma
+de chaque fichier.
+
+Deux licences, un seul fichier, [LICENSE](LICENSE) : le code est sous MIT, et la
+rédaction, les figures et les données mesurées sous CC BY 4.0. `original/` est le
+stage tel qu'il a été rendu, conservé et non maintenu ; la littérature citée y
+reste sous son propre droit d'auteur et est exclue de ce dépôt.
+
+Le stage a été réalisé au **GAEL** (Université Grenoble Alpes et INRAE), de janvier
+à avril 2025, sous la direction d'**Alexis Garapin** et d'**Olivier Bonroy**. Tout
+ce qui a été ajouté depuis est une continuation personnelle de l'auteur et ne
+faisait pas partie du travail rendu.

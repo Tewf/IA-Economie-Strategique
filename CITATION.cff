@@ -1,0 +1,100 @@
+cff-version: 1.2.0
+title: >-
+  AI and strategic behaviour in repeated price competition: an imitation
+  mechanism and a panel of language models on shared opponents
+message: >-
+  If you use this repository, its harnesses or its match data, please cite it as
+  below. The run conditions that make the language-model data interpretable are
+  in llm/results/README.md and must be reported alongside any reuse.
+type: software
+authors:
+  - given-names: Mohamed Ali Tewfik
+    family-names: Hamlil
+    email: mohamed.hamlil@etu.univ-grenoble-alpes.fr
+    affiliation: >-
+      Université Grenoble Alpes, UFR IM²AG
+repository-code: https://github.com/Tewf/IA-Economie-Strategique
+url: https://tewf.github.io/IA-Economie-Strategique/
+abstract: >-
+  In repeated price competition human players tend to settle on tacitly
+  collusive prices rather than the competitive equilibrium, and whether
+  algorithms sustain that behaviour, break it or intensify it is an open
+  question with direct consequences for competition policy. This repository
+  continues a research internship at GAEL (Université Grenoble Alpes and INRAE,
+  January to April 2025, supervised by Alexis Garapin and Olivier Bonroy) by
+  running the two mechanisms the internship report proposed but did not
+  implement, against one set of opponents and one measure of reciprocity.
+
+  The first is a Hebbian imitation agent, which the report expected Tit-for-Tat
+  to emerge from. It does not: over matches of 10 to 100 turns the agent
+  finishes eighth of eight against seven opponents from the literature, behind a
+  coin flip, because the update it implements is frequency matching whose state
+  cannot depend on the last round. In self-play the mechanism is a ratchet on
+  the initial condition, locking onto whichever regime it starts in over 700
+  runs out of 700.
+
+  The second is homo silicus, cited in the report's conclusion and never run:
+  five open-weight language models of 4B to 8B parameters, executed locally and
+  offline, playing the same iterated Prisoner's Dilemma against each other and
+  against the same opponents, with and without a non-binding cheap-talk channel,
+  from imposed cooperative, imposed defective and neutral openings. Over 220
+  matches of 30 rounds, three of the four readable models reproduce the
+  imitator's ratchet exactly, defecting in every round of an imposed defective
+  opening; a non-binding message frees exactly one of those three and leaves the
+  other two unchanged, while a fourth model escapes the same opening with no
+  channel at all. Communication is therefore neither necessary nor sufficient
+  for leaving an imposed regime, and the ability to leave one is a property of
+  the individual model rather than of language models.
+keywords:
+  - tacit collusion
+  - iterated prisoner's dilemma
+  - cheap talk
+  - large language models
+  - homo silicus
+  - multi-agent systems
+  - behavioural economics
+  - reciprocity
+license:
+  - MIT
+  - CC-BY-4.0
+license-url: https://github.com/Tewf/IA-Economie-Strategique/blob/main/LICENSE
+version: 1.0.0
+date-released: "2026-08-17"
+references:
+  - type: article
+    title: >-
+      What Can We Learn from Homo Silicus?
+    authors:
+      - family-names: Horton
+        given-names: John J.
+      - family-names: Filippas
+        given-names: Apostolos
+      - family-names: Manning
+        given-names: Benjamin S.
+    year: 2023
+    notes: >-
+      The method the language-model half implements; reference 5 of the
+      internship's own bibliography.
+  - type: article
+    title: >-
+      Artificial Intelligence, Algorithmic Pricing, and Collusion
+    authors:
+      - family-names: Calvano
+        given-names: Emilio
+      - family-names: Calzolari
+        given-names: Giacomo
+      - family-names: Denicolò
+        given-names: Vincenzo
+      - family-names: Pastorello
+        given-names: Sergio
+    year: 2020
+    notes: >-
+      The Q-learning result the imitation mechanism is contrasted against:
+      those agents do find collusion, and read payoffs to do it.
+  - type: software
+    title: Axelrod-Python
+    repository-code: https://github.com/Axelrod-Python/Axelrod
+    version: 4.13.1
+    notes: >-
+      Supplied the opponents, the match engine and the payoff bookkeeping for
+      both halves, so neither was written here.

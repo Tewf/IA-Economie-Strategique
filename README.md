@@ -106,3 +106,23 @@ One gap worth naming: Ng (2023), *When communicative AIs are cooperative
 actors*, is summarised in `original/Litterature/Summary/` and analysed in the
 report, but does not appear in that folder's bibliography. The bibliography lists
 nine papers; this is a tenth.
+
+## Citing this, and reusing it
+
+Machine-readable metadata is in [`CITATION.cff`](CITATION.cff), so GitHub's
+**Cite this repository** button gives a formatted reference. Please cite the
+repository rather than a figure: **the language-model results are only
+interpretable with the run conditions reported alongside them** — model digests,
+quantisation levels, seeds and hardware — which are in
+[`llm/results/README.md`](llm/results/README.md) together with the schema of every
+file.
+
+Two licenses, one file, [LICENSE](LICENSE): the code is MIT, and the write-up, the
+figures and the measured data are CC BY 4.0. `original/` is the internship as
+submitted and is preserved rather than maintained; the cited literature there
+remains under its own copyright and is excluded from this repository.
+
+The internship was carried out at **GAEL** (Université Grenoble Alpes and INRAE),
+January to April 2025, supervised by **Alexis Garapin** and **Olivier Bonroy**.
+Everything added since is the author's own continuation and was not part of the
+submitted work.
