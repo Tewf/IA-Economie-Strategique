@@ -280,9 +280,16 @@ def the_machine_is_checked_before_the_card_is_touched():
     try:
         machine_gate.check_can_start()
     except machine_gate.OutOfHeadroom as refusal:
+        assert reading is not None, (
+            "refused on heat with no sensor to read a temperature from")
         assert "start ceiling" in str(refusal), refusal
     else:
-        raise AssertionError("the start ceiling never fires")
+        # A host with no `coretemp` sensor is the CI runner, and the gate is
+        # written to let it through rather than block a stage forever on a
+        # reading it cannot take. Asserting the refusal unconditionally made
+        # this check pass on the laptop and fail on CI for the one difference
+        # that is not a fault. Both directions are the contract.
+        assert reading is None, "the start ceiling never fires"
     finally:
         machine_gate.MAXIMUM_START_TEMPERATURE_C = original
 
