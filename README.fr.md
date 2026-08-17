@@ -56,7 +56,7 @@ d'Özkes et al. (2024), et le jeu du dictateur des diapositives de soutenance.
 | | |
 |---|---|
 | <img src="mirror_neurons/results/standings.png" width="320" alt="L'agent imitateur termine huitième sur huit"> | **[`mirror_neurons/`](mirror_neurons/README.fr.md), lancé et analysé.** Observer une action multiplie son poids puis renormalise, et le rapport attend que le Tit-for-Tat en émerge sans avoir été programmé. Face à sept adversaires issus de la littérature, **il n'en est rien : sur des matchs de 10 à 100 tours, l'agent termine huitième sur huit, derrière un tirage à pile ou face.** Ce que la mise à jour implémente est un appariement de fréquences, dont l'état tient en un couple de compteurs et ne peut donc pas dépendre du dernier tour. Il ne dépasse le tirage à pile ou face que sur des matchs de plusieurs centaines de tours, en se figeant en joueur constant plutôt qu'en rendant la pareille. |
-| | **[`llm/`](llm/README.fr.md), des fondations.** Homo silicus, que le rapport cite dans sa conclusion sans jamais l'appliquer. Cinq modèles à poids ouverts, localement et hors ligne, sur les mêmes jeux. Rien n'a encore été lancé. |
+| <img src="llm/results/self_play_lock_in.png" width="320" alt="Trois des quatre modèles lisibles se figent dans un régime défectif imposé"> | **[`llm/`](llm/README.fr.md), lancé et analysé.** Homo silicus, que le rapport cite dans sa conclusion sans jamais l'appliquer. Cinq modèles à poids ouverts, localement et hors ligne, sur les mêmes jeux : 220 matchs, le 2026-08-17. Placés sur une ouverture de défection mutuelle sans canal, **trois des quatre modèles lisibles font défection sur les 30 tours, 4 matchs sur 4 — le cliquet de l'imitateur reproduit dans un modèle de langage.** Un message non contraignant en libère alors exactement un, ne change rien pour les deux autres, et le quatrième modèle sort du régime sans aucun message. **Le canal n'est ni nécessaire ni suffisant ; quels modèles savent en sortir est un fait sur les modèles.** |
 
 **Sur la question posée en haut de cette page**, le mécanisme des neurones
 miroirs entretient la coopération tacite, sans jamais la rompre ni l'intensifier.
@@ -68,6 +68,17 @@ qu'une voie vers la collusion, ce qui la sépare des Q-learners de Calvano et al
 (2020), qui trouvent la collusion, eux, en lisant les gains.
 [La lecture complète](mirror_neurons/README.fr.md#ce-que-tout-cela-donne), et
 ce qui la modifierait.
+
+**Posée aux modèles de langage, la même question n'a pas de réponse unique.** Le
+cliquet se reproduit bien — qwen2.5, gemma3 et qwen3 restent tous dans un régime
+défectif imposé sur les 30 tours lorsqu'ils ne peuvent pas parler — mais un
+message non contraignant ne libère que qwen2.5, qui passe d'un taux de
+coopération de 0,00 à 1,00, et laisse gemma3 et qwen3 à 0,00. mistral ne se fige
+jamais, et qwen3 est le seul modèle à faire défection même depuis une ouverture
+*neutre* en silence. La communication n'est donc ni ce qui brise le cliquet ni ce
+qui l'empêche en général : elle fait les deux, ou ni l'un ni l'autre, selon le
+modèle. [La lecture complète](llm/README.fr.md#ce-que-la-grille-a-trouvé), avec
+les réserves qui font partie du résultat.
 
 Les deux dossiers sont frères à dessein, et la portée de ce rapprochement est
 étroite : ce rapport a proposé ce mécanisme et affirmé que le Tit-for-Tat en

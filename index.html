@@ -110,14 +110,31 @@
 </section>
 
 <section>
-  <h2>What comes next</h2>
-  <p class="result">The other half of the report has not run yet</p>
+  <h2>The language-model half</h2>
+  <p class="result">Three of four models cannot leave an imposed regime, and talking frees only one of them</p>
   <p>
     <code>llm/</code> is homo silicus. The report cites Horton, Filippas and
     Manning (2023) and names the method in its conclusion without running it.
     Five open-weight models, run locally and offline, play the games the
     report's own frame defines: the Prisoner's Dilemma iterated and sequential,
-    the Ultimatum game, and the Dictator game.
+    the Ultimatum game, and the Dictator game. The iterated grid ran on
+    2026-08-17: 220 matches of 30 rounds, 210 of them readable.
+  </p>
+  <figure>
+    <img src="llm/results/self_play_lock_in.png" alt="Three of four readable models settle on mutual defection when handed a defective opening in silence">
+    <figcaption>Handed a regime they did not choose, most models keep it — and a message helps only some of them.</figcaption>
+  </figure>
+  <p>
+    Given a mutually defecting opening and no channel, qwen2.5, gemma3 and qwen3
+    defect in all 30 rounds, four matches out of four, a cooperation rate of
+    exactly zero. That is the imitator's ratchet above, reproduced in a language
+    model. A non-binding message then takes qwen2.5 from 0.00 to 1.00 and leaves
+    gemma3 and qwen3 at 0.00, while mistral climbs out of the same opening
+    without any message at all and qwen3 defects even from a neutral silent
+    start. So the channel is <strong>neither necessary nor sufficient</strong>:
+    which models can leave an imposed regime is a fact about the models, not
+    about language models. phi3:mini lost 10 of its 44 matches to unparseable
+    replies and is reported as unreadable rather than as a result.
   </p>
   <p>
     The two are siblings on purpose, and the point of the pairing is narrow:

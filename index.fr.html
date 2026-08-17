@@ -113,14 +113,32 @@
 </section>
 
 <section>
-  <h2>La suite</h2>
-  <p class="result">L'autre moitié du rapport n'a pas encore tourné</p>
+  <h2>La moitié modèles de langage</h2>
+  <p class="result">Trois modèles sur quatre ne savent pas sortir d'un régime imposé, et parler n'en libère qu'un</p>
   <p>
     <code>llm/</code>, c'est l'homo silicus. Le rapport cite Horton, Filippas et
     Manning (2023) et nomme la méthode dans sa conclusion sans jamais
     l'appliquer. Cinq modèles à poids ouverts, exécutés localement et hors ligne,
     jouent les jeux que le cadre du rapport définit : le dilemme du prisonnier
-    itéré et séquentiel, le jeu de l'ultimatum et le jeu du dictateur.
+    itéré et séquentiel, le jeu de l'ultimatum et le jeu du dictateur. La grille
+    itérée a tourné le 2026-08-17 : 220 matchs de 30 tours, dont 210 lisibles.
+  </p>
+  <figure>
+    <img src="llm/results/self_play_lock_in.png" alt="Trois des quatre modèles lisibles se figent sur la défection mutuelle depuis une ouverture défective en silence">
+    <figcaption>Placés dans un régime qu'ils n'ont pas choisi, la plupart des modèles y restent — et un message n'en aide que certains.</figcaption>
+  </figure>
+  <p>
+    Sur une ouverture de défection mutuelle et sans canal, qwen2.5, gemma3 et
+    qwen3 font défection sur les 30 tours, quatre matchs sur quatre, un taux de
+    coopération exactement nul. C'est le cliquet de l'imitateur ci-dessus,
+    reproduit dans un modèle de langage. Un message non contraignant fait ensuite
+    passer qwen2.5 de 0,00 à 1,00 et laisse gemma3 et qwen3 à 0,00, tandis que
+    mistral sort de la même ouverture sans aucun message et que qwen3 fait
+    défection même depuis une ouverture neutre en silence. Le canal n'est donc
+    <strong>ni nécessaire ni suffisant</strong> : quels modèles savent sortir d'un
+    régime imposé est un fait sur les modèles, pas sur les modèles de langage.
+    phi3:mini a perdu 10 de ses 44 matchs sur des réponses illisibles et est
+    rapporté comme illisible plutôt que comme un résultat.
   </p>
   <p>
     Les deux sont frères à dessein, et la portée de ce rapprochement est
