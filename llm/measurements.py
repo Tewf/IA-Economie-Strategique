@@ -212,14 +212,17 @@ def read_contrasts(log=CONTRASTS_LOG):
     same experiment, so folding it into `matches.jsonl` would quietly change what
     the headline numbers average over.
     """
-    if not log.exists():
-        return []
     played = []
-    for line in log.read_text().splitlines():
-        try:
-            played.append(json.loads(line))
-        except json.JSONDecodeError:
+    # Arms added after resumability was found to be keyed on the match rather
+    # than the arm write their own file, so every one of them is read here.
+    for path in [log] + sorted(log.parent.glob("contrast-*.jsonl")):
+        if not path.exists():
             continue
+        for line in path.read_text().splitlines():
+            try:
+                played.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
     return played
 
 
@@ -260,6 +263,34 @@ def contrast_parse_health(played, lost, contrasts):
                      arm_lost, arm_lost / len(arm) if arm else float("nan"),
                      len(original), original_lost,
                      original_lost / len(original) if original else float("nan")))
+    return rows
+
+
+def reasoning_contrast(played, contrasts, arm="qwen3-think-roomy"):
+    """Reasoning on against reasoning off, in the one cell that traps qwen3.
+
+    The grid runs every model with `think` off, because turning it on costs
+    qwen3 34 s a call against 1.9 s and would have added days. That left the
+    panel's hardest case untested: the model that defects from a neutral silent
+    start and that a message does not move. This arm turns it on in the imposed
+    defective cell alone, and reports it beside the same cell of the grid.
+    """
+    rows = []
+    for condition in ("without_cheap_talk", "with_cheap_talk"):
+        off = [m for m in played if m["model"] == "qwen3:8b"
+               and m["cell"] == "self_play"
+               and m["opening"] == "mutual_defection"
+               and m["condition"] == condition]
+        on = [m for m in contrasts if m.get("contrast") == arm
+              and m["condition"] == condition and "rounds" in m]
+        def rate(matches):
+            seats = []
+            for match in matches:
+                seats += [_cooperation(_actions(match, "a")),
+                          _cooperation(_actions(match, "b"))]
+            return _mean(seats)
+        rows.append((condition, len(off), rate(off), len(on), rate(on),
+                     rate(on) - rate(off)))
     return rows
 
 

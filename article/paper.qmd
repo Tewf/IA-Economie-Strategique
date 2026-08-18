@@ -552,6 +552,55 @@ may be running one disposition, not two.
 That is a caution about reading a single game as a personality, and it is
 exactly the direction @horton2023 says disagreement should be read in.
 
+## Does reasoning change it {#sec-reasoning}
+
+The grid runs every model with reasoning off, because turning it on costs qwen3
+34 seconds a call against 1.9 and would have added days. That left the panel's
+hardest case untested. `run_contrasts.py` turns it on in the imposed defective
+cell alone, on repetitions 0 and 1, which are one of each payoff order.
+
+```{python}
+#| label: tbl-reasoning
+#| output: asis
+reasoning = table(LLM, "reasoning_contrast.csv")
+md(["condition", "matches, off", "cooperation, off", "matches, on",
+    "cooperation, on", "difference"],
+   [[r["condition"].replace("_", " "), r["matches_reasoning_off"],
+     pct(float(r["cooperation_reasoning_off"])), r["matches_reasoning_on"],
+     pct(float(r["cooperation_reasoning_on"])),
+     f'{float(r["difference"]):+.2f}'] for r in reasoning])
+print("\n: qwen3 in the imposed defective cell, reasoning off against on.")
+```
+
+**Reasoning makes it try, and only where there is something to try with.** Silent,
+it stays at exactly 0.00 in both repetitions, the same lock the grid found.
+With a channel it reaches 0.09, which is not escape but is not nothing either:
+the pair probes, and the probes are visible in the play, `D D D D D D D D D D D
+D D D D C D D D D D D C D D D D D D C`.
+
+The reasons say what the actions do. It opens on the same dominance argument as
+before, and by the final round it is explicit about what it is attempting:
+*"The other player has shown willingness to Cooperate in some rounds, and mutual
+cooperation yields higher total points. Switching to Cooperate may encourage them
+to reciprocate, breaking the [cycle]."*
+
+That is the opposite sign from @liu2026memory, who report that ablating
+chain-of-thought often *reduces* a cooperation collapse, so deliberation amplifies
+it. Here deliberation is the only thing that produced any cooperation at all in a
+cell where four matches without it produced none. Two matches per condition is a
+weak basis for contradicting a 500-round study across seven models, and the
+disagreement is reported as a disagreement rather than a refutation: what is
+solid is that this cell moved off zero, and only with a channel.
+
+**An instrumentation note that is part of the result.** A first attempt at this
+arm lost both its matches to an empty answer, because reasoning consumed the
+whole token budget and left nothing for the action line. The real trajectories
+provoke about 5,120 characters of reasoning a call, roughly twice what a
+synthetic history of identical rounds provokes, which is why a probe at the same
+depth had suggested the budget was ample. Doubling it fixed the arm, and a lost
+match now records its final replies so the next such failure is diagnosable
+rather than merely counted.
+
 ## The two halves on one table {#sec-joined}
 
 Both mechanisms met the same five canonical strategies, and the reciprocity

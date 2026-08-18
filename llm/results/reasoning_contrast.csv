@@ -1,0 +1,3 @@
+condition,matches_reasoning_off,cooperation_reasoning_off,matches_reasoning_on,cooperation_reasoning_on,difference
+without_cheap_talk,4,0.000000,2,0.000000,0.000000
+with_cheap_talk,4,0.000000,2,0.091667,0.091667

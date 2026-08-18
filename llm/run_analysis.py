@@ -41,6 +41,11 @@ TABLES = [
       "original_loss_rate"],
      lambda played, lost: measurements.contrast_parse_health(
          played, lost, measurements.read_contrasts())),
+    ("reasoning_contrast.csv",
+     ["condition", "matches_reasoning_off", "cooperation_reasoning_off",
+      "matches_reasoning_on", "cooperation_reasoning_on", "difference"],
+     lambda played, lost: measurements.reasoning_contrast(
+         played, measurements.read_contrasts())),
     ("one_shot_offers.csv",
      ["model", "dictator_decisions", "dictator_offer", "ultimatum_decisions",
       "ultimatum_offer", "paid_to_avoid_refusal", "responder_decisions",

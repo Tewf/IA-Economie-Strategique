@@ -80,7 +80,7 @@ A match that could not be completed is recorded with the rounds it reached rathe
 than dropped, so a gap in the grid is always visible as a short match and never
 as a missing line.
 
-## The eleven derived tables
+## The thirteen derived tables
 
 | file | one row per | what it answers |
 |---|---|---|
@@ -88,6 +88,7 @@ as a missing line.
 | `self_play_lock_in.csv` | model × opening × condition | Whether a pair *settled*, and on what. The ratchet measurement, comparable to `mirror_neurons/results/self_play_lock_in.csv` |
 | `settling.csv` | model × opening × condition | *When* it settled. Round 0 means the opening decided the match outright; a late round means there was a window. Lock-in cannot show this |
 | `message_content.csv` | model × opening | What the channel actually carried: whether a message named an action, how long it was, and how often both seats sent the identical string |
+| `reasoning_contrast.csv` | condition | qwen3 in the imposed defective cell with reasoning off against on. The grid runs `think` off for every model because it costs qwen3 34 s a call, so this is the arm that tests the panel's hardest case |
 | `one_shot_offers.csv` | model | The Dictator and Ultimatum games. What a model gives when refusal is impossible, what it gives when refusal is possible, the difference between them, and the least it says it would accept |
 | `vs_bots.csv` | model × Axelrod strategy | Score per turn both ways, cooperation rate, reciprocity index |
 | `reciprocity.csv` | model × condition | The reciprocity index over self-play seats, on the shared definition in [`../../reciprocity.py`](../../reciprocity.py) |
@@ -113,6 +114,22 @@ written to six decimals because CI compares these files byte for byte.
 It is reported with verbatim samples in the article for exactly that reason: the
 counts alone do not distinguish a model that sends nothing of substance from one
 that sends fluent collaborative prose and defects anyway, and both are in here.
+
+## `contrasts.jsonl` and `contrast-*.jsonl`, the follow-up arms
+
+Matches run after the grid to answer one question each, kept out of
+`matches.jsonl` so the declared 220 stays 220. Each record carries a `contrast`
+field naming its arm, and otherwise has the same shape as a grid match.
+
+**Arms added after 2026-08-18 write their own file.** Resumability is keyed on
+the match rather than on the arm, so two arms replaying the same cells of the
+same model produce identical keys and the second would skip the first's work.
+The three arms already in `contrasts.jsonl` stayed there: moving records between
+raw logs to tidy a naming scheme is not worth the risk to data that cost hours.
+
+**A lost match keeps its last two replies per seat.** It used to record only how
+far it got, which is why two qwen3 matches lost to an empty answer could not be
+diagnosed from the log at all.
 
 ## `one_shot.jsonl`, one JSON object per decision
 

@@ -551,6 +551,58 @@ n'avoir qu'une seule disposition, et non deux.
 C'est une mise en garde contre la lecture d'un seul jeu comme une personnalité, et
 c'est exactement le sens dans lequel @horton2023 dit qu'il faut lire un désaccord.
 
+## La délibération change-t-elle quelque chose {#sec-reasoning-fr}
+
+La grille exécute tous les modèles délibération coupée, car l'activer coûte à
+qwen3 34 secondes par appel contre 1,9 et aurait ajouté des jours. Le cas le plus
+difficile du panel restait donc non testé. `run_contrasts.py` l'active dans la
+seule cellule de défection imposée, sur les répétitions 0 et 1, soit un ordre de
+gains chacune.
+
+```{python}
+#| label: tbl-reasoning-fr
+#| output: asis
+reasoning = table(LLM, "reasoning_contrast.csv")
+md(["condition", "matchs, coupée", "coopération, coupée", "matchs, active",
+    "coopération, active", "écart"],
+   [[r["condition"].replace("_", " "), r["matches_reasoning_off"],
+     fr(float(r["cooperation_reasoning_off"])), r["matches_reasoning_on"],
+     fr(float(r["cooperation_reasoning_on"])),
+     ("+" if float(r["difference"]) >= 0 else "") + fr(float(r["difference"]))]
+    for r in reasoning])
+print("\n: qwen3 dans la cellule de défection imposée, délibération coupée puis active.")
+```
+
+**La délibération le fait essayer, et seulement là où il a de quoi essayer.** En
+silence il reste exactement à 0,00 dans les deux répétitions, le même verrou que
+la grille. Avec un canal il atteint 0,09, ce qui n'est pas une sortie mais n'est
+pas rien : la paire sonde, et les sondages se voient dans le jeu.
+
+Les raisons disent ce que font les actions. Il ouvre sur le même argument de
+dominance qu'auparavant, et au dernier tour il énonce explicitement ce qu'il
+tente : *« The other player has shown willingness to Cooperate in some rounds,
+and mutual cooperation yields higher total points. Switching to Cooperate may
+encourage them to reciprocate, breaking the [cycle]. »*
+
+C'est le signe opposé à @liu2026memory, pour qui supprimer la chaîne de pensée
+*réduit* souvent un effondrement de la coopération, la délibération l'amplifiant
+donc. Ici la délibération est la seule chose qui ait produit la moindre
+coopération dans une cellule où quatre matchs sans elle n'en produisaient aucune.
+Deux matchs par condition sont une base faible pour contredire une étude de 500
+tours sur sept modèles, et le désaccord est rapporté comme un désaccord et non
+comme une réfutation : ce qui est solide, c'est que cette cellule a quitté le
+zéro, et seulement avec un canal.
+
+**Une note d'instrumentation qui fait partie du résultat.** Une première
+tentative de ce volet a perdu ses deux matchs sur une réponse vide, la
+délibération ayant consommé tout le budget de tokens sans rien laisser pour la
+ligne d'action. Les trajectoires réelles provoquent environ 5 120 caractères de
+raisonnement par appel, à peu près le double de ce que provoque un historique
+synthétique de tours identiques, ce qui explique qu'une sonde à la même
+profondeur ait laissé croire le budget suffisant. Le doubler a réparé le volet,
+et un match perdu conserve désormais ses dernières réponses, pour que le prochain
+échec de ce genre soit diagnosticable plutôt que seulement compté.
+
 ## Les deux moitiés sur un seul tableau {#sec-joined-fr}
 
 ```{python}

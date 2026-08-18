@@ -2353,7 +2353,8 @@ window.Quarto = {
   <li><a href="#sec-messages" id="toc-sec-messages" class="nav-link" data-scroll-target="#sec-messages"><span class="header-section-number">4.5</span> What the messages actually say</a></li>
   <li><a href="#the-stated-reason-and-the-move" id="toc-the-stated-reason-and-the-move" class="nav-link" data-scroll-target="#the-stated-reason-and-the-move"><span class="header-section-number">4.6</span> The stated reason and the move</a></li>
   <li><a href="#sec-oneshot" id="toc-sec-oneshot" class="nav-link" data-scroll-target="#sec-oneshot"><span class="header-section-number">4.7</span> What a model pays not to be refused</a></li>
-  <li><a href="#sec-joined" id="toc-sec-joined" class="nav-link" data-scroll-target="#sec-joined"><span class="header-section-number">4.8</span> The two halves on one table</a></li>
+  <li><a href="#sec-reasoning" id="toc-sec-reasoning" class="nav-link" data-scroll-target="#sec-reasoning"><span class="header-section-number">4.8</span> Does reasoning change it</a></li>
+  <li><a href="#sec-joined" id="toc-sec-joined" class="nav-link" data-scroll-target="#sec-joined"><span class="header-section-number">4.9</span> The two halves on one table</a></li>
   </ul></li>
   <li><a href="#sec-limits" id="toc-sec-limits" class="nav-link" data-scroll-target="#sec-limits"><span class="header-section-number">5</span> Threats to validity</a></li>
   <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion"><span class="header-section-number">6</span> Conclusion</a></li>
@@ -2417,7 +2418,7 @@ window.Quarto = {
 
 <div id="cell-setup" class="cell" data-execution_count="1">
 <div id="setup" class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>&#39;6b8a8d8808b2d086d56bad8490cbbf91&#39;</code></pre>
+<pre><code>&#39;859ef44cc2e884f343293a83bdf3c99a&#39;</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
@@ -3172,13 +3173,68 @@ Table 6: Points of 100 given to the other player, four decisions per cell.
 <p><strong>The unifying observation, and the reason this game is in the paper at all.</strong> qwen3’s behaviour here looks like the opposite of its behaviour in <a href="#sec-opening" class="quarto-xref">Section 4.4</a>, where it defects from a neutral silent start while every other model cooperates. It is the same rule. In the Prisoner’s Dilemma it wrote that defecting <em>“guarantees at least 1 point compared to potentially 0 if you cooperate”</em>; in the Ultimatum game it offers 99 <em>“to avoid getting nothing”</em>. Both are worst-case avoidance, applied to a payoff table. Defection is what that reasoning recommends in one game and near-total generosity is what it recommends in the other, so a model that looks ruthless in one and absurdly generous in the other may be running one disposition, not two.</p>
 <p>That is a caution about reading a single game as a personality, and it is exactly the direction <span class="citation" data-cites="horton2023">Horton, Filippas, and Manning (<a href="#ref-horton2023" role="doc-biblioref">2023</a>)</span> says disagreement should be read in.</p>
 </section>
-<section id="sec-joined" class="level2" data-number="4.8">
-<h2 data-number="4.8" class="anchored" data-anchor-id="sec-joined"><span class="header-section-number">4.8</span> The two halves on one table</h2>
+<section id="sec-reasoning" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="sec-reasoning"><span class="header-section-number">4.8</span> Does reasoning change it</h2>
+<p>The grid runs every model with reasoning off, because turning it on costs qwen3 34 seconds a call against 1.9 and would have added days. That left the panel’s hardest case untested. <code>run_contrasts.py</code> turns it on in the imposed defective cell alone, on repetitions 0 and 1, which are one of each payoff order.</p>
+<div id="tbl-reasoning" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="13">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-reasoning-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 7: qwen3 in the imposed defective cell, reasoning off against on.
+</figcaption>
+<div aria-describedby="tbl-reasoning-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>condition</th>
+<th>matches, off</th>
+<th>cooperation, off</th>
+<th>matches, on</th>
+<th>cooperation, on</th>
+<th>difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>without cheap talk</td>
+<td>4</td>
+<td>0.00</td>
+<td>2</td>
+<td>0.00</td>
+<td>+0.00</td>
+</tr>
+<tr class="even">
+<td>with cheap talk</td>
+<td>4</td>
+<td>0.00</td>
+<td>2</td>
+<td>0.09</td>
+<td>+0.09</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><strong>Reasoning makes it try, and only where there is something to try with.</strong> Silent, it stays at exactly 0.00 in both repetitions, the same lock the grid found. With a channel it reaches 0.09, which is not escape but is not nothing either: the pair probes, and the probes are visible in the play, <code>D D D D D D D D D D D D D D D C D D D D D D C D D D D D D C</code>.</p>
+<p>The reasons say what the actions do. It opens on the same dominance argument as before, and by the final round it is explicit about what it is attempting: <em>“The other player has shown willingness to Cooperate in some rounds, and mutual cooperation yields higher total points. Switching to Cooperate may encourage them to reciprocate, breaking the [cycle].”</em></p>
+<p>That is the opposite sign from <span class="citation" data-cites="liu2026memory">Liu et al. (<a href="#ref-liu2026memory" role="doc-biblioref">2026</a>)</span>, who report that ablating chain-of-thought often <em>reduces</em> a cooperation collapse, so deliberation amplifies it. Here deliberation is the only thing that produced any cooperation at all in a cell where four matches without it produced none. Two matches per condition is a weak basis for contradicting a 500-round study across seven models, and the disagreement is reported as a disagreement rather than a refutation: what is solid is that this cell moved off zero, and only with a channel.</p>
+<p><strong>An instrumentation note that is part of the result.</strong> A first attempt at this arm lost both its matches to an empty answer, because reasoning consumed the whole token budget and left nothing for the action line. The real trajectories provoke about 5,120 characters of reasoning a call, roughly twice what a synthetic history of identical rounds provokes, which is why a probe at the same depth had suggested the budget was ample. Doubling it fixed the arm, and a lost match now records its final replies so the next such failure is diagnosable rather than merely counted.</p>
+</section>
+<section id="sec-joined" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="sec-joined"><span class="header-section-number">4.9</span> The two halves on one table</h2>
 <p>Both mechanisms met the same five canonical strategies, and the reciprocity measure is shared, so they can be read side by side rather than as two studies.</p>
-<div id="tbl-joined" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="13">
+<div id="tbl-joined" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="14">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-joined-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 7: Score per turn against the opponents both halves played. The imitator’s matches are 100 rounds and the models’ are 30, so the per-turn scores are comparable and the cooperation rates behind them are not, quite.
+Table 8: Score per turn against the opponents both halves played. The imitator’s matches are 100 rounds and the models’ are 30, so the per-turn scores are comparable and the cooperation rates behind them are not, quite.
 </figcaption>
 <div aria-describedby="tbl-joined-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="cell caption-top table table-sm table-striped small">
@@ -3273,14 +3329,14 @@ Table 7: Score per turn against the opponents both halves played. The imitator�
 <p><strong>Self-play is one disposition, not two subjects.</strong> Both seats hold the same prompt and the same model. The message table in <a href="#sec-messages" class="quarto-xref">Section 4.5</a> records how often both seats emitted the identical string, which for one model is most rounds. Temperature is 0.7 rather than 0 precisely because greedy decoding makes self-play degenerate, but the two seats remain far from independent agents.</p>
 <p><strong>The lexical measure of message content is a proxy.</strong> Naming “cooperate” is not the same as proposing cooperation, and a paraphrase is missed. The verbatim samples in <a href="#sec-messages" class="quarto-xref">Section 4.5</a> are given because the counts alone would not support the claim; a coded content analysis by a second model or a human would be the proper instrument.</p>
 <p><strong>One model is reported as unreadable rather than as a result.</strong></p>
-<div id="phi3" class="cell" data-execution_count="14">
+<div id="phi3" class="cell" data-execution_count="15">
 <p>phi3:mini lost 10 of 44 matches to replies that named no action, at a mean of 16.2 rounds in. It is also the only model in the panel at Q4_0 rather than Q4_K_M quantisation, one of the two oldest builds, and the smallest. This design does not separate those explanations, so its cells are not interpreted.</p>
 </div>
 <p>That confound is testable, and was tested. <code>run_contrasts.py</code> replays phi3’s whole stage on the <code>Q4_K_M</code> build of the same 3.8B mini-4k instruct weights, holding the original’s seed stream so that quantisation is the only thing that moves, and writing to a separate log so the declared grid stays 220 matches.</p>
-<div id="tbl-contrast" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="15">
+<div id="tbl-contrast" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="16">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-contrast-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 8: The quantisation control, on the cells it has reached, against the same cells of the original stage.
+Table 9: The quantisation control, on the cells it has reached, against the same cells of the original stage.
 </figcaption>
 <div aria-describedby="tbl-contrast-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="cell caption-top table table-sm table-striped small">
@@ -3327,12 +3383,32 @@ Table 8: The quantisation control, on the cells it has reached, against the sam
 <td>10</td>
 <td>0.23</td>
 </tr>
+<tr class="odd">
+<td>qwen3-think</td>
+<td><code>qwen3:8b</code></td>
+<td>2</td>
+<td>2</td>
+<td>1.00</td>
+<td>2</td>
+<td>1</td>
+<td>0.50</td>
+</tr>
+<tr class="even">
+<td>qwen3-think-roomy</td>
+<td><code>qwen3:8b</code></td>
+<td>4</td>
+<td>0</td>
+<td>0.00</td>
+<td>4</td>
+<td>1</td>
+<td>0.25</td>
+</tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
-<div id="contrast-text" class="cell" data-execution_count="16">
+<div id="contrast-text" class="cell" data-execution_count="17">
 <p><strong>Quantisation accounts for much of it, and not all of it.</strong> Holding the weights, the context length, the seeds and the prompts, and changing only the 4-bit format, the loss rate falls from 0.23 to 0.09. The coarser <code>Q4_0</code> packing is therefore a real part of why phi3 could not hold an answer format, which is worth knowing before reading any small-model result off a default tag.</p>
 <p><strong>It is not the whole story either.</strong> 0.09 is still the only non-zero loss rate in the panel: the other four models lost nothing. So a residue belongs to the model, and phi3’s cells stay uninterpreted rather than being rehabilitated by a better build.</p>
 <p><strong>The third row is a mistake worth keeping.</strong> That arm was written as the quantisation control and was not one: <code>phi3:mini</code> is the 128k build and the build pulled against it was 4k, while the grid asks every model for a window of 8192 tokens. Running a 4096-token model at twice its trained window costs 0.75 of its matches, against 0.23 for the same weights at their own context length. It answers nothing about quantisation and quite a lot about what a context-window mismatch does, so it is reported as what it measured rather than deleted.</p>
@@ -3350,7 +3426,7 @@ Table 8: The quantisation control, on the cells it has reached, against the sam
 <section id="sec-repro" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Reproducing this</h1>
 <p>Every number and figure above is derived from <code>llm/results/matches.jsonl</code>, which is committed and never regenerated, by pure arithmetic that continuous integration re-runs on every push and compares byte for byte. The schema of the log, the derived tables, the model digests and the run conditions are documented in <code>llm/results/README.md</code>. This document reads those same CSV files, so a number in the text cannot disagree with the table it came from.</p>
-<div id="provenance" class="cell" data-execution_count="17">
+<div id="provenance" class="cell" data-execution_count="18">
 <p>Derived from 210 readable matches of a 220-match grid, 5 models, on the tables committed in <code>llm/results/</code>.</p>
 </div>
 </section>

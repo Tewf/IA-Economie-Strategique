@@ -30,6 +30,29 @@ from run_ownership import owning_the_run
 RESULTS = pathlib.Path(__file__).parent / "results"
 LOG = RESULTS / "contrasts.jsonl"
 
+
+def log_for(name):
+    """Where an arm writes.
+
+    **Resumability is keyed on the match, not on the arm.** Two arms that replay
+    the same cells of the same model produce identical keys, so a second arm
+    sharing a file would find the first arm's attempts and skip them, which is
+    exactly what `qwen3-think-roomy` needs not to do: the pilot's two matches are
+    the ones it exists to run again with a bigger budget.
+
+    Arms added after that was noticed get their own file. The three already in
+    `contrasts.jsonl` stay there rather than being split out of it, because
+    moving records between raw logs to tidy a naming scheme is not worth the risk
+    to data that cost hours on the card.
+    """
+    if name in ORIGINAL_LOG_ARMS:
+        return LOG
+    return RESULTS / f"contrast-{name}.jsonl"
+
+
+ORIGINAL_LOG_ARMS = {"phi3-quantisation", "phi3-quantisation-matched",
+                     "qwen3-think"}
+
 CONTRASTS = {
     # **This arm did not measure what it was named for, and the name is kept so
     # the log stays honest.** It was written to vary quantisation alone, on the
@@ -74,6 +97,14 @@ CONTRASTS = {
         "max_tokens": 300,
         "select": lambda spec: spec["model"] == "phi3:mini",
     },
+    # **A pilot, not the contrast.** Two of two matches were lost to an empty
+    # answer at rounds 15 and 17: with reasoning on, qwen3 sometimes emits a
+    # thinking trace and no content, and one such reply ends a match. Probing the
+    # same depth with three seeds produced content every time, so the 2000-token
+    # budget is not obviously the cause and the synthetic history in the probe
+    # does not provoke whatever the real trajectory does. What it establishes is
+    # that the instrument loses matches at depth, which is why the arm below
+    # raises the budget and why a lost match now keeps its last replies.
     "qwen3-think": {
         "question": "Does explicit reasoning change whether qwen3 leaves an imposed regime?",
         "why": (
@@ -96,6 +127,27 @@ CONTRASTS = {
         "select": lambda spec: (spec["model"] == "qwen3:8b"
                                 and spec["cell"] == "self_play"
                                 and spec["opening"] == "mutual_defection"),
+    },
+    "qwen3-think-roomy": {
+        "question": "The same question, with room for the reasoning to finish.",
+        "why": (
+            "The pilot above lost every match to an empty answer, so it measured "
+            "the instrument rather than the model. This doubles the token budget, "
+            "which the probe shows costs nothing when the reasoning is short, and "
+            "runs repetitions 0 and 1 only. Two is not a smaller sample here so "
+            "much as the minimum that keeps the design: parity selects the payoff "
+            "order, so 0 and 1 are one of each, and the grid's own cells came back "
+            "unanimous 4 out of 4 rather than mixed."),
+        "varies": "reasoning on, and room for it",
+        "model": "qwen3:8b",
+        "seed_as": "qwen3:8b",
+        "compare_with": "qwen3:8b",
+        "think": True,
+        "max_tokens": 4000,
+        "select": lambda spec: (spec["model"] == "qwen3:8b"
+                                and spec["cell"] == "self_play"
+                                and spec["opening"] == "mutual_defection"
+                                and spec["repetition"] < 2),
     },
 }
 
@@ -142,8 +194,9 @@ def make_players_for(name):
     return make
 
 
-def run_contrast(name, log=LOG):
+def run_contrast(name, log=None):
     arm = CONTRASTS[name]
+    log = log or log_for(name)
     specs = specs_for(name)
     check_can_start()
     before = throttle_count()
@@ -158,8 +211,8 @@ def run_contrast(name, log=LOG):
 
 
 def show():
-    done = run_experiment.already_done(LOG)
     for name, arm in CONTRASTS.items():
+        done = run_experiment.already_done(log_for(name))
         specs = specs_for(name)
         left = [s for s in specs if run_experiment.key_of(s) not in done]
         print(f"{name}: {len(specs) - len(left)}/{len(specs)} played "

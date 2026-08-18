@@ -2352,7 +2352,8 @@ window.Quarto = {
   <li><a href="#sec-messages-fr" id="toc-sec-messages-fr" class="nav-link" data-scroll-target="#sec-messages-fr"><span class="header-section-number">4.5</span> Ce que disent réellement les messages</a></li>
   <li><a href="#la-raison-annoncée-et-le-coup-joué" id="toc-la-raison-annoncée-et-le-coup-joué" class="nav-link" data-scroll-target="#la-raison-annoncée-et-le-coup-joué"><span class="header-section-number">4.6</span> La raison annoncée et le coup joué</a></li>
   <li><a href="#sec-oneshot-fr" id="toc-sec-oneshot-fr" class="nav-link" data-scroll-target="#sec-oneshot-fr"><span class="header-section-number">4.7</span> Ce qu’un modèle paie pour ne pas être refusé</a></li>
-  <li><a href="#sec-joined-fr" id="toc-sec-joined-fr" class="nav-link" data-scroll-target="#sec-joined-fr"><span class="header-section-number">4.8</span> Les deux moitiés sur un seul tableau</a></li>
+  <li><a href="#sec-reasoning-fr" id="toc-sec-reasoning-fr" class="nav-link" data-scroll-target="#sec-reasoning-fr"><span class="header-section-number">4.8</span> La délibération change-t-elle quelque chose</a></li>
+  <li><a href="#sec-joined-fr" id="toc-sec-joined-fr" class="nav-link" data-scroll-target="#sec-joined-fr"><span class="header-section-number">4.9</span> Les deux moitiés sur un seul tableau</a></li>
   </ul></li>
   <li><a href="#sec-limits-fr" id="toc-sec-limits-fr" class="nav-link" data-scroll-target="#sec-limits-fr"><span class="header-section-number">5</span> Limites</a></li>
   <li><a href="#sec-conclusion-fr" id="toc-sec-conclusion-fr" class="nav-link" data-scroll-target="#sec-conclusion-fr"><span class="header-section-number">6</span> Conclusion</a></li>
@@ -2416,7 +2417,7 @@ window.Quarto = {
 
 <div id="cell-setup" class="cell" data-execution_count="1">
 <div id="setup" class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>&#39;6b8a8d8808b2d086d56bad8490cbbf91&#39;</code></pre>
+<pre><code>&#39;859ef44cc2e884f343293a83bdf3c99a&#39;</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
@@ -3180,12 +3181,67 @@ Table 7: Points sur 100 cédés à l’autre joueur, quatre décisions par cell
 <p><strong>L’observation qui réunit les deux, et la raison de la présence de ce jeu dans l’article.</strong> Le comportement de qwen3 semble ici l’inverse de celui de la <a href="#sec-opening-fr" class="quarto-xref">Section 4.4</a>, où il fait défection depuis un départ neutre silencieux quand tous les autres coopèrent. C’est la même règle. Dans le dilemme du prisonnier il écrivait que faire défection <em>« guarantees at least 1 point compared to potentially 0 if you cooperate »</em> ; dans l’ultimatum il offre 99 <em>« to avoid getting nothing »</em>. Les deux évitent le pire cas d’une table de gains. Cette logique recommande la défection dans un jeu et une générosité quasi totale dans l’autre : un modèle qui paraît impitoyable ici et absurdement généreux là peut n’avoir qu’une seule disposition, et non deux.</p>
 <p>C’est une mise en garde contre la lecture d’un seul jeu comme une personnalité, et c’est exactement le sens dans lequel <span class="citation" data-cites="horton2023">Horton, Filippas, et Manning (<a href="#ref-horton2023" role="doc-biblioref">2023</a>)</span> dit qu’il faut lire un désaccord.</p>
 </section>
-<section id="sec-joined-fr" class="level2" data-number="4.8">
-<h2 data-number="4.8" class="anchored" data-anchor-id="sec-joined-fr"><span class="header-section-number">4.8</span> Les deux moitiés sur un seul tableau</h2>
-<div id="tbl-joined-fr" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="12">
+<section id="sec-reasoning-fr" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="sec-reasoning-fr"><span class="header-section-number">4.8</span> La délibération change-t-elle quelque chose</h2>
+<p>La grille exécute tous les modèles délibération coupée, car l’activer coûte à qwen3 34 secondes par appel contre 1,9 et aurait ajouté des jours. Le cas le plus difficile du panel restait donc non testé. <code>run_contrasts.py</code> l’active dans la seule cellule de défection imposée, sur les répétitions 0 et 1, soit un ordre de gains chacune.</p>
+<div id="tbl-reasoning-fr" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="12">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-reasoning-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 8: qwen3 dans la cellule de défection imposée, délibération coupée puis active.
+</figcaption>
+<div aria-describedby="tbl-reasoning-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>condition</th>
+<th>matchs, coupée</th>
+<th>coopération, coupée</th>
+<th>matchs, active</th>
+<th>coopération, active</th>
+<th>écart</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>without cheap talk</td>
+<td>4</td>
+<td>0,00</td>
+<td>2</td>
+<td>0,00</td>
+<td>+0,00</td>
+</tr>
+<tr class="even">
+<td>with cheap talk</td>
+<td>4</td>
+<td>0,00</td>
+<td>2</td>
+<td>0,09</td>
+<td>+0,09</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><strong>La délibération le fait essayer, et seulement là où il a de quoi essayer.</strong> En silence il reste exactement à 0,00 dans les deux répétitions, le même verrou que la grille. Avec un canal il atteint 0,09, ce qui n’est pas une sortie mais n’est pas rien : la paire sonde, et les sondages se voient dans le jeu.</p>
+<p>Les raisons disent ce que font les actions. Il ouvre sur le même argument de dominance qu’auparavant, et au dernier tour il énonce explicitement ce qu’il tente : <em>« The other player has shown willingness to Cooperate in some rounds, and mutual cooperation yields higher total points. Switching to Cooperate may encourage them to reciprocate, breaking the [cycle]. »</em></p>
+<p>C’est le signe opposé à <span class="citation" data-cites="liu2026memory">Liu et al. (<a href="#ref-liu2026memory" role="doc-biblioref">2026</a>)</span>, pour qui supprimer la chaîne de pensée <em>réduit</em> souvent un effondrement de la coopération, la délibération l’amplifiant donc. Ici la délibération est la seule chose qui ait produit la moindre coopération dans une cellule où quatre matchs sans elle n’en produisaient aucune. Deux matchs par condition sont une base faible pour contredire une étude de 500 tours sur sept modèles, et le désaccord est rapporté comme un désaccord et non comme une réfutation : ce qui est solide, c’est que cette cellule a quitté le zéro, et seulement avec un canal.</p>
+<p><strong>Une note d’instrumentation qui fait partie du résultat.</strong> Une première tentative de ce volet a perdu ses deux matchs sur une réponse vide, la délibération ayant consommé tout le budget de tokens sans rien laisser pour la ligne d’action. Les trajectoires réelles provoquent environ 5 120 caractères de raisonnement par appel, à peu près le double de ce que provoque un historique synthétique de tours identiques, ce qui explique qu’une sonde à la même profondeur ait laissé croire le budget suffisant. Le doubler a réparé le volet, et un match perdu conserve désormais ses dernières réponses, pour que le prochain échec de ce genre soit diagnosticable plutôt que seulement compté.</p>
+</section>
+<section id="sec-joined-fr" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="sec-joined-fr"><span class="header-section-number">4.9</span> Les deux moitiés sur un seul tableau</h2>
+<div id="tbl-joined-fr" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="13">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-joined-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 8: Score par tour contre les adversaires que les deux moitiés ont joués. Les matchs de l’imitateur font 100 tours et ceux des modèles 30 : les scores par tour sont donc comparables, les taux de coopération pas tout à fait.
+Table 9: Score par tour contre les adversaires que les deux moitiés ont joués. Les matchs de l’imitateur font 100 tours et ceux des modèles 30 : les scores par tour sont donc comparables, les taux de coopération pas tout à fait.
 </figcaption>
 <div aria-describedby="tbl-joined-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="cell caption-top table table-sm table-striped small">
@@ -3280,14 +3336,14 @@ Table 8: Score par tour contre les adversaires que les deux moitiés ont joués
 <p><strong>L’auto-affrontement est une disposition, pas deux sujets.</strong> Les deux sièges portent le même prompt et le même modèle. Le tableau des messages enregistre la fréquence à laquelle les deux sièges ont émis la chaîne identique, qui pour un modèle est la majorité des tours. La température est à 0,7 plutôt qu’à 0 précisément parce qu’un décodage glouton rend l’auto-affrontement dégénéré, mais les deux sièges restent loin d’être des agents indépendants.</p>
 <p><strong>La mesure lexicale du contenu des messages est un indicateur indirect.</strong> Nommer « cooperate » n’est pas proposer la coopération, et une paraphrase échappe au test. Les extraits verbatim de la <a href="#sec-messages-fr" class="quarto-xref">Section 4.5</a> sont donnés pour cette raison : les comptes seuls ne suffiraient pas à soutenir l’affirmation. Une analyse de contenu codée, par un second modèle ou par un humain, serait l’instrument approprié.</p>
 <p><strong>Un modèle est rapporté comme illisible et non comme un résultat.</strong></p>
-<div id="phi3-fr" class="cell" data-execution_count="13">
+<div id="phi3-fr" class="cell" data-execution_count="14">
 <p>phi3:mini a perdu 10 de ses 44 matchs sur des réponses ne nommant aucune action, à une moyenne de 16,2 tours. C’est aussi le seul modèle du panel en Q4_0 plutôt qu’en Q4_K_M, l’un des deux builds les plus anciens, et le plus petit. Ce protocole ne sépare pas ces explications, et ses cellules ne sont donc pas interprétées.</p>
 </div>
 <p>Ce facteur confondant est testable, et il a été testé. <code>run_contrasts.py</code> rejoue tout le stage de phi3 sur le build <code>Q4_K_M</code> des mêmes poids 3,8B mini-4k instruct, en conservant la suite de graines de l’original pour que la quantification soit la seule chose qui change, et en écrivant dans un journal séparé pour que la grille déclarée reste à 220 matchs.</p>
-<div id="tbl-contrast-fr" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="14">
+<div id="tbl-contrast-fr" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="15">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-contrast-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 9: Le contrôle de quantification, sur les cellules qu’il a atteintes, face aux mêmes cellules du stage d’origine.
+Table 10: Le contrôle de quantification, sur les cellules qu’il a atteintes, face aux mêmes cellules du stage d’origine.
 </figcaption>
 <div aria-describedby="tbl-contrast-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="cell caption-top table table-sm table-striped small">
@@ -3334,12 +3390,32 @@ Table 9: Le contrôle de quantification, sur les cellules qu’il a atteintes, 
 <td>10</td>
 <td>0,23</td>
 </tr>
+<tr class="odd">
+<td>qwen3-think</td>
+<td><code>qwen3:8b</code></td>
+<td>2</td>
+<td>2</td>
+<td>1,00</td>
+<td>2</td>
+<td>1</td>
+<td>0,50</td>
+</tr>
+<tr class="even">
+<td>qwen3-think-roomy</td>
+<td><code>qwen3:8b</code></td>
+<td>4</td>
+<td>0</td>
+<td>0,00</td>
+<td>4</td>
+<td>1</td>
+<td>0,25</td>
+</tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
-<div id="contrast-text-fr" class="cell" data-execution_count="15">
+<div id="contrast-text-fr" class="cell" data-execution_count="16">
 <p><strong>La quantification en explique une bonne part, et pas la totalité.</strong> À poids, longueur de contexte, graines et prompts constants, en ne changeant que le format 4 bits, le taux de perte passe de 0,23 à 0,09. L’empaquetage <code>Q4_0</code>, plus grossier, compte donc réellement dans l’incapacité de phi3 à tenir un format de réponse, ce qu’il vaut mieux savoir avant de lire un résultat de petit modèle sur une étiquette par défaut.</p>
 <p><strong>Ce n’est pas non plus toute l’histoire.</strong> 0,09 reste le seul taux de perte non nul du panel : les quatre autres modèles n’ont rien perdu. Un résidu revient donc au modèle, et les cellules de phi3 restent non interprétées plutôt que réhabilitées par un meilleur build.</p>
 <p><strong>La troisième ligne est une erreur qu’il vaut la peine de garder.</strong> Ce volet avait été écrit comme le contrôle de quantification et n’en était pas un : <code>phi3:mini</code> est le build 128k, celui tiré face à lui était en 4k, et la grille demande à chaque modèle une fenêtre de 8192 tokens. Faire tourner un modèle de 4096 tokens au double de sa fenêtre d’entraînement coûte 0,75 de ses matchs, contre 0,23 pour les mêmes poids à leur propre longueur de contexte. Cela ne dit rien de la quantification et beaucoup d’un décalage de fenêtre, et c’est rapporté pour ce que cela mesure plutôt que supprimé.</p>

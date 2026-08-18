@@ -173,6 +173,13 @@ where the loops should live, and settled by reading the note next door: the
 imitator is *mute* in the Dictator game, so there was never a shared home to
 design.
 
+**The follow-up arms are in [`run_contrasts.py`](run_contrasts.py)**, each
+answering one question and writing outside the grid. Quantisation explains much
+of why phi3 could not hold an answer format, 4 lost of 44 against 10, and not all
+of it. Reasoning turned on moves qwen3 off zero in the imposed defective cell,
+0.09 against 0.00, but only where there is a channel: silent it stays exactly
+locked.
+
 **[`results/README.md`](results/README.md) is the data dictionary**: every field
 of the raw log, every column of the seven tables, and the run conditions that have
 to be reported with a number for it to mean anything: the model digests and

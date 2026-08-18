@@ -165,9 +165,23 @@ def play_one(spec, make=make_players):
                             game=grid_config.GAME,
                             cheap_talk=spec["condition"] == "with_cheap_talk")
     except UnparseableReply as failure:
+        # **Keep the reply that lost the match, not only the fact that one did.**
+        # A lost match used to record how far it got and nothing else, so when
+        # qwen3 lost two matches to an empty answer on 2026-08-18 there was no
+        # way to see whether the reasoning had run long, the answer had been
+        # truncated, or the prompt had grown past the window. The transcript is
+        # the evidence and it was being discarded at exactly the moment it
+        # mattered. Only the tail is kept: the whole thing is what made prompt
+        # echoes 94% of an earlier log.
+        seats = {}
+        for name, player in (("a", player_a), ("b", player_b)):
+            tail = getattr(player, "transcript", [])[-2:]
+            if tail:
+                seats[f"{name}_last_replies"] = tail
         record = {"failed": str(failure),
                   "rounds_completed": min(len(player_a.own_history),
-                                          len(player_b.own_history))}
+                                          len(player_b.own_history)),
+                  **seats}
     return {**common,
             "seconds": round(time.monotonic() - started, 2),
             # Sampled the instant the match ends, which is the closest cheap
