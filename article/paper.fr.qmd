@@ -63,6 +63,7 @@ execute:
 #| label: setup
 #| echo: false
 from analysis import *
+stamp_render()
 ```
 
 > [Read in English](paper.html)

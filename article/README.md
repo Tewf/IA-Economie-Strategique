@@ -29,12 +29,19 @@ environment needs nothing beyond what [`../requirements.txt`](../requirements.tx
 already pins: the chunks use `csv` and `pathlib` from the standard library, and
 no plotting or dataframe library at all.
 
-**The four rendered files are build products that CI does not rebuild.**
+**The four rendered files are build products that CI does not rebuild**, because
+that would mean installing Quarto and LaTeX in the workflow to check a document.
 They are committed because GitHub Pages serves this repository directly and a
-reader should not have to install Quarto to read the paper. The consequence is
-the one drift risk in the repository: **re-render after anything changes a table
-in `*/results/`**, or the published paper will quote numbers the CSVs no longer
-hold.
+reader should not have to install Quarto to read the paper.
+
+That would be the one drift risk in the repository, so the cheap half of the
+guarantee is wired in: rendering stamps [`rendered-from.txt`](rendered-from.txt)
+with a digest of every table the paper read, and
+[`check_freshness.py`](check_freshness.py) compares it with those tables as they
+stand. CI runs it, so a table that moves without the paper being re-rendered
+turns the build red instead of publishing numbers the data no longer holds.
+
+    python article/check_freshness.py
 
 ## Two languages, one set of numbers
 

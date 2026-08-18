@@ -10,6 +10,7 @@ render needs nothing beyond `requirements.txt` and the standard library.
 """
 
 import csv
+import hashlib
 import pathlib
 
 ROOT = (pathlib.Path.cwd().parent if pathlib.Path.cwd().name == "article"
@@ -79,6 +80,41 @@ CONDITIONS = ["without_cheap_talk", "with_cheap_talk"]
 CELLS = [(opening, condition) for opening in OPENINGS for condition in CONDITIONS]
 SHARED_OPPONENTS = ["Tit For Tat", "Grudger", "Win-Stay Lose-Shift", "Defector",
                     "Alternator"]
+
+
+SOURCES = sorted(
+    [path for path in LLM.glob("*.csv")]
+    + [HEBBIAN / "standings.csv", HEBBIAN / "self_play_lock_in.csv",
+       HEBBIAN / "reciprocity.csv", HEBBIAN / "head_to_head.csv",
+       ROOT / "comparison.csv"])
+
+
+def digest_of_sources():
+    """A hash of every CSV the paper reads, so staleness is detectable.
+
+    The rendered HTML and PDF are the one thing continuous integration does not
+    rebuild, because that would mean installing Quarto and LaTeX to check a
+    document. This is the cheap half of that guarantee: rendering writes the
+    digest of its inputs to `rendered-from.txt`, CI recomputes it from the CSVs
+    as they stand, and a table that moved without the paper being re-rendered
+    fails the build instead of publishing numbers the data no longer holds.
+    """
+    running = hashlib.blake2b(digest_size=16)
+    for path in SOURCES:
+        running.update(path.name.encode())
+        running.update(path.read_bytes())
+    return running.hexdigest()
+
+
+def stamp_render(into=None):
+    """Record what the paper was rendered from. Called by both editions."""
+    into = into or (ROOT / "article" / "rendered-from.txt")
+    into.write_text(
+        f"{digest_of_sources()}\n"
+        f"# blake2b-128 over the {len(SOURCES)} CSVs the paper reads, written at\n"
+        f"# render time. `python article/check_freshness.py` compares it with the\n"
+        f"# CSVs as they stand.\n")
+    return digest_of_sources()
 
 
 def captured_freed_unmoved_never():

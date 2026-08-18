@@ -69,3 +69,11 @@ jobs:
         run: |
           python comparison.py
           git diff --exit-code --stat -- comparison.csv
+
+      # The rendered paper is the one artefact this workflow does not rebuild,
+      # because that would mean installing Quarto and LaTeX to check a document.
+      # Rendering stamps a digest of every table it read, so the cheap half of
+      # the guarantee is available: a table that moved without the paper being
+      # re-rendered fails here rather than being published.
+      - name: The published paper was rendered from these tables
+        run: python article/check_freshness.py
