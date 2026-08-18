@@ -201,6 +201,68 @@ def settling(matches):
     return rows
 
 
+CONTRASTS_LOG = pathlib.Path(__file__).parent / "results" / "contrasts.jsonl"
+
+
+def read_contrasts(log=CONTRASTS_LOG):
+    """Every match from a follow-up arm. A separate log, deliberately.
+
+    The grid is 220 matches over five declared models and it stays 220. An arm
+    run afterwards to answer a confound is a follow-up rather than more of the
+    same experiment, so folding it into `matches.jsonl` would quietly change what
+    the headline numbers average over.
+    """
+    if not log.exists():
+        return []
+    played = []
+    for line in log.read_text().splitlines():
+        try:
+            played.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return played
+
+
+# What each arm actually changed, which is not always what it was named for:
+# `phi3-quantisation` was written to vary quantisation and turned out to vary the
+# context length too, because `phi3:mini` is the 128k build and the one pulled
+# against it was 4k. Named here rather than in the log, so a mislabelled arm is
+# visible in the table a reader sees.
+VARIES = {"phi3-quantisation": "quantisation and context length",
+          "phi3-quantisation-matched": "quantisation only"}
+
+
+def contrast_parse_health(played, lost, contrasts):
+    """A contrast arm's parse health beside the arm it controls for.
+
+    phi3:mini lost 10 of 44 matches to replies that named no action, and it is
+    also the only model in the panel at Q4_0. `run_contrasts.py` replays its
+    stage on the Q4_K_M build of the same weights with the same seeds, so this
+    table is the answer to whether the quantisation was the cause: the control's
+    loss rate against the original's, on the cells the control has reached.
+    """
+    rows = []
+    for name in sorted({match.get("contrast") for match in contrasts} - {None}):
+        arm = [match for match in contrasts if match.get("contrast") == name]
+        keys = {(match["cell"], match["condition"], match["opening"],
+                 match["repetition"]) for match in arm}
+        control_model = sorted({match["model"] for match in arm})[0]
+        # `played` holds only whole matches, so the lost ones have to be added
+        # back: a comparison of loss rates that silently drops the losses on one
+        # side is the one arithmetic error this table exists to avoid.
+        original = [match for match in list(played) + list(lost)
+                    if (match["cell"], match["condition"], match["opening"],
+                        match["repetition"]) in keys
+                    and match["model"] == "phi3:mini"]
+        original_lost = sum("failed" in match for match in original)
+        arm_lost = sum("failed" in match for match in arm)
+        rows.append((name, VARIES.get(name, "unknown"), control_model, len(arm),
+                     arm_lost, arm_lost / len(arm) if arm else float("nan"),
+                     len(original), original_lost,
+                     original_lost / len(original) if original else float("nan")))
+    return rows
+
+
 ONE_SHOT_LOG = pathlib.Path(__file__).parent / "results" / "one_shot.jsonl"
 
 

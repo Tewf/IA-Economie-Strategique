@@ -2416,7 +2416,7 @@ window.Quarto = {
 
 <div id="cell-setup" class="cell" data-execution_count="1">
 <div id="setup" class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>&#39;1f50670d93cca1f2d846df584d60c252&#39;</code></pre>
+<pre><code>&#39;23c1a4457a6e8d8f15fffd14eacd101e&#39;</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
@@ -3283,7 +3283,56 @@ Table 8: Score par tour contre les adversaires que les deux moitiés ont joués
 <div id="phi3-fr" class="cell" data-execution_count="13">
 <p>phi3:mini a perdu 10 de ses 44 matchs sur des réponses ne nommant aucune action, à une moyenne de 16,2 tours. C’est aussi le seul modèle du panel en Q4_0 plutôt qu’en Q4_K_M, l’un des deux builds les plus anciens, et le plus petit. Ce protocole ne sépare pas ces explications, et ses cellules ne sont donc pas interprétées.</p>
 </div>
-<p>Le volet quantification est testable, et a été lancé : <code>run_contrasts.py</code> rejoue le même stage sur le build <code>Q4_K_M</code> des mêmes poids et avec les mêmes graines, de sorte que la quantification est la seule chose qui bouge. Il a été arrêté après 10 matchs pour des raisons thermiques et figure ici comme préliminaire plutôt qu’intégré à un tableau : <strong>les 10 ont échoué au parsing</strong>, dans des cellules où le build <code>Q4_0</code> en perdait trois sur quatre. Cela éloigne l’explication par la quantification sans encore la trancher.</p>
+<p>Ce facteur confondant est testable, et il a été testé. <code>run_contrasts.py</code> rejoue tout le stage de phi3 sur le build <code>Q4_K_M</code> des mêmes poids 3,8B mini-4k instruct, en conservant la suite de graines de l’original pour que la quantification soit la seule chose qui change, et en écrivant dans un journal séparé pour que la grille déclarée reste à 220 matchs.</p>
+<div id="tbl-contrast-fr" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="14">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-contrast-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 9: Le contrôle de quantification, sur les cellules qu’il a atteintes, face aux mêmes cellules du stage d’origine.
+</figcaption>
+<div aria-describedby="tbl-contrast-fr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>volet</th>
+<th>build de contrôle</th>
+<th>matchs</th>
+<th>perdus</th>
+<th>taux de perte</th>
+<th>matchs d’origine</th>
+<th>perdus</th>
+<th>taux de perte</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>phi3-quantisation</td>
+<td><code>phi3:3.8b-mini-4k-instruct-q4_K_M</code></td>
+<td>44</td>
+<td>33</td>
+<td>0,75</td>
+<td>44</td>
+<td>10</td>
+<td>0,23</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="contrast-text-fr" class="cell" data-execution_count="15">
+<p><strong>La quantification n’est pas l’explication.</strong> Sur les mêmes cellules et avec les mêmes graines, le build <code>Q4_K_M</code> perd 0,75 de ses matchs contre 0,23 pour le build <code>Q4_0</code>. Il échoue plus souvent, et non moins : le format 4 bits le plus grossier ne peut donc pas être ce qui empêche phi3 de tenir un format de réponse. Restent le modèle lui-même et l’âge de son build, que ce volet ne sépare pas.</p>
+</div>
+<p>Ce volet est rapporté ici plutôt qu’intégré à l’un des tableaux ci-dessus, parce qu’il s’agit d’une exécution de suivi répondant à un facteur confondant, et non d’une partie de la grille déclarée.</p>
 <p><strong>L’échelle.</strong> Tous les modèles sont entre 3,8 et 8,2 milliards de paramètres et quantifiés en 4 bits sur une carte grand public. Là où ces résultats diffèrent de travaux portant sur des modèles de pointe, la taille et la quantification restent des explications vivantes que ce protocole ne peut pas écarter.</p>
 <p><strong>Une étiquette n’est pas une version.</strong> Les empreintes exactes des modèles, les graines et le matériel sont consignés à côté des données, car une réexécution qui résout une empreinte différente est une autre expérience.</p>
 </section>

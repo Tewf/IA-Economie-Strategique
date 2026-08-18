@@ -35,6 +35,12 @@ TABLES = [
       "settled_on_mutual_cooperation", "settled_on_mutual_defection",
       "unsettled", "mean_score_per_turn"],
      lambda played, lost: measurements.self_play_lock_in(played)),
+    ("contrast_parse_health.csv",
+     ["contrast", "varies", "control_model", "control_matches", "control_lost",
+      "control_loss_rate", "original_matches", "original_lost",
+      "original_loss_rate"],
+     lambda played, lost: measurements.contrast_parse_health(
+         played, lost, measurements.read_contrasts())),
     ("one_shot_offers.csv",
      ["model", "dictator_decisions", "dictator_offer", "ultimatum_decisions",
       "ultimatum_offer", "paid_to_avoid_refusal", "responder_decisions",

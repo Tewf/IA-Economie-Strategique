@@ -25,18 +25,25 @@ every cell. All five models are 4-bit quantised local builds:
 | gemma3:4b | 4.3B | Q4_K_M | `a2af6cc3eb7fa8be8504abaf` | 2026-07-26 |
 | phi3:mini | 3.8B | **Q4_0** | `4f222292793889a9a40a0207` | 2025-10-31 |
 
+**`phi3:mini` is the 128k build**, not the 4k one: it reports
+`phi3.context_length` 131072. Worth stating because the name does not, and a
+control built on the assumption that `mini` means 4k varied two things at once.
+Every model above was asked for a `num_ctx` of 8192, which all five support.
+
 **A tag is not a version.** `qwen3:8b` names whatever build Ollama last resolved
 that tag to, so the digests above are the only reproducible identifier of what
 actually played, and a rerun that resolves a different digest is a different
 experiment.
 
-**A confound to carry, not to bury.** phi3:mini is the model whose replies could
-not be parsed, and it is also the only model in the panel at `Q4_0` rather than
-`Q4_K_M`, one of the two oldest builds, and the smallest. Those explanations are
-not separated by this design: its failure to hold an answer format may be the
-model, the coarser quantisation, or the nine-month-older build, and nothing here
-distinguishes them. That is why its cells are reported as unreadable rather than
-as a result about phi3.
+**A confound, and the arm that tests it.** phi3:mini is the model whose replies
+could not be parsed, and it is also the only model in the panel at `Q4_0` rather
+than `Q4_K_M`, one of the two oldest builds, and the smallest. The grid separates
+none of those, which is why its cells are reported as unreadable rather than as a
+result about phi3. [`../run_contrasts.py`](../run_contrasts.py) replays its whole
+stage on the `Q4_K_M` build of the *same* 128k weights, holding the seed stream,
+so quantisation is the only thing that moves; `contrast_parse_health.csv` reports
+it beside the original, with a `varies` column because the first attempt at that
+arm did not vary what it claimed to.
 
 Every model in the panel is 4B to 8B and 4-bit quantised on an 8 GB card. Where
 these results differ from work using frontier models, model scale and

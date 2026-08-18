@@ -628,13 +628,41 @@ print(f"{m} lost {r['matches_lost']} of "
       f"interpreted.")
 ```
 
-The quantisation half of that is testable, and was started: `run_contrasts.py`
-replays the same stage on the `Q4_K_M` build of the same weights with the same
-seeds, so quantisation is the only thing that moves. It was stopped after
-10 matches for thermal reasons and is reported here as preliminary rather
-than folded into any table: **all 10 failed to parse**, in cells where the
-`Q4_0` build lost three of four. That points away from quantisation as the
-explanation without yet settling it.
+That confound is testable, and was tested. `run_contrasts.py` replays phi3's
+whole stage on the `Q4_K_M` build of the same 3.8B mini-4k instruct weights,
+holding the original's seed stream so that quantisation is the only thing that
+moves, and writing to a separate log so the declared grid stays 220 matches.
+
+```{python}
+#| label: tbl-contrast
+#| output: asis
+contrast = table(LLM, "contrast_parse_health.csv")
+md(["arm", "control build", "control matches", "lost", "loss rate",
+    "original matches", "lost", "loss rate"],
+   [[r["contrast"], f'`{r["control_model"]}`', r["control_matches"],
+     r["control_lost"], pct(float(r["control_loss_rate"])),
+     r["original_matches"], r["original_lost"],
+     pct(float(r["original_loss_rate"]))] for r in contrast])
+print("\n: The quantisation control, on the cells it has reached, against the "
+      "same cells of the original stage.")
+```
+
+```{python}
+#| label: contrast-text
+#| output: asis
+r = contrast[0]
+control, original = float(r["control_loss_rate"]), float(r["original_loss_rate"])
+print(f"**The quantisation is not the explanation.** On the same cells, with the "
+      f"same seeds, the `Q4_K_M` build loses {pct(control)} of its matches against "
+      f"the `Q4_0` build's {pct(original)}. It fails "
+      f"{'more often' if control > original else 'no less often'}, not less, so "
+      f"the coarser 4-bit format cannot be what stops phi3 holding an answer "
+      f"format. The remaining explanations are the model itself and its build "
+      f"age, which this arm does not separate.")
+```
+
+The arm is reported here rather than folded into any table above, because it is a
+follow-up run to answer a confound and not part of the pre-declared grid.
 
 **Scale.** Every model here is between 3.8 and 8.2 billion parameters and 4-bit
 quantised on a consumer card. Where these results differ from work on frontier

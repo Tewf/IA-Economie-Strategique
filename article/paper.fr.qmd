@@ -629,13 +629,43 @@ print(f"{m} a perdu {r['matches_lost']} de ses "
       f"et ses cellules ne sont donc pas interprétées.")
 ```
 
-Le volet quantification est testable, et a été lancé : `run_contrasts.py`
-rejoue le même stage sur le build `Q4_K_M` des mêmes poids et avec les mêmes
-graines, de sorte que la quantification est la seule chose qui bouge. Il a été
-arrêté après 10 matchs pour des raisons thermiques et figure ici comme
-préliminaire plutôt qu'intégré à un tableau : **les 10 ont échoué au
-parsing**, dans des cellules où le build `Q4_0` en perdait trois sur quatre.
-Cela éloigne l'explication par la quantification sans encore la trancher.
+Ce facteur confondant est testable, et il a été testé. `run_contrasts.py` rejoue
+tout le stage de phi3 sur le build `Q4_K_M` des mêmes poids 3,8B mini-4k
+instruct, en conservant la suite de graines de l'original pour que la
+quantification soit la seule chose qui change, et en écrivant dans un journal
+séparé pour que la grille déclarée reste à 220 matchs.
+
+```{python}
+#| label: tbl-contrast-fr
+#| output: asis
+contrast = table(LLM, "contrast_parse_health.csv")
+md(["volet", "build de contrôle", "matchs", "perdus", "taux de perte",
+    "matchs d'origine", "perdus", "taux de perte"],
+   [[r["contrast"], f'`{r["control_model"]}`', r["control_matches"],
+     r["control_lost"], fr(float(r["control_loss_rate"])),
+     r["original_matches"], r["original_lost"],
+     fr(float(r["original_loss_rate"]))] for r in contrast])
+print("\n: Le contrôle de quantification, sur les cellules qu'il a atteintes, "
+      "face aux mêmes cellules du stage d'origine.")
+```
+
+```{python}
+#| label: contrast-text-fr
+#| output: asis
+r = contrast[0]
+control, original = float(r["control_loss_rate"]), float(r["original_loss_rate"])
+print(f"**La quantification n'est pas l'explication.** Sur les mêmes cellules et "
+      f"avec les mêmes graines, le build `Q4_K_M` perd {fr(control)} de ses matchs "
+      f"contre {fr(original)} pour le build `Q4_0`. Il échoue "
+      f"{'plus souvent' if control > original else 'au moins autant'}, et non "
+      f"moins : le format 4 bits le plus grossier ne peut donc pas être ce qui "
+      f"empêche phi3 de tenir un format de réponse. Restent le modèle lui-même et "
+      f"l'âge de son build, que ce volet ne sépare pas.")
+```
+
+Ce volet est rapporté ici plutôt qu'intégré à l'un des tableaux ci-dessus, parce
+qu'il s'agit d'une exécution de suivi répondant à un facteur confondant, et non
+d'une partie de la grille déclarée.
 
 **L'échelle.** Tous les modèles sont entre 3,8 et 8,2 milliards de paramètres et
 quantifiés en 4 bits sur une carte grand public. Là où ces résultats diffèrent de

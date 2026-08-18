@@ -31,16 +31,43 @@ RESULTS = pathlib.Path(__file__).parent / "results"
 LOG = RESULTS / "contrasts.jsonl"
 
 CONTRASTS = {
+    # **This arm did not measure what it was named for, and the name is kept so
+    # the log stays honest.** It was written to vary quantisation alone, on the
+    # belief that `phi3:mini` is the 4k build. It is not: `phi3:mini` resolves to
+    # the 128k variant (`phi3.context_length` 131072), and the build pulled here
+    # is 4096. The grid asks for `num_ctx` 8192, so this arm ran a 4k model at
+    # twice its trained window, and its 75% loss rate says so. The same mistake
+    # the panel already documents, made again: a tag is not a version, and
+    # "mini" names a family rather than a context length.
     "phi3-quantisation": {
+        "question": "Does a 4k build survive being asked for an 8192-token window?",
+        "why": (
+            "Intended as the quantisation control and mis-specified. It varies "
+            "quantisation AND context length at once, so it answers neither "
+            "cleanly; what it does show is that a 4096-context build asked for "
+            "8192 fails 33 of 44 matches against the original's 10. Kept because "
+            "the run happened and deleting an inconvenient arm is worse than "
+            "labelling it. The control it was meant to be is the next entry."),
+        "varies": "quantisation and context length",
+        "model": "phi3:3.8b-mini-4k-instruct-q4_K_M",
+        "seed_as": "phi3:mini",
+        "compare_with": "phi3:mini",
+        "think": False,
+        "max_tokens": 300,
+        "select": lambda spec: spec["model"] == "phi3:mini",
+    },
+    "phi3-quantisation-matched": {
         "question": "Are phi3's unparseable replies the model, or its quantisation?",
         "why": (
-            "phi3:mini lost 10 of 44 matches to replies that named no action, and "
-            "it is also the only model in the panel at Q4_0 rather than Q4_K_M, "
-            "one of the two oldest builds, and the smallest. The grid cannot "
-            "separate those. This replays its whole stage on the Q4_K_M build of "
-            "the same 3.8B mini-4k instruct weights, same seeds, same prompts, so "
-            "quantisation is the only thing that moved."),
-        "model": "phi3:3.8b-mini-4k-instruct-q4_K_M",
+            "The control the arm above was meant to be. `phi3:mini` is the 128k "
+            "variant at Q4_0, so the only build that isolates quantisation is the "
+            "128k variant at Q4_K_M: same weights, same 131072 context, same "
+            "seeds, same prompts, one thing changed. If the loss rate matches the "
+            "original's 10 of 44, quantisation is not what stops phi3 holding an "
+            "answer format and the remaining explanations are the model itself "
+            "and its build age."),
+        "varies": "quantisation only",
+        "model": "phi3:3.8b-mini-128k-instruct-q4_K_M",
         "seed_as": "phi3:mini",
         "compare_with": "phi3:mini",
         "think": False,
