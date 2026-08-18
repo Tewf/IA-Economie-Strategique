@@ -652,15 +652,31 @@ print("\n: Le contrôle de quantification, sur les cellules qu'il a atteintes, "
 ```{python}
 #| label: contrast-text-fr
 #| output: asis
-r = contrast[0]
-control, original = float(r["control_loss_rate"]), float(r["original_loss_rate"])
-print(f"**La quantification n'est pas l'explication.** Sur les mêmes cellules et "
-      f"avec les mêmes graines, le build `Q4_K_M` perd {fr(control)} de ses matchs "
-      f"contre {fr(original)} pour le build `Q4_0`. Il échoue "
-      f"{'plus souvent' if control > original else 'au moins autant'}, et non "
-      f"moins : le format 4 bits le plus grossier ne peut donc pas être ce qui "
-      f"empêche phi3 de tenir un format de réponse. Restent le modèle lui-même et "
-      f"l'âge de son build, que ce volet ne sépare pas.")
+matched = rows(contrast, contrast="phi3-quantisation-matched")[0]
+mismatched = rows(contrast, contrast="phi3-quantisation")[0]
+control = float(matched["control_loss_rate"])
+original = float(matched["original_loss_rate"])
+wrong = float(mismatched["control_loss_rate"])
+print(f"**La quantification en explique une bonne part, et pas la totalité.** À "
+      f"poids, longueur de contexte, graines et prompts constants, en ne changeant "
+      f"que le format 4 bits, le taux de perte passe de {fr(original)} à "
+      f"{fr(control)}. L'empaquetage `Q4_0`, plus grossier, compte donc "
+      f"réellement dans l'incapacité de phi3 à tenir un format de réponse, ce "
+      f"qu'il vaut mieux savoir avant de lire un résultat de petit modèle sur une "
+      f"étiquette par défaut.\n")
+print(f"**Ce n'est pas non plus toute l'histoire.** {fr(control)} reste le seul "
+      f"taux de perte non nul du panel : les quatre autres modèles n'ont rien "
+      f"perdu. Un résidu revient donc au modèle, et les cellules de phi3 restent "
+      f"non interprétées plutôt que réhabilitées par un meilleur build.\n")
+print(f"**La troisième ligne est une erreur qu'il vaut la peine de garder.** Ce "
+      f"volet avait été écrit comme le contrôle de quantification et n'en était "
+      f"pas un : `phi3:mini` est le build 128k, celui tiré face à lui était en 4k, "
+      f"et la grille demande à chaque modèle une fenêtre de 8192 tokens. Faire "
+      f"tourner un modèle de 4096 tokens au double de sa fenêtre d'entraînement "
+      f"coûte {fr(wrong)} de ses matchs, contre {fr(original)} pour les mêmes "
+      f"poids à leur propre longueur de contexte. Cela ne dit rien de la "
+      f"quantification et beaucoup d'un décalage de fenêtre, et c'est rapporté "
+      f"pour ce que cela mesure plutôt que supprimé.")
 ```
 
 Ce volet est rapporté ici plutôt qu'intégré à l'un des tableaux ci-dessus, parce

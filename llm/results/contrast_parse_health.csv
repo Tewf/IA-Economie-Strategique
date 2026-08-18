@@ -1,2 +1,3 @@
 contrast,varies,control_model,control_matches,control_lost,control_loss_rate,original_matches,original_lost,original_loss_rate
 phi3-quantisation,quantisation and context length,phi3:3.8b-mini-4k-instruct-q4_K_M,44,33,0.750000,44,10,0.227273
+phi3-quantisation-matched,quantisation only,phi3:3.8b-mini-128k-instruct-q4_K_M,44,4,0.090909,44,10,0.227273

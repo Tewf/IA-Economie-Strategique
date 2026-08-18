@@ -62,10 +62,10 @@ CONTRASTS = {
             "The control the arm above was meant to be. `phi3:mini` is the 128k "
             "variant at Q4_0, so the only build that isolates quantisation is the "
             "128k variant at Q4_K_M: same weights, same 131072 context, same "
-            "seeds, same prompts, one thing changed. If the loss rate matches the "
-            "original's 10 of 44, quantisation is not what stops phi3 holding an "
-            "answer format and the remaining explanations are the model itself "
-            "and its build age."),
+            "seeds, same prompts, one thing changed. Answered 2026-08-18: 4 of "
+            "44 against the original's 10 of 44, so the coarser packing is much "
+            "of why phi3 could not hold an answer format. Not all of it, since 4 "
+            "of 44 is still the only non-zero loss rate in the panel."),
         "varies": "quantisation only",
         "model": "phi3:3.8b-mini-128k-instruct-q4_K_M",
         "seed_as": "phi3:mini",

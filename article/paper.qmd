@@ -650,15 +650,29 @@ print("\n: The quantisation control, on the cells it has reached, against the "
 ```{python}
 #| label: contrast-text
 #| output: asis
-r = contrast[0]
-control, original = float(r["control_loss_rate"]), float(r["original_loss_rate"])
-print(f"**The quantisation is not the explanation.** On the same cells, with the "
-      f"same seeds, the `Q4_K_M` build loses {pct(control)} of its matches against "
-      f"the `Q4_0` build's {pct(original)}. It fails "
-      f"{'more often' if control > original else 'no less often'}, not less, so "
-      f"the coarser 4-bit format cannot be what stops phi3 holding an answer "
-      f"format. The remaining explanations are the model itself and its build "
-      f"age, which this arm does not separate.")
+matched = rows(contrast, contrast="phi3-quantisation-matched")[0]
+mismatched = rows(contrast, contrast="phi3-quantisation")[0]
+control = float(matched["control_loss_rate"])
+original = float(matched["original_loss_rate"])
+wrong = float(mismatched["control_loss_rate"])
+print(f"**Quantisation accounts for much of it, and not all of it.** Holding the "
+      f"weights, the context length, the seeds and the prompts, and changing only "
+      f"the 4-bit format, the loss rate falls from {pct(original)} to "
+      f"{pct(control)}. The coarser `Q4_0` packing is therefore a real part of why "
+      f"phi3 could not hold an answer format, which is worth knowing before "
+      f"reading any small-model result off a default tag.\n")
+print(f"**It is not the whole story either.** {pct(control)} is still the only "
+      f"non-zero loss rate in the panel: the other four models lost nothing. So a "
+      f"residue belongs to the model, and phi3's cells stay uninterpreted rather "
+      f"than being rehabilitated by a better build.\n")
+print(f"**The third row is a mistake worth keeping.** That arm was written as the "
+      f"quantisation control and was not one: `phi3:mini` is the 128k build and "
+      f"the build pulled against it was 4k, while the grid asks every model for a "
+      f"window of 8192 tokens. Running a 4096-token model at twice its trained "
+      f"window costs {pct(wrong)} of its matches, against {pct(original)} for the "
+      f"same weights at their own context length. It answers nothing about "
+      f"quantisation and quite a lot about what a context-window mismatch does, "
+      f"so it is reported as what it measured rather than deleted.")
 ```
 
 The arm is reported here rather than folded into any table above, because it is a

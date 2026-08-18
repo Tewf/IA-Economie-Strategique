@@ -2417,7 +2417,7 @@ window.Quarto = {
 
 <div id="cell-setup" class="cell" data-execution_count="1">
 <div id="setup" class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>&#39;23c1a4457a6e8d8f15fffd14eacd101e&#39;</code></pre>
+<pre><code>&#39;6b8a8d8808b2d086d56bad8490cbbf91&#39;</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
@@ -3317,13 +3317,25 @@ Table 8: The quantisation control, on the cells it has reached, against the sam
 <td>10</td>
 <td>0.23</td>
 </tr>
+<tr class="even">
+<td>phi3-quantisation-matched</td>
+<td><code>phi3:3.8b-mini-128k-instruct-q4_K_M</code></td>
+<td>44</td>
+<td>4</td>
+<td>0.09</td>
+<td>44</td>
+<td>10</td>
+<td>0.23</td>
+</tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
 <div id="contrast-text" class="cell" data-execution_count="16">
-<p><strong>The quantisation is not the explanation.</strong> On the same cells, with the same seeds, the <code>Q4_K_M</code> build loses 0.75 of its matches against the <code>Q4_0</code> build’s 0.23. It fails more often, not less, so the coarser 4-bit format cannot be what stops phi3 holding an answer format. The remaining explanations are the model itself and its build age, which this arm does not separate.</p>
+<p><strong>Quantisation accounts for much of it, and not all of it.</strong> Holding the weights, the context length, the seeds and the prompts, and changing only the 4-bit format, the loss rate falls from 0.23 to 0.09. The coarser <code>Q4_0</code> packing is therefore a real part of why phi3 could not hold an answer format, which is worth knowing before reading any small-model result off a default tag.</p>
+<p><strong>It is not the whole story either.</strong> 0.09 is still the only non-zero loss rate in the panel: the other four models lost nothing. So a residue belongs to the model, and phi3’s cells stay uninterpreted rather than being rehabilitated by a better build.</p>
+<p><strong>The third row is a mistake worth keeping.</strong> That arm was written as the quantisation control and was not one: <code>phi3:mini</code> is the 128k build and the build pulled against it was 4k, while the grid asks every model for a window of 8192 tokens. Running a 4096-token model at twice its trained window costs 0.75 of its matches, against 0.23 for the same weights at their own context length. It answers nothing about quantisation and quite a lot about what a context-window mismatch does, so it is reported as what it measured rather than deleted.</p>
 </div>
 <p>The arm is reported here rather than folded into any table above, because it is a follow-up run to answer a confound and not part of the pre-declared grid.</p>
 <p><strong>Scale.</strong> Every model here is between 3.8 and 8.2 billion parameters and 4-bit quantised on a consumer card. Where these results differ from work on frontier models, scale and quantisation are live explanations that this design cannot rule out.</p>

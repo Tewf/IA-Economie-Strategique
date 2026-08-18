@@ -45,6 +45,13 @@ so quantisation is the only thing that moves; `contrast_parse_health.csv` report
 it beside the original, with a `varies` column because the first attempt at that
 arm did not vary what it claimed to.
 
+**The answer, in one line: quantisation is much of it and not all of it.** At the
+same 128k context and the same seeds, `Q4_K_M` loses 4 of 44 matches against
+`Q4_0`'s 10 of 44. That is a real effect and still the only non-zero loss rate in
+the panel, so phi3's cells remain uninterpreted rather than rehabilitated. The
+mis-specified arm, a 4k build asked for the grid's 8192-token window, loses 33 of
+44 and measures a context-window mismatch instead.
+
 Every model in the panel is 4B to 8B and 4-bit quantised on an 8 GB card. Where
 these results differ from work using frontier models, model scale and
 quantisation are live explanations that this design cannot rule out.

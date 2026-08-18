@@ -2416,7 +2416,7 @@ window.Quarto = {
 
 <div id="cell-setup" class="cell" data-execution_count="1">
 <div id="setup" class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>&#39;23c1a4457a6e8d8f15fffd14eacd101e&#39;</code></pre>
+<pre><code>&#39;6b8a8d8808b2d086d56bad8490cbbf91&#39;</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
@@ -3324,13 +3324,25 @@ Table 9: Le contrôle de quantification, sur les cellules qu’il a atteintes, 
 <td>10</td>
 <td>0,23</td>
 </tr>
+<tr class="even">
+<td>phi3-quantisation-matched</td>
+<td><code>phi3:3.8b-mini-128k-instruct-q4_K_M</code></td>
+<td>44</td>
+<td>4</td>
+<td>0,09</td>
+<td>44</td>
+<td>10</td>
+<td>0,23</td>
+</tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
 <div id="contrast-text-fr" class="cell" data-execution_count="15">
-<p><strong>La quantification n’est pas l’explication.</strong> Sur les mêmes cellules et avec les mêmes graines, le build <code>Q4_K_M</code> perd 0,75 de ses matchs contre 0,23 pour le build <code>Q4_0</code>. Il échoue plus souvent, et non moins : le format 4 bits le plus grossier ne peut donc pas être ce qui empêche phi3 de tenir un format de réponse. Restent le modèle lui-même et l’âge de son build, que ce volet ne sépare pas.</p>
+<p><strong>La quantification en explique une bonne part, et pas la totalité.</strong> À poids, longueur de contexte, graines et prompts constants, en ne changeant que le format 4 bits, le taux de perte passe de 0,23 à 0,09. L’empaquetage <code>Q4_0</code>, plus grossier, compte donc réellement dans l’incapacité de phi3 à tenir un format de réponse, ce qu’il vaut mieux savoir avant de lire un résultat de petit modèle sur une étiquette par défaut.</p>
+<p><strong>Ce n’est pas non plus toute l’histoire.</strong> 0,09 reste le seul taux de perte non nul du panel : les quatre autres modèles n’ont rien perdu. Un résidu revient donc au modèle, et les cellules de phi3 restent non interprétées plutôt que réhabilitées par un meilleur build.</p>
+<p><strong>La troisième ligne est une erreur qu’il vaut la peine de garder.</strong> Ce volet avait été écrit comme le contrôle de quantification et n’en était pas un : <code>phi3:mini</code> est le build 128k, celui tiré face à lui était en 4k, et la grille demande à chaque modèle une fenêtre de 8192 tokens. Faire tourner un modèle de 4096 tokens au double de sa fenêtre d’entraînement coûte 0,75 de ses matchs, contre 0,23 pour les mêmes poids à leur propre longueur de contexte. Cela ne dit rien de la quantification et beaucoup d’un décalage de fenêtre, et c’est rapporté pour ce que cela mesure plutôt que supprimé.</p>
 </div>
 <p>Ce volet est rapporté ici plutôt qu’intégré à l’un des tableaux ci-dessus, parce qu’il s’agit d’une exécution de suivi répondant à un facteur confondant, et non d’une partie de la grille déclarée.</p>
 <p><strong>L’échelle.</strong> Tous les modèles sont entre 3,8 et 8,2 milliards de paramètres et quantifiés en 4 bits sur une carte grand public. Là où ces résultats diffèrent de travaux portant sur des modèles de pointe, la taille et la quantification restent des explications vivantes que ce protocole ne peut pas écarter.</p>
