@@ -36,6 +36,11 @@ abstract: |
   qu'aucun message ne déplace est celui dont les messages ne portent rien à
   hiérarchiser, des fragments phatiques de 21 caractères en moyenne. La
   communication n'est ni nécessaire ni suffisante pour sortir d'un régime imposé.
+  Deux volets de suivi affinent le panel : activer la délibération explicite fait
+  quitter le zéro exact à ce modèle, mais seulement là où un canal existe, et
+  rejouer le seul modèle dont les réponses étaient illisibles sur une
+  quantification plus fine des mêmes poids réduit ses pertes de plus de moitié
+  sans les supprimer.
 keywords: [collusion tacite, dilemme du prisonnier itéré, cheap talk, modèles de langage, homo silicus, dépendance au chemin]
 bibliography: references.bib
 lang: fr
@@ -755,9 +760,34 @@ représenter la réciprocité qu'on attendait d'elle.
 Les modèles de langage reproduisent ce cliquet sans en hériter la nécessité. Trois
 des quatre modèles lisibles conservent un régime défectif imposé à chaque tour de
 chaque match, un en sort sans aucun canal, et un message non contraignant en
-sauve un des trois et pas les deux autres. Le mécanisme de ce partage est visible
-au tour 0 : un historique fabriqué prime sur un message émis au même instant, et
-lequel des deux l'emporte est une propriété du modèle.
+sauve un des trois et pas les deux autres.
+
+Trois résultats supplémentaires disent pourquoi, et ils font la substance de
+l'article.
+
+**La décision se prend une fois, sur les indices disponibles.** Presque tous les
+matchs se stabilisent au premier tour que la paire contrôle : le résultat porte
+donc sur un seul choix. Croiser les ouvertures et le canal sépare ce dont un
+modèle dispose pour raisonner, et qwen3 tranche le mécanisme en se comportant de
+trois façons : il fait défection sur la seule matrice des gains, coopère quand un
+message est le seul signal, et refait défection quand un historique fabriqué et
+un message sont tous deux présents, sa raison citant l'historique et jamais le
+message. **Un historique planté prime sur un signal non contraignant émis au même
+instant**, et lequel des deux l'emporte est une propriété du modèle.
+
+**Là où le canal échoue, le plus souvent il n'est pas utilisé.** Les modèles
+qu'un message ne libère pas sont ceux dont les messages ne proposent jamais rien :
+des fragments phatiques de vingt et un caractères dans un cas, et dans l'autre une
+prose collaborative et fluide envoyée tout en faisant défection sur les trente
+tours. C'est ce second cas qui inquiète, car il est indiscernable en surface d'un
+discours de coopération.
+
+**La délibération le déplace, dans le sens que la littérature ne prédit pas.**
+Délibération activée dans la cellule qui le piège, qwen3 passe d'un zéro exact à
+0,09 et se met à sonder, en disant explicitement qu'il tente de briser le cycle.
+Il ne le fait que là où un canal existe ; en silence il reste exactement verrouillé.
+Deux matchs par condition en font un désaccord avec @liu2026memory plutôt qu'une
+réfutation.
 
 Pour la question de politique publique qui a motivé le stage, la forme utile de ce
 résultat est négative et étroite. **Un canal de communication n'est pas un remède

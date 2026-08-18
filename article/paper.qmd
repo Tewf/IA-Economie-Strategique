@@ -33,7 +33,11 @@ abstract: |
   Reading the messages supplies the third case: the model a message never moves
   at all is the one whose messages carry nothing to rank, phatic fragments
   averaging 21 characters. Communication is neither necessary nor sufficient for
-  escaping an imposed regime.
+  escaping an imposed regime. Two follow-up arms sharpen the panel: turning on
+  explicit reasoning moves that model off an exact zero, but only where a channel
+  exists, and re-running the one model whose replies could not be parsed at a
+  finer quantisation of the same weights more than halves its losses without
+  removing them.
 keywords: [tacit collusion, iterated prisoner's dilemma, cheap talk, large language models, homo silicus, path dependence]
 bibliography: references.bib
 format:
@@ -747,16 +751,40 @@ was hypothesised to produce.
 Language models reproduce that ratchet without inheriting its necessity. Three of
 four readable models keep an imposed defective regime for every round of every
 match, one leaves it without any channel, and a non-binding message rescues one of
-the three captured models and not the other two. The mechanism behind that split
-is visible in the messages: the models a message does not free are the models that
-never use the message to propose anything.
+the three captured models and not the other two.
 
-For the policy question that motivated the internship, the useful form of this
-result is negative and narrow. **A communication channel is not a remedy for a
+Three further results say why, and they are the substance of the paper.
+
+**The decision is made once, on the evidence to hand.** Almost every match settles
+in the first round a pair controls, so the result is a claim about one choice.
+Crossing the openings with the channel separates what a model has to reason from,
+and qwen3 settles the mechanism by behaving three different ways: it defects on
+the payoff matrix alone, cooperates when a message is the only signal, and defects
+again when a fabricated history and a message are both present, its stated reason
+citing the history and never the message. **A planted history outranks a live
+non-binding signal**, and which of the two wins is a property of the model.
+
+**Where the channel fails, it is usually not being used.** The models a message
+does not free are the ones whose messages never propose anything: phatic fragments
+of twenty-one characters in one case, and in the other fluent collaborative prose
+sent while defecting in all thirty rounds. That second case is the one to worry
+about, because it is indistinguishable from cooperation talk at the surface.
+
+**Deliberation moves it, in the direction the literature does not predict.** With
+reasoning turned on in the cell that traps it, qwen3 goes from an exact zero to
+0.09 and begins probing, saying explicitly that it is trying to break the cycle.
+It does so only where a channel exists; silent, it stays exactly locked. Two
+matches per condition make that a disagreement with @liu2026memory rather than a
+refutation of them.
+
+For the policy question that motivated the internship, the useful form of all of
+this is negative and narrow. **A communication channel is not a remedy for a
 collusive regime, and its absence is not a guarantee against one.** Whether a
 given agent can be talked out of a regime it was placed in is a property of that
 agent, and has to be measured for that agent rather than inferred from the class
-it belongs to.
+it belongs to. The same holds one level down, for the build: the model in this
+panel that could not hold an answer format loses four matches of forty-four at one
+quantisation and ten at another, from the same weights.
 
 # Reproducing this {#sec-repro}
 
