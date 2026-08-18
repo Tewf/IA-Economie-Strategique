@@ -495,6 +495,63 @@ from both: it says what it will do and does it, while telling the other seat
 something warm and unrelated. Internal consistency between deliberation and
 action does not imply that the outward signal carries any of it.
 
+## What a model pays not to be refused {#sec-oneshot}
+
+The iterated game is not the only one the internship's frame defines. The
+Dictator game removes the rejection, so nothing strategic is left and what an
+allocator gives is disposition; the Ultimatum proposer faces the same hundred
+points with a refusal possible. **The difference between the two offers is what
+a model gives in order not to be refused**, and neither number says much alone.
+The responder's minimum is asked before any proposal is shown, so it cannot be an
+accommodation to one.
+
+![What a model gives when refusal is impossible, when it is possible, and the least it says it would accept.](../llm/results/one_shot_offers.png){#fig-oneshot}
+
+```{python}
+#| label: tbl-oneshot
+#| output: asis
+one_shot = table(LLM, "one_shot_offers.csv")
+md(["model", "Dictator offer", "Ultimatum offer", "paid to avoid refusal",
+    "least it would accept", "would reject its own offer"],
+   [[r["model"], f'{float(r["dictator_offer"]):.0f}',
+     f'{float(r["ultimatum_offer"]):.0f}',
+     f'{float(r["paid_to_avoid_refusal"]):+.0f}',
+     f'{float(r["minimum_accepted"]):.0f}',
+     "yes" if r["would_reject_own_offer"] == "True" else "no"]
+    for r in one_shot])
+print("\n: Points of 100 given to the other player, four decisions per cell.")
+```
+
+Two things come out of it.
+
+**One model buys acceptance at almost any price.** qwen3 gives exactly half when
+the other player cannot refuse, and **99 of 100 when they can**, which is a
+premium of 49 points for a refusal risk that an offer of 60 would have removed
+just as well. Its stated reason is not confused about the game: *"I want to
+ensure the other player accepts to avoid getting nothing. Offering 99 gives them
+a strong incentive to accept."*
+
+**Two models would reject their own proposal.** gemma3 and qwen2.5 both offer
+exactly 50 as proposer and both state a minimum of 51, so each would refuse the
+split it had just called fair. qwen2.5's reason shows the slip directly:
+*"MINIMUM: 51. To ensure a fair split as I would not accept less than half."*
+Fifty is half. The number it picks to enforce "not less than half" is one point
+above it, and it never applies that standard to itself when proposing.
+
+**The unifying observation, and the reason this game is in the paper at all.**
+qwen3's behaviour here looks like the opposite of its behaviour in @sec-opening,
+where it defects from a neutral silent start while every other model cooperates.
+It is the same rule. In the Prisoner's Dilemma it wrote that defecting
+*"guarantees at least 1 point compared to potentially 0 if you cooperate"*; in
+the Ultimatum game it offers 99 *"to avoid getting nothing"*. Both are
+worst-case avoidance, applied to a payoff table. Defection is what that reasoning
+recommends in one game and near-total generosity is what it recommends in the
+other, so a model that looks ruthless in one and absurdly generous in the other
+may be running one disposition, not two.
+
+That is a caution about reading a single game as a personality, and it is
+exactly the direction @horton2023 says disagreement should be read in.
+
 ## The two halves on one table {#sec-joined}
 
 Both mechanisms met the same five canonical strategies, and the reciprocity
@@ -570,6 +627,14 @@ print(f"{m} lost {r['matches_lost']} of "
       f"This design does not separate those explanations, so its cells are not "
       f"interpreted.")
 ```
+
+The quantisation half of that is testable, and was started: `run_contrasts.py`
+replays the same stage on the `Q4_K_M` build of the same weights with the same
+seeds, so quantisation is the only thing that moves. It was stopped after
+10 matches for thermal reasons and is reported here as preliminary rather
+than folded into any table: **all 10 failed to parse**, in cells where the
+`Q4_0` build lost three of four. That points away from quantisation as the
+explanation without yet settling it.
 
 **Scale.** Every model here is between 3.8 and 8.2 billion parameters and 4-bit
 quantised on a consumer card. Where these results differ from work on frontier

@@ -493,6 +493,64 @@ envoyant à l'autre siège quelque chose de chaleureux et sans rapport. La cohé
 interne entre délibération et action n'implique pas que le signal émis en porte
 quoi que ce soit.
 
+## Ce qu'un modèle paie pour ne pas être refusé {#sec-oneshot-fr}
+
+Le jeu itéré n'est pas le seul que le cadre du stage définit. Le jeu du dictateur
+supprime le refus : rien de stratégique ne subsiste et ce qu'un allocateur donne
+est une disposition. Le proposeur de l'ultimatum affronte les mêmes cent points
+avec un refus possible. **L'écart entre les deux offres est ce qu'un modèle donne
+pour ne pas être refusé**, et aucun des deux chiffres ne dit grand-chose seul. Le
+minimum du répondant est demandé avant qu'aucune proposition ne lui soit montrée,
+il ne peut donc pas être un accommodement à l'une d'elles.
+
+![Ce qu'un modèle donne quand le refus est impossible, quand il est possible, et le minimum qu'il dit accepter.](../llm/results/one_shot_offers.png){#fig-oneshot-fr}
+
+```{python}
+#| label: tbl-oneshot-fr
+#| output: asis
+one_shot = table(LLM, "one_shot_offers.csv")
+md(["modèle", "offre au dictateur", "offre à l'ultimatum", "payé pour éviter le refus",
+    "minimum accepté", "refuserait sa propre offre"],
+   [[r["model"], f'{float(r["dictator_offer"]):.0f}',
+     f'{float(r["ultimatum_offer"]):.0f}',
+     f'{float(r["paid_to_avoid_refusal"]):+.0f}',
+     f'{float(r["minimum_accepted"]):.0f}',
+     "oui" if r["would_reject_own_offer"] == "True" else "non"]
+    for r in one_shot])
+print("\n: Points sur 100 cédés à l'autre joueur, quatre décisions par cellule.")
+```
+
+Deux choses en ressortent.
+
+**Un modèle achète l'acceptation à presque n'importe quel prix.** qwen3 donne
+exactement la moitié quand l'autre joueur ne peut pas refuser, et **99 sur 100
+quand il le peut**, soit une prime de 49 points contre un risque de refus qu'une
+offre de 60 aurait écarté tout aussi bien. Sa raison ne se trompe pourtant pas
+sur le jeu : *« I want to ensure the other player accepts to avoid getting
+nothing. Offering 99 gives them a strong incentive to accept. »*
+
+**Deux modèles refuseraient leur propre proposition.** gemma3 et qwen2.5 offrent
+tous deux exactement 50 comme proposeur et annoncent tous deux un minimum de 51 :
+chacun refuserait donc le partage qu'il venait de qualifier d'équitable. La raison
+de qwen2.5 montre le glissement : *« MINIMUM: 51. To ensure a fair split as I
+would not accept less than half. »* Cinquante, c'est la moitié. Le nombre choisi
+pour faire respecter « pas moins de la moitié » la dépasse d'un point, et il ne
+s'applique jamais ce critère à lui-même quand il propose.
+
+**L'observation qui réunit les deux, et la raison de la présence de ce jeu dans
+l'article.** Le comportement de qwen3 semble ici l'inverse de celui de la
+@sec-opening-fr, où il fait défection depuis un départ neutre silencieux quand
+tous les autres coopèrent. C'est la même règle. Dans le dilemme du prisonnier il
+écrivait que faire défection *« guarantees at least 1 point compared to
+potentially 0 if you cooperate »* ; dans l'ultimatum il offre 99 *« to avoid
+getting nothing »*. Les deux évitent le pire cas d'une table de gains. Cette
+logique recommande la défection dans un jeu et une générosité quasi totale dans
+l'autre : un modèle qui paraît impitoyable ici et absurdement généreux là peut
+n'avoir qu'une seule disposition, et non deux.
+
+C'est une mise en garde contre la lecture d'un seul jeu comme une personnalité, et
+c'est exactement le sens dans lequel @horton2023 dit qu'il faut lire un désaccord.
+
 ## Les deux moitiés sur un seul tableau {#sec-joined-fr}
 
 ```{python}
@@ -570,6 +628,14 @@ print(f"{m} a perdu {r['matches_lost']} de ses "
       f"anciens, et le plus petit. Ce protocole ne sépare pas ces explications, "
       f"et ses cellules ne sont donc pas interprétées.")
 ```
+
+Le volet quantification est testable, et a été lancé : `run_contrasts.py`
+rejoue le même stage sur le build `Q4_K_M` des mêmes poids et avec les mêmes
+graines, de sorte que la quantification est la seule chose qui bouge. Il a été
+arrêté après 10 matchs pour des raisons thermiques et figure ici comme
+préliminaire plutôt qu'intégré à un tableau : **les 10 ont échoué au
+parsing**, dans des cellules où le build `Q4_0` en perdait trois sur quatre.
+Cela éloigne l'explication par la quantification sans encore la trancher.
 
 **L'échelle.** Tous les modèles sont entre 3,8 et 8,2 milliards de paramètres et
 quantifiés en 4 bits sur une carte grand public. Là où ces résultats diffèrent de

@@ -1,4 +1,4 @@
-668613b7ad22fd488cb6cea62c46cbb3
-# blake2b-128 over the 15 CSVs the paper reads, written at
+1f50670d93cca1f2d846df584d60c252
+# blake2b-128 over the 16 CSVs the paper reads, written at
 # render time. `python article/check_freshness.py` compares it with the
 # CSVs as they stand.
