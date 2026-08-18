@@ -18,8 +18,10 @@ figures are the committed PNGs, drawn by
 ```sh
 conda activate gael
 cd article
-quarto render paper.qmd --to html
-quarto render paper.qmd --to pdf     # needs a LaTeX install; tinytex is enough
+for doc in paper.qmd paper.fr.qmd; do
+    quarto render "$doc" --to html
+    quarto render "$doc" --to pdf    # needs a LaTeX install; tinytex is enough
+done
 ```
 
 Quarto runs the document's Python chunks in the active environment, so the
@@ -27,21 +29,23 @@ environment needs nothing beyond what [`../requirements.txt`](../requirements.tx
 already pins: the chunks use `csv` and `pathlib` from the standard library, and
 no plotting or dataframe library at all.
 
-**`paper.html` and `paper.pdf` are build products that CI does not rebuild.**
+**The four rendered files are build products that CI does not rebuild.**
 They are committed because GitHub Pages serves this repository directly and a
 reader should not have to install Quarto to read the paper. The consequence is
 the one drift risk in the repository: **re-render after anything changes a table
 in `*/results/`**, or the published paper will quote numbers the CSVs no longer
 hold.
 
-## It is in English only
+## Two languages, one set of numbers
 
-The two READMEs and the site are bilingual; this is not. The design notes, the
-prompts and the literature are English, the prompts especially because
-translating one would change the experiment the models were run on. A French
-version would be a translation of finished prose rather than a second original,
-and it has not been written. That is a gap, and it is named here rather than
-left to be noticed.
+[`paper.qmd`](paper.qmd) and [`paper.fr.qmd`](paper.fr.qmd) are the English and
+French editions. Both import [`analysis.py`](analysis.py), which owns the loading,
+the lookups and the table formatting, so the arithmetic exists once and a diff
+between the two documents shows translation rather than divergence. A number that
+moves, moves in both papers at once.
+
+The prompts and the design notes stay English whatever the paper does, because
+translating a prompt would change the experiment the models were run on.
 
 ## What is in it that is not elsewhere
 

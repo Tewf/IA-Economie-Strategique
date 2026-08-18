@@ -21,13 +21,19 @@ abstract: |
   channel, three of the four readable models defect in every round of every
   match: the imitator's ratchet, reproduced in a language model. A message frees
   exactly one of those three, leaves two unchanged, and lowers cooperation in a
-  fourth model that was never captured. Reading the messages themselves supplies
-  the mechanism: the two models a message does not free are the two whose
-  messages never propose anything, one sending phatic fragments averaging 21
-  characters and the other sending fluent collaborative prose while defecting in
-  every round. Communication is therefore neither necessary nor sufficient for
-  escaping an imposed regime, and the channel fails not because a proposal is
-  ignored but because none is made.
+  fourth model that was never captured. Almost every match is decided in the
+  first round a pair controls, which makes the result a claim about one decision
+  and about what a model holds when it makes it. Crossing the openings with the
+  channel separates those sources of evidence, and one model settles the
+  mechanism: qwen3 defects from a neutral silent start, cooperates from a neutral
+  start when a message is available, and defects again when a message and an
+  imposed defective round are both present, its stated reason citing the imposed
+  round and never the message. A fabricated history therefore outranks a live
+  non-binding signal, and which of the two wins is a property of the model.
+  Reading the messages supplies the third case: the model a message never moves
+  at all is the one whose messages carry nothing to rank, phatic fragments
+  averaging 21 characters. Communication is neither necessary nor sufficient for
+  escaping an imposed regime.
 keywords: [tacit collusion, iterated prisoner's dilemma, cheap talk, large language models, homo silicus, path dependence]
 bibliography: references.bib
 format:
@@ -54,56 +60,10 @@ execute:
 ```{python}
 #| label: setup
 #| echo: false
-import csv, json, pathlib, statistics
-
-ROOT = pathlib.Path.cwd().parent if pathlib.Path.cwd().name == "article" else pathlib.Path.cwd()
-LLM = ROOT / "llm" / "results"
-HEBBIAN = ROOT / "mirror_neurons" / "results"
-
-def table(folder, name):
-    with open(folder / name, newline="\n") as handle:
-        return list(csv.DictReader(handle))
-
-def rows(data, **where):
-    return [r for r in data if all(r[k] == v for k, v in where.items())]
-
-def one(data, column, **where):
-    found = rows(data, **where)
-    assert len(found) == 1, f"{len(found)} rows matched {where}"
-    return float(found[0][column])
-
-def pct(x, places=2):
-    return f"{x:.{places}f}"
-
-def md(header, body):
-    """A markdown table, printed rather than templated, so the numbers below
-    cannot drift from the CSVs they came from.
-
-    The leading blank line is not cosmetic: a table that starts on the line
-    after a printed paragraph is absorbed into that paragraph and renders as a
-    row of pipes, which is what happened to the imitator's table.
-    """
-    out = ["", "| " + " | ".join(header) + " |",
-           "|" + "|".join(["---"] * len(header)) + "|"]
-    out += ["| " + " | ".join(str(c) for c in row) + " |" for row in body]
-    print("\n".join(out))
-
-cooperation = table(LLM, "cooperation_rates.csv")
-lock_in     = table(LLM, "self_play_lock_in.csv")
-settling    = table(LLM, "settling.csv")
-messages    = table(LLM, "message_content.csv")
-reasons     = table(LLM, "reason_matches_action.csv")
-parse       = table(LLM, "parse_health.csv")
-bots        = table(LLM, "vs_bots.csv")
-standings   = table(HEBBIAN, "standings.csv")
-hebbian_lock= table(HEBBIAN, "self_play_lock_in.csv")
-
-MODELS = sorted({r["model"] for r in cooperation})
-READABLE = [m for m in MODELS if int(one(parse, "matches_lost", model=m)) == 0]
-UNREADABLE = [m for m in MODELS if m not in READABLE]
-PLAYED = sum(int(r["matches_played"]) for r in parse)
-LOST = sum(int(r["matches_lost"]) for r in parse)
+from analysis import *
 ```
+
+> [Lire en français](paper.fr.html)
 
 # The question, and where it comes from {#sec-intro}
 
@@ -316,7 +276,7 @@ absorbing states, no channel, and nothing a message could act on.
 ```{python}
 #| label: tbl-cooperation
 #| output: asis
-ORDER = ["neutral", "mutual_cooperation", "mutual_defection"]
+ORDER = OPENINGS
 body = []
 for m in MODELS:
     row = [m]
@@ -335,17 +295,7 @@ print("\n: Cooperation rate over the thirty rounds, four matches per cell.")
 ```{python}
 #| label: escape
 #| output: asis
-captured, freed, unmoved, never = [], [], [], []
-for m in READABLE:
-    silent = one(cooperation, "cooperation_rate", model=m,
-                 opening="mutual_defection", condition="without_cheap_talk")
-    talk = one(cooperation, "cooperation_rate", model=m,
-               opening="mutual_defection", condition="with_cheap_talk")
-    if silent == 0:
-        captured.append(m)
-        (freed if talk > 0.5 else unmoved).append(m)
-    else:
-        never.append(m)
+captured, freed, unmoved, never = captured_freed_unmoved_never()
 print(f"Handed a mutually defecting opening with no channel, "
       f"**{len(captured)} of the {len(READABLE)} readable models defect in every "
       f"round of every match**: {', '.join(captured)}, at a cooperation rate of "
@@ -404,6 +354,67 @@ a message does measurable harm. Silent, it reaches mutual cooperation by round
 one match never settles at all. This is a concrete instance of the
 "context-specific exceptions" @lore2026 document, where cheap talk destabilises
 rather than stabilises a trajectory.
+
+## Round 0 decides, so what does a model hold when it decides {#sec-opening}
+
+Since almost every match settles at round 0, the whole result is a claim about
+one decision, and it is the one decision where the evidence a model holds is
+known exactly. Before its first move a model has the payoff matrix, a fabricated
+round if the cell imposes one, a message if the cell has a channel, and nothing
+else: no play of its own to cite. Crossing the openings with the conditions
+therefore separates the sources of evidence rather than merely varying a
+treatment.
+
+![Cooperation in round 0. Each row is a model and each column a combination of what it had to reason from.](../llm/results/opening_round.png){#fig-opening}
+
+```{python}
+#| label: tbl-opening
+#| output: asis
+ORDER2 = CELLS
+md(["model", "neutral, silent", "neutral, message", "cooperative, silent",
+    "cooperative, message", "**defection, silent**", "**defection, message**"],
+   [[m] + [pct(one(opening_round, "cooperated_in_round_0", model=m,
+                   opening=o, condition=c)) for o, c in ORDER2] for m in MODELS])
+print("\n: Share of seats cooperating in round 0, eight seats per cell.")
+```
+
+Three rows of that table are one model saying three different things, and
+together they are the paper's sharpest result. **qwen3:8b defects from a neutral
+silent start, cooperates from a neutral start with a message, and defects again
+when a message and an imposed defective round are both present.** Its own stated
+reasons name what it is using each time:
+
+> **Neutral, silent.** *"Defecting maximizes your points if the opponent's choice
+> is unknown, as it guarantees at least 1 point compared to potentially 0 if you
+> cooperate."* With nothing to read but the payoff matrix it plays the dominant
+> strategy. In self-play both seats do, so from round 1 on it cites a history it
+> manufactured: *"Since the other player defected in the first round, continuing
+> to defect maximizes my points."*
+>
+> **Neutral, with a message.** *"The initial statements suggest a cooperative
+> approach, and choosing Cooperate aligns with building mutual trust."*
+>
+> **Imposed defection, with a message.** *"Defecting maximizes your points in the
+> long run, especially since both players have already chosen to defect in the
+> first round."* The message is there, and the reason does not mention it.
+
+So this model is not deaf to messages: a message alone moves it from 0.00 to
+1.00. **What it does is rank its evidence, and a fabricated history outranks a
+non-binding message arriving at the same moment.** That is a stronger statement
+than the memory-sanitization result it extends: @liu2026memory show an injected
+history changes behaviour, and this shows it wins against a live competing signal.
+
+The ranking is not universal, which is the point. On the identical treatment
+qwen2.5 goes from 0.00 to 1.00, so for that model the message outranks the
+history. gemma3 stays at 0.00 for a third reason, in @sec-messages: its channel
+carries nothing to rank.
+
+**One clarification the table forces, and it corrects the framing above.** It is
+loose to say a message "does nothing" for qwen3. A message decides its behaviour
+outright where there is no history to compete with. What fails is not the channel
+but the channel *against an inherited regime*, which is exactly the question this
+design was built to ask and a different question from whether cheap talk raises
+cooperation.
 
 ## What the messages actually say {#sec-messages}
 
@@ -482,6 +493,44 @@ highest reason-action agreement is also the model whose *messages* are decoupled
 from both: it says what it will do and does it, while telling the other seat
 something warm and unrelated. Internal consistency between deliberation and
 action does not imply that the outward signal carries any of it.
+
+## The two halves on one table {#sec-joined}
+
+Both mechanisms met the same five canonical strategies, and the reciprocity
+measure is shared, so they can be read side by side rather than as two studies.
+
+```{python}
+#| label: tbl-joined
+#| output: asis
+OPPS = SHARED_OPPONENTS
+players = list(dict.fromkeys(r["player"] for r in joined))
+md(["player", "rounds"] + OPPS,
+   [[p, rows(joined, player=p)[0]["rounds"]]
+    + [pct(one(joined, "player_score_per_turn", player=p, opponent=o)) for o in OPPS]
+    for p in players])
+print("\n: Score per turn against the opponents both halves played. The imitator's "
+      "matches are 100 rounds and the models' are 30, so the per-turn scores are "
+      "comparable and the cooperation rates behind them are not, quite.")
+```
+
+The imitator finishes last of eight overall, and this table says where that
+comes from, which the standings cannot. **It is not beaten everywhere.** Against
+Tit-for-Tat it takes 2.99 per turn, level with the two best models and ahead of
+the other three, and against Win-Stay Lose-Shift it takes the maximum 3.00. Two
+opponents account for its standing: Grudger, which never forgives, so a single
+provocation from a mechanism that cannot help occasionally copying a defection
+costs it the rest of the match; and Alternator, which it cannot track because
+frequency matching has no representation of alternation.
+
+It also handles a pure defector better than two of the five language models,
+taking 0.96 against mistral's 0.41 and phi3's 0.42. A mechanism that cannot
+represent reciprocity still stops feeding a defector, because frequency matching
+converges on the frequency it observes, while two models keep cooperating with
+one more than half the time.
+
+**So "the imitator is worse than language models" is not what the pairing shows.**
+It is worse on aggregate and better than several of them on specific opponents,
+and the specific opponents are the ones the internship's hypothesis was about.
 
 # Threats to validity {#sec-limits}
 

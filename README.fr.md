@@ -62,8 +62,9 @@ en sont le candidat évident, et c'est l'hypothèse que le rapport a proposée.
 L'homo silicus est l'autre moitié de cette lecture, cité dans la conclusion et
 jamais appliqué. **[L'article](article/paper.qmd) est le compte rendu des deux
 exécutions**, avec la littérature qui les situe :
-[le lire](https://tewf.github.io/IA-Economie-Strategique/article/paper.html) ou
-[en PDF](article/paper.pdf). Il est rédigé en anglais.
+[le lire](https://tewf.github.io/IA-Economie-Strategique/article/paper.fr.html) ou
+[en PDF](article/paper.fr.pdf). Une édition anglaise existe aussi, et les deux
+partagent leurs chiffres.
 
 | | |
 |---|---|
