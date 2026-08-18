@@ -45,6 +45,14 @@ abstract: >-
   channel at all. Communication is therefore neither necessary nor sufficient
   for leaving an imposed regime, and the ability to leave one is a property of
   the individual model rather than of language models.
+
+  Reading the messages supplies a mechanism for that split: the two models a
+  message does not free are the two whose messages never propose anything, one
+  sending phatic fragments averaging 21 characters and the other sending fluent
+  collaborative prose while defecting in every round. The channel fails not
+  because a proposal is ignored but because none is made. The full write-up,
+  with the literature review that positions each result as a replication or not,
+  is in article/paper.qmd.
 keywords:
   - tacit collusion
   - iterated prisoner's dilemma
@@ -58,8 +66,8 @@ license:
   - MIT
   - CC-BY-4.0
 license-url: https://github.com/Tewf/IA-Economie-Strategique/blob/main/LICENSE
-version: 1.0.0
-date-released: "2026-08-17"
+version: 1.1.0
+date-released: "2026-08-18"
 references:
   - type: article
     title: >-
