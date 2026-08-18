@@ -1,4 +1,4 @@
-# What is left, and it is the part worth running
+# The question this grid was built for, and what it returned
 
 Part of [what the field already knows](README.md).
 
@@ -29,3 +29,24 @@ accident of continuing an internship rather than starting a study:
 - **A mechanism with no channel at all as the baseline.** Most of this work
   compares communication against no communication within language models. Here
   the floor is an agent that cannot represent a message even in principle.
+
+## Answered, 2026-08-17
+
+Handed a regime they did not choose, three of the four readable models cannot
+leave it: 0.00 cooperation across all thirty rounds, four matches out of four.
+The ratchet the imitation half found survives being given language.
+
+A non-binding message frees exactly one of those three, leaves two where they
+were, and lowers cooperation in the fourth model, which was never captured. So
+**the channel is neither necessary nor sufficient**, and the narrow question
+above has a per-model answer rather than a general one.
+
+The mechanism is in [`the-memory-curse.md`](the-memory-curse.md): an injected
+history outranks a message arriving at the same moment, and which of the two
+wins is the model. The full write-up is [`../../../article/paper.qmd`](../../../article/paper.qmd).
+
+**What is genuinely left**, and none of it is in this grid: the Ultimatum and
+Dictator loops, whose shared home with `mirror_neurons/` is still a structural
+decision; the reasoning contrast, now in
+[`../../run_contrasts.py`](../../run_contrasts.py); and a coded content analysis
+of the messages, which are currently read by a substring test and by hand.

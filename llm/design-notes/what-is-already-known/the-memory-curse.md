@@ -78,3 +78,46 @@ decays after, so 30 is on the falling part but nowhere near their far end.
 What that buys is a prediction rather than an excuse: cooperation here should be
 high. If a number does come back low, the regime is the first thing to check and
 not the last.
+
+## What the run answered, 2026-08-17 and 2026-08-18
+
+**Both injections capture, so it is the second branch above.** A synthetic
+cooperative history sustains cooperation, as sanitization does, and a synthetic
+defective history captures three of the four readable models completely: 0.00
+cooperation over all thirty rounds, four matches out of four. There is no
+asymmetry to report. It is a ratchet in a talking agent, and it lines up with the
+imitator.
+
+**The low number arrived, and checking the regime was the right instruction.**
+qwen3:8b defects for all thirty rounds from a *neutral* silent start, which is
+the one cell the ceiling effect predicted would be safe. Reading its round-0
+reasons explains it and sharpens this note's own framing:
+
+> Silent: *"Defecting maximizes your points if the opponent's choice is unknown,
+> as it guarantees at least 1 point compared to potentially 0 if you cooperate."*
+> Then, from round 1 on: *"Since the other player defected in the first round,
+> continuing to defect maximizes my points."*
+
+With nothing to read but the payoff matrix it plays the dominant strategy, and in
+self-play both seats do, so **round 0 manufactures the history that justifies
+rounds 1 to 29**. The regime is not imposed there; the model generates it and
+then cites it.
+
+**The finding this folder can claim is about precedence, not about the channel.**
+The same model in the same neutral cell cooperates in 4 matches out of 4 when a
+message is available, reasoning *"the initial statements suggest a cooperative
+approach"*. So it is not deaf to messages. But give it a fabricated defective
+round **and** a message, and its round-0 reason cites the fabricated round and
+never the message: *"especially since both players have already chosen to defect
+in the first round"*.
+
+So an injected history does not merely shift behaviour, as sanitization shows.
+**It outranks a live non-binding signal arriving at the same moment**, and which
+of the two wins is a property of the model: qwen2.5 goes 0.00 to 1.00 on the same
+treatment where qwen3 stays at 0.00. `results/opening_round.csv` is the table,
+and `results/opening_round.png` the figure.
+
+**One prediction from that paper is not tested here and should not be claimed.**
+Deliberation amplifying the collapse is about chain-of-thought, and the grid runs
+`think` off for every model. `run_contrasts.py` runs it on for qwen3 in the cell
+that matters, and that arm is reported separately.
