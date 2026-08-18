@@ -77,3 +77,11 @@ jobs:
       # re-rendered fails here rather than being published.
       - name: The published paper was rendered from these tables
         run: python article/check_freshness.py
+
+      # The article reads its figures from the CSVs, so it cannot drift. The
+      # READMEs and the site type theirs by hand and can, and did: a sentence
+      # quoting 0.630 sat beside a table that said 0.666 until someone noticed.
+      # A stale sentence next to a fresh number is worse than two stale ones,
+      # because the live figure lends the dead one its credibility.
+      - name: Numbers quoted in prose still match their tables
+        run: python check_quoted_numbers.py
