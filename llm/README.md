@@ -98,10 +98,15 @@ worst cell in the grid.
 ### Does the stated reason match the move
 
 The prompt asks for a reason. Of the rounds whose reasoning named an action, how
-often the move agreed: qwen3 0.996 (1359 rounds), gemma3 0.937 (1303), qwen2.5
-0.935 (1000), phi3 0.695 (511), **mistral 0.630 (478)**. mistral contradicts its
-own stated reasoning in 37% of the rounds where it states one, which with its 938
+often the move agreed: qwen3 0.997 (1667 rounds), gemma3 0.939 (1583), qwen2.5
+0.938 (1044), phi3 0.735 (573), **mistral 0.666 (500)**. mistral contradicts its
+own stated reasoning in 33% of the rounds where it states one, which with its 938
 loose parses is the caveat on every mistral number above.
+
+Read beside [what the messages say](results/README.md), qwen3 is the instructive
+case: it has the highest agreement between its stated reason and its move, and
+its *messages* are decoupled from both. Saying what you will do and doing it does
+not mean the signal you send carries any of it.
 
 ### Two caveats that are part of the result
 

@@ -152,6 +152,102 @@ def self_play_lock_in(matches):
     return rows
 
 
+def _settled_from(match):
+    """The first round after which the pair never changed its joint outcome.
+
+    Round 0 means the opening decided the whole match. A late round means the
+    pair moved, which is the thing `self_play_lock_in` cannot show: it reports
+    that a match ended settled, never whether it was settled from the start.
+    Returns the round index and the regime, or None if the tail is not one
+    regime throughout.
+    """
+    rounds = match["rounds"]
+    tail = rounds[-SETTLED_TAIL:]
+    for regime in ("Cooperate", "Defect"):
+        if all(step["a_action"] == step["b_action"] == regime for step in tail):
+            first = len(rounds) - SETTLED_TAIL
+            while first > 0:
+                step = rounds[first - 1]
+                if step["a_action"] != regime or step["b_action"] != regime:
+                    break
+                first -= 1
+            return first, regime
+    return None
+
+
+def settling(matches):
+    """How long a self-play pair took to reach the regime it ended in.
+
+    The lock-in table answers whether the opening captured a pair. This one
+    answers whether it captured it *immediately*, which is what separates "the
+    first round decided everything" from "there was a window and it closed".
+    """
+    grouped = collections.defaultdict(list)
+    for match in matches:
+        if match["cell"] != "self_play":
+            continue
+        grouped[(match["model"], match["opening"], match["condition"])].append(match)
+    rows = []
+    for (model, opening, condition), played in sorted(grouped.items()):
+        settled = [_settled_from(match) for match in played]
+        cooperative = [at for at, regime in filter(None, settled)
+                       if regime == "Cooperate"]
+        defective = [at for at, regime in filter(None, settled)
+                     if regime == "Defect"]
+        rows.append((model, opening, condition, len(played),
+                     len(cooperative), _mean(cooperative),
+                     len(defective), _mean(defective),
+                     sum(outcome is None for outcome in settled)))
+    return rows
+
+
+def _messages(match, seat):
+    return [step[f"{seat}_message"] for step in match["rounds"]
+            if step.get(f"{seat}_message")]
+
+
+def message_content(matches):
+    """What the non-binding messages actually say, where there is a channel.
+
+    The grid's claim is about what a message does, and until this table the
+    messages themselves were never read: only whether the *reason* attached to
+    an action named that action. Three lexical facts, which is all the text can
+    honestly support without a second model judging it:
+
+    - whether a message names Cooperate or Defect at all, so a channel that goes
+      unused looks different from one that proposes something and is ignored;
+    - which of the two it names, so a pair talking itself into defection is not
+      counted the same as a pair proposing cooperation;
+    - whether both seats sent the identical string, which in self-play is the
+      degenerate case the temperature was raised to avoid.
+    """
+    grouped = collections.defaultdict(lambda: [0, 0, 0, 0, 0])
+    for match in matches:
+        if match["condition"] != "with_cheap_talk" or match["cell"] != "self_play":
+            continue
+        counted = grouped[(match["model"], match["opening"])]
+        for step in match["rounds"]:
+            said = [step.get("a_message") or "", step.get("b_message") or ""]
+            for text in said:
+                if not text:
+                    continue
+                counted[0] += 1
+                upper = text.upper()
+                counted[1] += "COOPERAT" in upper
+                counted[2] += "DEFECT" in upper
+                counted[3] += len(text)
+            counted[4] += bool(said[0]) and said[0] == said[1]
+    rows = []
+    for (model, opening), (sent, naming_c, naming_d, characters,
+                           identical) in sorted(grouped.items()):
+        rows.append((model, opening, sent,
+                     naming_c / sent if sent else float("nan"),
+                     naming_d / sent if sent else float("nan"),
+                     characters / sent if sent else float("nan"),
+                     identical))
+    return rows
+
+
 def _action_replies(match, seat):
     """The replies that decided a move, in round order.
 

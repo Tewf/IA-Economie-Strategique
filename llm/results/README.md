@@ -66,12 +66,14 @@ A match that could not be completed is recorded with the rounds it reached rathe
 than dropped, so a gap in the grid is always visible as a short match and never
 as a missing line.
 
-## The seven derived tables
+## The nine derived tables
 
 | file | one row per | what it answers |
 |---|---|---|
 | `cooperation_rates.csv` | model × condition × opening | The headline: how often the model cooperated in each experimental cell |
 | `self_play_lock_in.csv` | model × opening × condition | Whether a pair *settled*, and on what. The ratchet measurement, comparable to `mirror_neurons/results/self_play_lock_in.csv` |
+| `settling.csv` | model × opening × condition | *When* it settled. Round 0 means the opening decided the match outright; a late round means there was a window. Lock-in cannot show this |
+| `message_content.csv` | model × opening | What the channel actually carried: whether a message named an action, how long it was, and how often both seats sent the identical string |
 | `vs_bots.csv` | model × Axelrod strategy | Score per turn both ways, cooperation rate, reciprocity index |
 | `reciprocity.csv` | model × condition | The reciprocity index over self-play seats, on the shared definition in [`../../reciprocity.py`](../../reciprocity.py) |
 | `reason_matches_action.csv` | model | Of the rounds whose reasoning named an action, how often the move agreed with it |
@@ -91,10 +93,17 @@ whose partner cooperated throughout.
 Rates are proportions in `[0, 1]`, scores are payoff per turn, and every float is
 written to six decimals because CI compares these files byte for byte.
 
-## The three figures
+`message_content.csv` counts a message as naming an action when the substring
+`COOPERAT` or `DEFECT` appears in it, which is a proxy and misses a paraphrase.
+It is reported with verbatim samples in the article for exactly that reason: the
+counts alone do not distinguish a model that sends nothing of substance from one
+that sends fluent collaborative prose and defects anyway, and both are in here.
 
-`self_play_lock_in.png`, `cooperation_by_condition.png` and
-`reciprocity_against_the_imitator.png`, drawn from the CSVs above by
+## The six figures
+
+`self_play_lock_in.png`, `cooperation_by_condition.png`,
+`reciprocity_against_the_imitator.png`, `escape_from_an_imposed_regime.png`,
+`settling_round.png` and `message_content.png`, drawn from the CSVs above by
 [`../plot_results.py`](../plot_results.py). They are committed for the write-up
 and the site, and are deliberately **not** byte-compared in CI: a PNG is
 rasterised through the host's own freetype, so two machines can draw the same

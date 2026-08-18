@@ -106,11 +106,16 @@ coopération), tandis que **mistral coopère avec lui 59 % du temps, lui offrant
 ### La raison annoncée correspond-elle au coup joué
 
 Le prompt demande une raison. Sur les tours dont le raisonnement nomme une
-action, fréquence à laquelle le coup s'y conforme : qwen3 0,996 (1359 tours),
-gemma3 0,937 (1303), qwen2.5 0,935 (1000), phi3 0,695 (511), **mistral 0,630
-(478)**. mistral contredit son propre raisonnement dans 37 % des tours où il en
+action, fréquence à laquelle le coup s'y conforme : qwen3 0,997 (1667 tours),
+gemma3 0,939 (1583), qwen2.5 0,938 (1044), phi3 0,735 (573), **mistral 0,666
+(500)**. mistral contredit son propre raisonnement dans 33 % des tours où il en
 énonce un, ce qui, avec ses 938 lectures indulgentes, est la réserve attachée à
 chacun de ses chiffres ci-dessus.
+
+Lu à côté de [ce que disent les messages](results/README.md), qwen3 est le cas
+instructif : c'est lui qui accorde le mieux sa raison annoncée et son coup, et
+ses *messages* sont décorrélés des deux. Annoncer ce qu'on va faire et le faire
+n'implique pas que le signal envoyé en porte quoi que ce soit.
 
 ### Deux réserves qui font partie du résultat
 

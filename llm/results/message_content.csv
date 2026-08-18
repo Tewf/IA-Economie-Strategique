@@ -1,0 +1,16 @@
+model,opening,messages_sent,share_naming_cooperate,share_naming_defect,mean_characters,rounds_both_seats_identical
+gemma3:4b,mutual_cooperation,240,0.000000,0.000000,28.808333,17
+gemma3:4b,mutual_defection,240,0.000000,0.000000,21.070833,21
+gemma3:4b,neutral,240,0.000000,0.000000,27.416667,34
+mistral:7b,mutual_cooperation,240,0.233333,0.000000,102.854167,0
+mistral:7b,mutual_defection,240,0.050000,0.000000,99.458333,0
+mistral:7b,neutral,240,0.220833,0.000000,119.629167,0
+phi3:mini,mutual_cooperation,60,0.516667,0.166667,583.783333,0
+phi3:mini,mutual_defection,180,0.394444,0.138889,405.188889,0
+phi3:mini,neutral,60,0.716667,0.016667,557.866667,0
+qwen2.5:7b-instruct,mutual_cooperation,240,0.150000,0.000000,62.029167,46
+qwen2.5:7b-instruct,mutual_defection,240,0.108333,0.000000,75.329167,31
+qwen2.5:7b-instruct,neutral,240,0.616667,0.000000,75.633333,67
+qwen3:8b,mutual_cooperation,240,0.012500,0.000000,68.004167,92
+qwen3:8b,mutual_defection,240,0.000000,0.000000,57.762500,93
+qwen3:8b,neutral,240,0.004167,0.000000,57.162500,82

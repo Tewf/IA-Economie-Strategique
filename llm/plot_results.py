@@ -115,6 +115,97 @@ def plot_reciprocity_against_the_imitator(rows):
     save(figure, "reciprocity_against_the_imitator.png")
 
 
+def plot_escape_from_an_imposed_regime(rows):
+    """The headline cell alone: does a message get a pair out of defection?
+
+    Averaging over openings, as `cooperation_by_condition` does, hides this:
+    every model cooperates from a neutral or cooperative start, so the mean
+    moves little and the one cell where the models disagree is diluted away.
+    """
+    here = [row for row in rows if row["opening"] == "mutual_defection"]
+    models = sorted({row["model"] for row in here})
+    figure, axes = plt.subplots()
+    height = 0.38
+    for offset, condition, colour in ((height / 2, "with_cheap_talk", TALK),
+                                      (-height / 2, "without_cheap_talk", NO_TALK)):
+        values = [_mean([float(row["cooperation_rate"]) for row in here
+                         if row["model"] == model
+                         and row["condition"] == condition]) for model in models]
+        bars = axes.barh([i + offset for i in range(len(models))], values, height,
+                         color=colour, label=condition.replace("_", " "))
+        axes.bar_label(bars, fmt="%.2f", padding=3, fontsize=8)
+    axes.set_yticks(range(len(models)), models)
+    axes.set_xlabel("cooperation rate over the 30 rounds")
+    axes.set_xlim(0, 1.15)
+    axes.set_title("Handed a mutually defecting opening, who leaves it")
+    axes.legend(frameon=False, loc="lower right")
+    save(figure, "escape_from_an_imposed_regime.png")
+
+
+def plot_settling_round(rows):
+    """When a pair reached the regime it ended in, not merely whether it did."""
+    here = [row for row in rows if row["opening"] == "mutual_defection"]
+    models = sorted({row["model"] for row in here})
+    figure, axes = plt.subplots()
+    drawn = False
+    # The two conditions collide whenever both settle on round 0, which is most
+    # of this table, so they are offset rather than drawn on top of each other:
+    # a hidden point reads as a model having no result in that condition.
+    for condition, colour, marker, shift in (("with_cheap_talk", TALK, "o", 0.16),
+                                             ("without_cheap_talk", NO_TALK, "s", -0.16)):
+        points, labels = [], []
+        for index, model in enumerate(models):
+            for row in here:
+                if row["model"] != model or row["condition"] != condition:
+                    continue
+                for column, edge in (("mean_round_settled_cooperative", "none"),
+                                     ("mean_round_settled_defective", "black")):
+                    value = float(row[column])
+                    if value != value:
+                        continue
+                    points.append((value, index + shift))
+                    labels.append(edge)
+        if points:
+            drawn = True
+            axes.scatter([x for x, _ in points], [y for _, y in points],
+                         c=colour, marker=marker, s=70, zorder=3,
+                         edgecolors=labels, linewidths=1.2,
+                         label=condition.replace("_", " "))
+    if not drawn:
+        plt.close(figure)
+        return
+    axes.set_yticks(range(len(models)), models)
+    axes.set_xlabel("mean round from which the outcome never changed again "
+                    "(0 = the opening decided it)")
+    axes.set_title("A black outline is mutual defection, no outline mutual cooperation")
+    axes.legend(frameon=False, loc="lower right")
+    save(figure, "settling_round.png")
+
+
+def plot_message_content(rows):
+    """Whether the channel carried a proposal at all, in the cell that matters."""
+    here = sorted((row for row in rows if row["opening"] == "mutual_defection"),
+                  key=lambda row: row["model"])
+    if not here:
+        return
+    models = [row["model"] for row in here]
+    figure, (left, right) = plt.subplots(1, 2, figsize=(10, 4.2))
+    naming = [float(row["share_naming_cooperate"]) for row in here]
+    bars = left.barh(models, naming, color=TALK)
+    left.bar_label(bars, fmt="%.2f", padding=3, fontsize=8)
+    left.set_xlabel("share of messages naming Cooperate")
+    left.set_xlim(0, max(naming + [0.1]) * 1.35)
+    left.set_title("Does the message propose anything")
+    length = [float(row["mean_characters"]) for row in here]
+    bars = right.barh(models, length, color=NO_TALK)
+    right.bar_label(bars, fmt="%.0f", padding=3, fontsize=8)
+    right.set_xlabel("mean characters per message")
+    right.set_xlim(0, max(length) * 1.3)
+    right.set_title("How much was said")
+    right.set_yticklabels([])
+    save(figure, "message_content.png")
+
+
 def _mean(values):
     return sum(values) / len(values) if values else float("nan")
 
@@ -129,7 +220,16 @@ def main():
     plot_cooperation_by_condition(cooperation)
     plot_lock_in(lock_in)
     plot_reciprocity_against_the_imitator(reciprocity)
-    print(f"wrote 3 figures to {RESULTS}")
+    drawn = 3
+    plot_escape_from_an_imposed_regime(cooperation)
+    drawn += 1
+    for table, draw in (("settling.csv", plot_settling_round),
+                        ("message_content.csv", plot_message_content)):
+        rows = read(RESULTS, table)
+        if rows:
+            draw(rows)
+            drawn += 1
+    print(f"wrote {drawn} figures to {RESULTS}")
 
 
 if __name__ == "__main__":
