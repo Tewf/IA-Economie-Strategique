@@ -182,6 +182,47 @@ def plot_settling_round(rows):
     save(figure, "settling_round.png")
 
 
+def plot_opening_round(rows):
+    """Round 0, where the evidence a model holds is known exactly.
+
+    Six cells per model, because the point is which source of evidence wins when
+    two of them disagree: the payoff matrix alone, a fabricated history, a
+    message, or a history and a message pointing opposite ways.
+    """
+    openings = ["neutral", "mutual_cooperation", "mutual_defection"]
+    conditions = ["without_cheap_talk", "with_cheap_talk"]
+    models = sorted({row["model"] for row in rows})
+    grid, labels = [], []
+    for opening in openings:
+        for condition in conditions:
+            labels.append(f"{opening.replace('mutual_', '')}\n"
+                          f"{'silent' if condition.startswith('without') else 'message'}")
+    for model in models:
+        line = []
+        for opening in openings:
+            for condition in conditions:
+                found = [row for row in rows if row["model"] == model
+                         and row["opening"] == opening
+                         and row["condition"] == condition]
+                line.append(float(found[0]["cooperated_in_round_0"]) if found
+                            else float("nan"))
+        grid.append(line)
+
+    figure, axes = plt.subplots(figsize=(9, 4))
+    image = axes.imshow(grid, cmap="RdYlBu", vmin=0, vmax=1, aspect="auto")
+    axes.set_xticks(range(len(labels)), labels, fontsize=8)
+    axes.set_yticks(range(len(models)), models)
+    for y, line in enumerate(grid):
+        for x, value in enumerate(line):
+            if value != value:
+                continue
+            axes.text(x, y, f"{value:.2f}", ha="center", va="center", fontsize=9,
+                      color="black" if 0.2 < value < 0.8 else "white")
+    axes.set_title("Cooperation in round 0, the round that decides the match")
+    figure.colorbar(image, ax=axes, label="share of seats cooperating")
+    save(figure, "opening_round.png")
+
+
 def plot_message_content(rows):
     """Whether the channel carried a proposal at all, in the cell that matters."""
     here = sorted((row for row in rows if row["opening"] == "mutual_defection"),
@@ -224,6 +265,7 @@ def main():
     plot_escape_from_an_imposed_regime(cooperation)
     drawn += 1
     for table, draw in (("settling.csv", plot_settling_round),
+                        ("opening_round.csv", plot_opening_round),
                         ("message_content.csv", plot_message_content)):
         rows = read(RESULTS, table)
         if rows:

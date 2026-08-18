@@ -201,6 +201,29 @@ def settling(matches):
     return rows
 
 
+def opening_round(matches):
+    """What a pair does in the first round it actually controls.
+
+    The crux of the whole grid, and the one round where the evidence available
+    to a model is known exactly. Before round 0 a model holds the payoff matrix,
+    plus a fabricated history if the cell imposes one, plus a message if the cell
+    has a channel, and nothing else: no play of its own to cite. Since almost
+    every match settles at round 0 (`settling`), this is where the outcome is
+    decided, and separating the three sources of evidence is what tells a model
+    that ignores messages apart from one that has none to read.
+    """
+    grouped = collections.defaultdict(list)
+    for match in matches:
+        if match["cell"] != "self_play":
+            continue
+        key = (match["model"], match["opening"], match["condition"])
+        first = match["rounds"][0]
+        grouped[key].extend([first["a_action"] == "Cooperate",
+                             first["b_action"] == "Cooperate"])
+    return [(model, opening, condition, len(seats), _mean(seats))
+            for (model, opening, condition), seats in sorted(grouped.items())]
+
+
 def _messages(match, seat):
     return [step[f"{seat}_message"] for step in match["rounds"]
             if step.get(f"{seat}_message")]
