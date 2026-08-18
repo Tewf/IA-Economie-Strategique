@@ -52,6 +52,18 @@ starting something else, and both play the report's own games: the Prisoner's
 Dilemma iterated and sequential, the Ultimatum game from Özkes et al. (2024),
 and the Dictator game from the defence slides.
 
+Both came out of the same reading, and neither was run at the time. The
+imitation mechanism is mine: what stood out about Tit-for-Tat is that it is a
+rule about the *previous round*, needing no model of the opponent and no memory
+beyond one step, which is little enough that a mechanism that merely copies what
+it sees might produce it for free. Mirror neurons are the obvious candidate for
+such a mechanism, and that is the hypothesis the report proposed. Homo silicus is
+the other half of the same reading, cited in the conclusion and never applied.
+**[The article](article/paper.qmd) is the write-up of running both**, with the
+literature each is positioned against:
+[read it](https://tewf.github.io/IA-Economie-Strategique/article/paper.html) or
+[as a PDF](article/paper.pdf).
+
 | | |
 |---|---|
 | <img src="mirror_neurons/results/standings.png" width="320" alt="The imitating agent finishes eighth of eight"> | **[`mirror_neurons/`](mirror_neurons/), run and reported.** Observing an action multiplies its weight and renormalises, and the report expects Tit-for-Tat to fall out of that without being programmed. Given seven opponents from the literature, **it does not: over matches of 10 to 100 turns the agent finishes eighth of eight, behind a coin flip.** What the update implements is frequency matching, whose state is a pair of counts and so cannot depend on the last round at all. It passes the coin flip only in matches of several hundred turns, by freezing into a constant player rather than by reciprocating. |

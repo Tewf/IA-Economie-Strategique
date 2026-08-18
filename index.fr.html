@@ -28,6 +28,7 @@
     les chiffres réellement atteints.
   </p>
   <div class="badges">
+    <a href="article/paper.html">L'article (en anglais)</a>
     <a href="https://github.com/Tewf/IA-Economie-Strategique">Dépôt</a>
     <a href="original/RapportDeStageFinal.pdf">Le rapport</a>
     <a href="original/Presentation.pdf">Les diapositives</a>
@@ -137,6 +138,20 @@
     défection même depuis une ouverture neutre en silence. Le canal n'est donc
     <strong>ni nécessaire ni suffisant</strong> : quels modèles savent sortir d'un
     régime imposé est un fait sur les modèles, pas sur les modèles de langage.
+  </p>
+  <figure>
+    <img src="llm/results/message_content.png" alt="Les deux modèles qu'un message ne libère pas sont ceux dont les messages ne nomment jamais d'action">
+    <figcaption>Lire les messages donne le mécanisme : les modèles qu'un message ne libère pas sont ceux qui ne s'en servent jamais pour proposer quoi que ce soit.</figcaption>
+  </figure>
+  <p>
+    C'est là l'essentiel. Le canal n'échoue pas parce qu'une proposition est faite
+    puis ignorée. gemma3 envoie des fragments phatiques de 21 caractères en
+    moyenne, <em>« Interesting. »</em>, <em>« Keep going. »</em>, et qwen3 envoie
+    une prose collaborative et fluide, <em>« Let's keep the pressure on and make
+    every round count. »</em>, tout en faisant défection sur les trente tours. Un
+    modèle peut produire un texte qui se lit comme un discours de coopération sans
+    que son comportement en soit touché. L'argument complet, avec la littérature
+    où il se situe, est dans <a href="article/paper.html">l'article</a>.
     phi3:mini a perdu 10 de ses 44 matchs sur des réponses illisibles et est
     rapporté comme illisible plutôt que comme un résultat.
   </p>

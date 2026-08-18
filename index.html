@@ -28,6 +28,7 @@
     the numbers it actually reached.
   </p>
   <div class="badges">
+    <a href="article/paper.html">The article</a>
     <a href="https://github.com/Tewf/IA-Economie-Strategique">Repository</a>
     <a href="original/RapportDeStageFinal.pdf">The report</a>
     <a href="original/Presentation.pdf">The defence slides</a>
@@ -133,7 +134,21 @@
     without any message at all and qwen3 defects even from a neutral silent
     start. So the channel is <strong>neither necessary nor sufficient</strong>:
     which models can leave an imposed regime is a fact about the models, not
-    about language models. phi3:mini lost 10 of its 44 matches to unparseable
+    about language models.
+  </p>
+  <figure>
+    <img src="llm/results/message_content.png" alt="The two models a message does not free are the two whose messages never name an action">
+    <figcaption>Reading the messages gives the mechanism: the models a message does not free are the models that never use it to propose anything.</figcaption>
+  </figure>
+  <p>
+    That is the part worth carrying away. The channel does not fail because a
+    proposal is made and ignored. gemma3 sends phatic fragments averaging 21
+    characters, <em>"Interesting."</em> and <em>"Keep going."</em>, and qwen3
+    sends fluent collaborative prose, <em>"Let's keep the pressure on and make
+    every round count."</em>, while defecting in all thirty rounds. A model can
+    produce text that reads as cooperation talk while its behaviour is untouched
+    by it. The full argument, with the literature it sits in, is in
+    <a href="article/paper.html">the article</a>. phi3:mini lost 10 of its 44 matches to unparseable
     replies and is reported as unreadable rather than as a result.
   </p>
   <p>

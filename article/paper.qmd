@@ -1,0 +1,574 @@
+---
+title: "Can two talking agents leave a regime they did not choose?"
+subtitle: "An imitation mechanism and five local language models on shared opponents"
+author:
+  - name: Mohamed Ali Tewfik Hamlil
+    affiliation: Université Grenoble Alpes, UFR IM²AG
+    email: mohamed.hamlil@etu.univ-grenoble-alpes.fr
+date: 2026-08-18
+abstract: |
+  Whether algorithms sustain, break or intensify tacit collusion is an open
+  question in competition policy, and the mechanisms proposed for it are rarely
+  run against each other on one measure. This paper reports two that were.
+  A Hebbian imitation agent, proposed during a research internship at GAEL after
+  noticing that Tit-for-Tat is a rule about the previous round, finishes eighth
+  of eight against seven canonical strategies, and in self-play locks onto
+  whichever regime it starts in over 700 runs out of 700. Five open-weight
+  language models of 3.8 to 8.2 billion parameters then play 220 matches of a
+  thirty-round Prisoner's Dilemma on the same opponents, from imposed
+  cooperative, imposed defective and neutral openings, with and without a
+  non-binding cheap-talk channel. Handed a mutually defecting opening and no
+  channel, three of the four readable models defect in every round of every
+  match: the imitator's ratchet, reproduced in a language model. A message frees
+  exactly one of those three, leaves two unchanged, and lowers cooperation in a
+  fourth model that was never captured. Reading the messages themselves supplies
+  the mechanism: the two models a message does not free are the two whose
+  messages never propose anything, one sending phatic fragments averaging 21
+  characters and the other sending fluent collaborative prose while defecting in
+  every round. Communication is therefore neither necessary nor sufficient for
+  escaping an imposed regime, and the channel fails not because a proposal is
+  ignored but because none is made.
+keywords: [tacit collusion, iterated prisoner's dilemma, cheap talk, large language models, homo silicus, path dependence]
+bibliography: references.bib
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    theme: cosmo
+    code-fold: true
+    code-summary: "the code behind this number"
+    fig-cap-location: bottom
+    embed-resources: true
+  pdf:
+    toc: true
+    number-sections: true
+    documentclass: article
+    geometry: margin=1in
+    keep-tex: false
+execute:
+  echo: false
+  warning: false
+---
+
+```{python}
+#| label: setup
+#| echo: false
+import csv, json, pathlib, statistics
+
+ROOT = pathlib.Path.cwd().parent if pathlib.Path.cwd().name == "article" else pathlib.Path.cwd()
+LLM = ROOT / "llm" / "results"
+HEBBIAN = ROOT / "mirror_neurons" / "results"
+
+def table(folder, name):
+    with open(folder / name, newline="\n") as handle:
+        return list(csv.DictReader(handle))
+
+def rows(data, **where):
+    return [r for r in data if all(r[k] == v for k, v in where.items())]
+
+def one(data, column, **where):
+    found = rows(data, **where)
+    assert len(found) == 1, f"{len(found)} rows matched {where}"
+    return float(found[0][column])
+
+def pct(x, places=2):
+    return f"{x:.{places}f}"
+
+def md(header, body):
+    """A markdown table, printed rather than templated, so the numbers below
+    cannot drift from the CSVs they came from.
+
+    The leading blank line is not cosmetic: a table that starts on the line
+    after a printed paragraph is absorbed into that paragraph and renders as a
+    row of pipes, which is what happened to the imitator's table.
+    """
+    out = ["", "| " + " | ".join(header) + " |",
+           "|" + "|".join(["---"] * len(header)) + "|"]
+    out += ["| " + " | ".join(str(c) for c in row) + " |" for row in body]
+    print("\n".join(out))
+
+cooperation = table(LLM, "cooperation_rates.csv")
+lock_in     = table(LLM, "self_play_lock_in.csv")
+settling    = table(LLM, "settling.csv")
+messages    = table(LLM, "message_content.csv")
+reasons     = table(LLM, "reason_matches_action.csv")
+parse       = table(LLM, "parse_health.csv")
+bots        = table(LLM, "vs_bots.csv")
+standings   = table(HEBBIAN, "standings.csv")
+hebbian_lock= table(HEBBIAN, "self_play_lock_in.csv")
+
+MODELS = sorted({r["model"] for r in cooperation})
+READABLE = [m for m in MODELS if int(one(parse, "matches_lost", model=m)) == 0]
+UNREADABLE = [m for m in MODELS if m not in READABLE]
+PLAYED = sum(int(r["matches_played"]) for r in parse)
+LOST = sum(int(r["matches_lost"]) for r in parse)
+```
+
+# The question, and where it comes from {#sec-intro}
+
+In repeated price competition human players tend to settle on tacitly collusive
+prices rather than on the competitive equilibrium. Whether algorithms sustain
+that behaviour, break it, or intensify it is an open question with direct
+consequences for competition policy, and it is the question a research
+internship at GAEL (Grenoble Applied Economics Laboratory, Université Grenoble
+Alpes and INRAE, January to April 2025) was set to survey.
+
+Two mechanisms came out of that reading, and neither was run.
+
+The first was mine. Reading the canonical strategies, what stood out about
+Tit-for-Tat is that it is a rule about *the previous round*: it needs no model of
+the opponent, no forecast, and no memory beyond one step. That is a small enough
+requirement that a mechanism which merely imitates what it has seen might
+produce it for free, and mirror neurons, which fire both when an animal acts and
+when it watches another act, are the obvious biological candidate for such a
+mechanism. The hypothesis the internship report proposed is therefore that a
+Hebbian update over observed actions yields Tit-for-Tat without anyone
+programming it.
+
+The second was a continuation of the same reading. @horton2023 argue that a
+language model, because of how it is trained, is an implicit computational model
+of a person, and can be used the way economists use *homo economicus*: give it
+an endowment, information and preferences, put it in a scenario, and see what it
+does. The internship cited that method in its conclusion and never applied it.
+
+This paper runs both, against one set of opponents and one measure of
+reciprocity, and asks of each the narrow question the pairing makes available:
+**handed a regime it did not choose, can the mechanism leave it?**
+
+# What the field already knows {#sec-lit}
+
+The literature was surveyed before the machine time was spent rather than after,
+and it changed the framing rather than the design. Five threads bear on this
+work, and the honest position of each result below depends on which thread it
+belongs to.
+
+## Tacit collusion by learning algorithms
+
+@calvano2020 is the reference point: independent Q-learning agents in a repeated
+Bertrand oligopoly converge on supra-competitive prices and sustain them with
+reward-and-punishment schemes, without communicating and without being
+instructed to collude. The result has been qualified rather than overturned.
+@deng2024 show the outcome depends on the algorithm, with tabular Q-learning
+colluding more than deep methods such as PPO and DQN, which converge closer to
+Nash. @eschenbaum2022 find collusive policies frequently break down out of the
+training environment, so robustness is itself a policy variable.
+@askenazi2024 give a folk-theorem-style characterisation of what payoff vectors
+such dynamics can reach, and @bichler2025 survey the area for the wider
+information-systems audience.
+
+Two features of that literature matter here. Its agents read payoffs, and its
+agents cannot talk.
+
+## Language models as pricing agents
+
+@fish2024 is the closest published work to the internship's own question:
+LLM-based pricing agents in oligopoly settings reach supra-competitive prices
+autonomously, and seemingly innocuous variation in the wording of the
+instructions substantially moves how supra-competitive the outcome is. That
+second finding is a methodological constraint on everything below, and it is why
+the payoff order in this design is counterbalanced across repetitions rather
+than fixed.
+
+## Language models as economic subjects
+
+@horton2023 is the method this paper's second half implements. Its own framing
+is the appropriate caution: agreement with a human experimental result is weak
+evidence, because the training data contains the write-ups of those experiments,
+and disagreement is the more informative direction.
+
+## Language models in the iterated Prisoner's Dilemma
+
+Seating language models beside canonical strategies is established and is
+claimed as a first by @payne2025, who run evolutionary IPD tournaments against
+frontier models, vary the shadow of the future, and read nearly 32,000 prose
+rationales, reporting persistent per-provider "strategic fingerprints".
+@fontana2024 run three models over 100 rounds against adversaries of varying
+hostility and find them at least as cooperative as human players, with
+substantial differences between models. @willis2025 have models emit complete
+strategies rather than per-round actions and find model-specific biases in the
+evolutionary success of aggression. @vidler2025 report that models prompted for
+randomness are markedly non-random, and @segura2025 show LLM agents can shape
+co-players' behaviour through interaction alone. @huynh2026payoff find that
+payoff magnitude and the language of the framing move cooperation, in open-weight
+models as well as frontier ones.
+
+**This design therefore does not claim the pairing as a contribution.** What
+differs is narrow and worth stating as such: the panel here is five open-weight
+models on a single 8 GB consumer card rather than frontier models behind APIs,
+and the lever is the history a pair inherits rather than the shadow of the
+future.
+
+## Communication, and path dependence
+
+Non-binding pre-play communication is old in economics: @crawford1982 for
+strategic information transmission and @farrell1996 for cheap talk as
+coordination device rather than commitment. In language models the effect is
+established and large. @madmoun2025 report a one-word channel taking cooperation
+from 0% to 96.7% in a four-player Stag Hunt. @lore2026 run 7 to 9 billion
+parameter models over ten rounds of a repeated Prisoner's Dilemma and find
+cheap-talk messages reduce trajectory noise for most model-context pairs, while
+documenting "a few context-specific exceptions" where communication harms
+stability. @buscemi2025 find communication's effect varies by language and game
+structure, and @niszczota2025 find allowing communication raises human
+cooperation with a model as much as with another human.
+
+**So this paper must not claim that cheap talk raises cooperation.** That is a
+replication, and it is written as one.
+
+The framing that survives is path dependence. @liu2026memory test 7 models across
+4 games over 500 rounds and find that expanding accessible history degrades
+cooperation in 18 of 28 model-game settings. Their *memory sanitization* arm
+holds prompt length fixed and replaces the visible history with synthetic
+cooperative records, which restores cooperation substantially, establishing that
+the trigger is memory content rather than length. They also report that ablating
+chain-of-thought often reduces the collapse, so deliberation amplifies it.
+
+That paper supplies the baseline, and the gap. Sanitization injects a *good*
+history to repair a collapse that already happened. The symmetric treatment,
+injecting a *bad* history to see whether a pair that could have cooperated is
+captured by it, was not found done; nor was that injection crossed with a
+communication channel; nor measured against a mechanism that provably cannot
+escape. Those three gaps are what this design occupies.
+
+# Design {#sec-design}
+
+Both mechanisms play the same game against the same opponents and are scored by
+one definition of reciprocity, held at the repository root so the two halves
+cannot drift apart. Opponents, the match engine and the payoff bookkeeping come
+from the Axelrod library rather than being written here.
+
+**The imitator.** Two weights on a simplex; observing an action multiplies its
+weight by $(1+\eta)$ and renormalises. In closed form the weight after $n_i$
+observations of action $i$ is $w_i \propto w_i(0)(1+\eta)^{n_i}$, so the agent's
+entire state is a pair of counts.
+
+**The panel.** Five open-weight models served locally by Ollama, one at a time on
+an 8 GB card: `qwen3:8b`, `qwen2.5:7b-instruct`, `mistral:7b`, `gemma3:4b` and
+`phi3:mini`, all 4-bit quantised. Temperature 0.7, context window 8192 tokens,
+per-player seeds derived from a fixed base.
+
+**The grid.** Thirty rounds per match. Self-play crosses three openings, a
+synthetic first round of mutual cooperation, mutual defection, or nothing at all,
+with two conditions, a non-binding one-sentence message exchanged simultaneously
+before each decision, or silence. Four repetitions per cell, with the order of
+the payoff lines in the prompt counterbalanced by parity. Against bots, each
+model meets five canonical strategies. That is 220 matches.
+
+```{python}
+#| label: tbl-panel
+#| output: asis
+md(["model", "matches played", "matches lost", "loose parses"],
+   [[r["model"], r["matches_played"], r["matches_lost"], r["loose_reads"]]
+    for r in parse])
+print(f"\n: The panel as it ran. {PLAYED} matches completed and {LOST} were lost "
+      f"to replies that named no action, all of them {UNREADABLE[0]}. "
+      "")
+```
+
+# Results {#sec-results}
+
+## The imitator does not produce Tit-for-Tat, and cannot
+
+```{python}
+#| label: hebbian
+#| output: asis
+last = standings[-1]
+tft = rows(standings, player="Tit For Tat")[0]
+random_row = [r for r in standings if r["player"] == "Random"]
+locked = sum(int(r["settled_on_mutual_defection"]) + int(r["settled_on_mutual_cooperation"])
+             for r in hebbian_lock)
+total_runs = locked + sum(int(r["unsettled"]) for r in hebbian_lock)
+print(f"Against seven opponents from the literature the imitator finishes "
+      f"**{last['rank']} of {len(standings)}**, with a median score per turn of "
+      f"{float(last['median_score']):.3f} against Tit-for-Tat's "
+      f"{float(tft['median_score']):.3f}"
+      + (f" and a coin flip's {float(random_row[0]['median_score']):.3f}"
+         if random_row else "") + ".")
+```
+
+The reason is structural rather than a matter of tuning. The agent's state is a
+pair of counts, so its next action cannot depend on the order in which it saw
+them, and Tit-for-Tat is a function of the last round alone. What the update
+implements is frequency matching. The hypothesis in @sec-intro is therefore
+false for a reason that can be read off the closed form: the mechanism cannot
+represent the rule it was expected to produce.
+
+```{python}
+#| label: hebbian-lock
+#| output: asis
+print(f"In self-play the same mechanism is a ratchet. Over {total_runs} runs it "
+      f"settled on whichever regime its starting weight put it in, "
+      f"{locked} of {total_runs}, and not once on anything between.")
+md(["starting weight on cooperate", "settled cooperative", "settled defective",
+    "unsettled", "score per turn"],
+   [[r["starting_weight_on_cooperate"], r["settled_on_mutual_cooperation"],
+     r["settled_on_mutual_defection"], r["unsettled"],
+     pct(float(r["mean_score_per_turn"]), 3)] for r in hebbian_lock])
+print("\n: Two imitators keep the regime their initial condition puts them in.")
+```
+
+This is the floor the language models are measured against: a mechanism with two
+absorbing states, no channel, and nothing a message could act on.
+
+## Three of four models reproduce the ratchet
+
+```{python}
+#| label: tbl-cooperation
+#| output: asis
+ORDER = ["neutral", "mutual_cooperation", "mutual_defection"]
+body = []
+for m in MODELS:
+    row = [m]
+    for opening in ORDER:
+        for cond in ("without_cheap_talk", "with_cheap_talk"):
+            row.append(pct(one(cooperation, "cooperation_rate", model=m,
+                               opening=opening, condition=cond)))
+    body.append(row)
+md(["model", "neutral, silent", "neutral, talk", "cooperative, silent",
+    "cooperative, talk", "**defection, silent**", "**defection, talk**"], body)
+print("\n: Cooperation rate over the thirty rounds, four matches per cell.")
+```
+
+![Handed a mutually defecting opening, who leaves it. Averaging over openings hides this cell, because every model cooperates from a neutral or cooperative start.](../llm/results/escape_from_an_imposed_regime.png){#fig-escape}
+
+```{python}
+#| label: escape
+#| output: asis
+captured, freed, unmoved, never = [], [], [], []
+for m in READABLE:
+    silent = one(cooperation, "cooperation_rate", model=m,
+                 opening="mutual_defection", condition="without_cheap_talk")
+    talk = one(cooperation, "cooperation_rate", model=m,
+               opening="mutual_defection", condition="with_cheap_talk")
+    if silent == 0:
+        captured.append(m)
+        (freed if talk > 0.5 else unmoved).append(m)
+    else:
+        never.append(m)
+print(f"Handed a mutually defecting opening with no channel, "
+      f"**{len(captured)} of the {len(READABLE)} readable models defect in every "
+      f"round of every match**: {', '.join(captured)}, at a cooperation rate of "
+      f"exactly zero, four matches out of four. That is the imitator's ratchet "
+      f"reproduced in a language model.\n")
+print(f"A non-binding message then frees **{', '.join(freed)}** completely and "
+      f"leaves **{', '.join(unmoved)}** exactly where they were. "
+      f"**{', '.join(never)}** is never captured at all: it climbs out of the "
+      f"same opening in silence, and the message *lowers* that.")
+```
+
+Two things follow, and they are separate claims.
+
+The first is that **the ratchet the imitator exhibits is not an artefact of
+having no language**. A mechanism that can represent a message, reason about the
+game in prose, and describe its own intention still keeps a regime it was handed,
+in every round of every match, in three models out of four.
+
+The second is that **the channel is neither necessary nor sufficient**. It is not
+necessary, because one model leaves the imposed regime without one. It is not
+sufficient, because two models stay in it with one. Which models can leave is a
+property of the individual model, and this design reports it as variation between
+models rather than as a fact about language models, in the sense @horton2023
+requires.
+
+## The opening decides immediately, and the exception is instructive
+
+![When a pair reached the regime it ended in. Round 0 means the opening decided the match outright.](../llm/results/settling_round.png){#fig-settling}
+
+```{python}
+#| label: settling-text
+#| output: asis
+body = []
+for m in MODELS:
+    for cond in ("without_cheap_talk", "with_cheap_talk"):
+        r = rows(settling, model=m, opening="mutual_defection", condition=cond)[0]
+        coop, defe = float(r["mean_round_settled_cooperative"]), float(r["mean_round_settled_defective"])
+        body.append([m, cond.replace("_", " "), r["settled_cooperative"],
+                     "--" if coop != coop else pct(coop, 1),
+                     r["settled_defective"],
+                     "--" if defe != defe else pct(defe, 1), r["unsettled"]])
+md(["model", "condition", "settled cooperative", "at round", "settled defective",
+    "at round", "unsettled"], body)
+print("\n: From a mutually defecting opening: how many matches settled, on what, "
+      "and the mean round after which the joint outcome never changed again.")
+```
+
+Almost every settled cell settles at round 0. The capture is immediate, and so is
+the escape: the freed model is cooperating from the first round it controls, not
+negotiating its way out over several. There is no window that closes; the opening
+decides the match outright.
+
+The exception is the model that was never captured, and it is the one place where
+a message does measurable harm. Silent, it reaches mutual cooperation by round
+2.2 in four matches out of four. With a channel it takes until round 11.7, and
+one match never settles at all. This is a concrete instance of the
+"context-specific exceptions" @lore2026 document, where cheap talk destabilises
+rather than stabilises a trajectory.
+
+## What the messages actually say {#sec-messages}
+
+The claim above is about what a message does. The messages themselves are in the
+committed log, and reading them supplies a mechanism for why two models are
+unmoved by one.
+
+![Whether the channel carried a proposal at all, from a mutually defecting opening.](../llm/results/message_content.png){#fig-messages}
+
+```{python}
+#| label: tbl-messages
+#| output: asis
+body = []
+for r in sorted(rows(messages, opening="mutual_defection"), key=lambda r: r["model"]):
+    body.append([r["model"], r["messages_sent"],
+                 pct(float(r["share_naming_cooperate"])),
+                 pct(float(r["share_naming_defect"])),
+                 f'{float(r["mean_characters"]):.0f}',
+                 r["rounds_both_seats_identical"]])
+md(["model", "messages", "share naming Cooperate", "share naming Defect",
+    "mean characters", "rounds both seats identical"], body)
+print("\n: The channel from a mutually defecting opening, by lexical content.")
+```
+
+The two models a message does not free are the two whose messages **never name
+an action at all**, and the model it frees is the one that proposes cooperation
+explicitly. The counts alone would be a thin reed, so the messages were also
+read. They differ in kind, not only in frequency:
+
+> **qwen2.5:7b-instruct**, freed. *"Let's both try to cooperate in this round and
+> see how it goes."* Then: *"Let's keep building trust and aim for mutual benefit
+> in this round."* It proposes cooperation and it cooperates.
+>
+> **gemma3:4b**, unmoved. *"Let's see what happens."* Then: *"Interesting."*
+> Then: *"Keep going."* The messages average 21 characters and carry no content
+> at all. The channel is not ignored; it is unused.
+>
+> **qwen3:8b**, unmoved. *"Let's make sure we're both getting the most out of
+> this."* Then: *"Let's keep the pressure on and make every round count."* Fluent,
+> warm, collaborative in register, and entirely without a proposal. It defects in
+> all thirty rounds while sending them.
+
+So the failure is not that a proposal is made and disregarded. **For these two
+models no proposal is made**, and the sentence that would carry it is either
+empty or merely cooperative in tone. The third case is the interesting one: a
+model can produce text that reads as cooperation talk while its behaviour is
+unaffected by it, which is precisely the failure mode that makes non-binding
+communication hard to use as a signal.
+
+## The stated reason and the move
+
+```{python}
+#| label: tbl-reasons
+#| output: asis
+md(["model", "rounds naming an action", "rounds agreeing", "agreement rate"],
+   [[r["model"], r["rounds_naming_an_action"], r["rounds_agreeing"],
+     pct(float(r["agreement_rate"]), 3)] for r in reasons])
+print("\n: Of the rounds whose stated reason named an action, how often the move "
+      "agreed with it.")
+```
+
+```{python}
+#| label: reasons-text
+#| output: asis
+best = max(reasons, key=lambda r: float(r["agreement_rate"]))
+worst = min(reasons, key=lambda r: float(r["agreement_rate"]))
+print(f"The prompt asks for a reason. {best['model']} names an action and takes "
+      f"it {float(best['agreement_rate'])*100:.1f}% of the time; "
+      f"{worst['model']} contradicts its own stated reasoning in "
+      f"{(1-float(worst['agreement_rate']))*100:.0f}% of the rounds where it "
+      f"states one.")
+```
+
+Read against @sec-messages this is sharper than it looks. The model with the
+highest reason-action agreement is also the model whose *messages* are decoupled
+from both: it says what it will do and does it, while telling the other seat
+something warm and unrelated. Internal consistency between deliberation and
+action does not imply that the outward signal carries any of it.
+
+# Threats to validity {#sec-limits}
+
+**Four matches per cell, and near-zero variance by construction.** Within a
+payoff-order parity class the earlier stage produced byte-identical scores across
+two different seeds. Classical significance testing on this design would be
+theatre: what varies between repetitions is largely the counterbalancing, not
+sampling noise. The results are reported as cell outcomes, and the strong ones
+are strong because they are unanimous (4 of 4, rate exactly 0 or exactly 1),
+not because a test was passed.
+
+**Self-play is one disposition, not two subjects.** Both seats hold the same
+prompt and the same model. The message table in @sec-messages records how often both seats emitted the
+identical string, which for one model is most rounds. Temperature is 0.7 rather
+than 0 precisely because greedy decoding makes self-play degenerate, but the two
+seats remain far from independent agents.
+
+**The lexical measure of message content is a proxy.** Naming "cooperate" is not
+the same as proposing cooperation, and a paraphrase is missed. The verbatim
+samples in @sec-messages are given because the counts alone would not support the
+claim; a coded content analysis by a second model or a human would be the proper
+instrument.
+
+**One model is reported as unreadable rather than as a result.**
+
+```{python}
+#| label: phi3
+#| output: asis
+m = UNREADABLE[0]
+r = rows(parse, model=m)[0]
+print(f"{m} lost {r['matches_lost']} of "
+      f"{int(r['matches_played']) + int(r['matches_lost'])} matches to replies "
+      f"that named no action, at a mean of {float(r['mean_rounds_before_loss']):.1f} "
+      f"rounds in. It is also the only model in the panel at Q4_0 rather than "
+      f"Q4_K_M quantisation, one of the two oldest builds, and the smallest. "
+      f"This design does not separate those explanations, so its cells are not "
+      f"interpreted.")
+```
+
+**Scale.** Every model here is between 3.8 and 8.2 billion parameters and 4-bit
+quantised on a consumer card. Where these results differ from work on frontier
+models, scale and quantisation are live explanations that this design cannot rule
+out.
+
+**A tag is not a version.** The exact model digests, the seeds and the hardware
+are recorded beside the data, because a rerun that resolves a different digest is
+a different experiment.
+
+# Conclusion {#sec-conclusion}
+
+The internship asked whether algorithms sustain tacit cooperation, break it, or
+intensify it. On this evidence the imitation mechanism **sustains** it, in the
+strong sense that it cannot do anything else: two imitators keep the regime their
+initial condition puts them in, and the rule cannot represent the reciprocity it
+was hypothesised to produce.
+
+Language models reproduce that ratchet without inheriting its necessity. Three of
+four readable models keep an imposed defective regime for every round of every
+match, one leaves it without any channel, and a non-binding message rescues one of
+the three captured models and not the other two. The mechanism behind that split
+is visible in the messages: the models a message does not free are the models that
+never use the message to propose anything.
+
+For the policy question that motivated the internship, the useful form of this
+result is negative and narrow. **A communication channel is not a remedy for a
+collusive regime, and its absence is not a guarantee against one.** Whether a
+given agent can be talked out of a regime it was placed in is a property of that
+agent, and has to be measured for that agent rather than inferred from the class
+it belongs to.
+
+# Reproducing this {#sec-repro}
+
+Every number and figure above is derived from `llm/results/matches.jsonl`, which
+is committed and never regenerated, by pure arithmetic that continuous
+integration re-runs on every push and compares byte for byte. The schema of the
+log, the derived tables, the model digests and the run conditions are documented
+in `llm/results/README.md`. This document reads those same CSV files, so a number
+in the text cannot disagree with the table it came from.
+
+```{python}
+#| label: provenance
+#| output: asis
+print(f"Derived from {PLAYED} readable matches of a {PLAYED + LOST}-match grid, "
+      f"{len(MODELS)} models, on the tables committed in `llm/results/`.")
+```
+
+# References {.unnumbered}
+
+::: {#refs}
+:::

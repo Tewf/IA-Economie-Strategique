@@ -53,6 +53,18 @@ que d'ouvrir autre chose, et tous deux jouent les jeux du rapport : le dilemme
 du prisonnier sous ses formes itérée et séquentielle, le jeu de l'ultimatum
 d'Özkes et al. (2024), et le jeu du dictateur des diapositives de soutenance.
 
+Les deux sortent de la même lecture, et aucun n'avait été exécuté à l'époque. Le
+mécanisme d'imitation est le mien : ce qui frappe dans le Tit-for-Tat, c'est
+qu'il s'agit d'une règle sur le *tour précédent*, sans modèle de l'adversaire ni
+mémoire au-delà d'un pas, ce qui est assez peu pour qu'un mécanisme se contentant
+de copier ce qu'il observe puisse le produire gratuitement. Les neurones miroirs
+en sont le candidat évident, et c'est l'hypothèse que le rapport a proposée.
+L'homo silicus est l'autre moitié de cette lecture, cité dans la conclusion et
+jamais appliqué. **[L'article](article/paper.qmd) est le compte rendu des deux
+exécutions**, avec la littérature qui les situe :
+[le lire](https://tewf.github.io/IA-Economie-Strategique/article/paper.html) ou
+[en PDF](article/paper.pdf). Il est rédigé en anglais.
+
 | | |
 |---|---|
 | <img src="mirror_neurons/results/standings.png" width="320" alt="L'agent imitateur termine huitième sur huit"> | **[`mirror_neurons/`](mirror_neurons/README.fr.md), lancé et analysé.** Observer une action multiplie son poids puis renormalise, et le rapport attend que le Tit-for-Tat en émerge sans avoir été programmé. Face à sept adversaires issus de la littérature, **il n'en est rien : sur des matchs de 10 à 100 tours, l'agent termine huitième sur huit, derrière un tirage à pile ou face.** Ce que la mise à jour implémente est un appariement de fréquences, dont l'état tient en un couple de compteurs et ne peut donc pas dépendre du dernier tour. Il ne dépasse le tirage à pile ou face que sur des matchs de plusieurs centaines de tours, en se figeant en joueur constant plutôt qu'en rendant la pareille. |
