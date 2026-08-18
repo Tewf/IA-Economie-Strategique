@@ -148,8 +148,62 @@
     every round count."</em>, while defecting in all thirty rounds. A model can
     produce text that reads as cooperation talk while its behaviour is untouched
     by it. The full argument, with the literature it sits in, is in
-    <a href="article/paper.html">the article</a>. phi3:mini lost 10 of its 44 matches to unparseable
-    replies and is reported as unreadable rather than as a result.
+    <a href="article/paper.html">the article</a>.
+  </p>
+  <figure>
+    <img src="llm/results/opening_round.png" alt="Cooperation in the first round each pair controls, by what the model had to reason from">
+    <figcaption>Round 0 decides the match. Each column is a different thing to reason from.</figcaption>
+  </figure>
+  <p>
+    Almost every match settles in the first round a pair controls, so the whole
+    result is a claim about one decision, and it is the only one where what a
+    model holds is known exactly: the payoff matrix, a fabricated round if the
+    cell imposes one, a message if the cell has a channel. qwen3 behaves three
+    ways across that row. On the payoff matrix alone it defects. With a message
+    and nothing else it cooperates, four times out of four. With a message
+    <em>and</em> an imposed defective round it defects again, and its stated
+    reason cites the imposed round without mentioning the message:
+    <em>"especially since both players have already chosen to defect in the
+    first round."</em> So <strong>a planted history outranks a live signal
+    arriving at the same moment</strong>, and which of the two wins is a
+    property of the model: qwen2.5 ranks them the other way on the identical
+    treatment.
+  </p>
+  <h3>What a model gives when it cannot be refused</h3>
+  <figure>
+    <img src="llm/results/one_shot_offers.png" alt="What each model gives in the Dictator game, in the Ultimatum game, and the least it says it would accept">
+    <figcaption>The Dictator game removes the refusal, so the gap between the two offers is what a model pays not to be refused.</figcaption>
+  </figure>
+  <p>
+    The report's frame defines two more games, and neither number means much
+    alone. Removing the rejection leaves disposition; adding it back leaves
+    strategy. <strong>qwen3 gives half when refusal is impossible and 99 of 100
+    when it is not</strong>, a premium of 49 points against a risk that an offer
+    of 60 would have removed. gemma3 and qwen2.5 each offer exactly 50 and each
+    demand 51, so both would reject the split they had just called fair.
+  </p>
+  <p>
+    That last case is the one that ties the study together. qwen3 looks ruthless
+    in one game and absurdly generous in the other, and its own reasons show one
+    rule doing both: defecting <em>"guarantees at least 1 point compared to
+    potentially 0"</em>, and offering 99 is <em>"to avoid getting nothing"</em>.
+    Worst-case avoidance recommends opposite behaviour in the two games, which is
+    a caution against reading a single game as a personality.
+  </p>
+  <h3>Two things we checked rather than assumed</h3>
+  <p>
+    phi3:mini lost 10 of its 44 matches to replies that named no action, and it
+    was also the only model at a coarser quantisation. Re-running its whole stage
+    on a finer build of the <em>same</em> weights, same context length and same
+    seeds, cut the losses to 4 of 44 without removing them: the packing was much
+    of the problem and not all of it, and its cells stay uninterpreted.
+  </p>
+  <p>
+    The grid runs every model with reasoning switched off, because turning it on
+    costs qwen3 34 seconds a call instead of 1.9. Turned on in the cell that
+    traps it, it moves off an exact zero to 0.09 and starts probing, saying
+    plainly that it is trying to break the cycle, but only where a channel
+    exists. Silent, it stays exactly locked.
   </p>
   <p>
     The two are siblings on purpose, and the point of the pairing is narrow:

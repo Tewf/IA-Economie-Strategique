@@ -152,8 +152,63 @@
     modèle peut produire un texte qui se lit comme un discours de coopération sans
     que son comportement en soit touché. L'argument complet, avec la littérature
     où il se situe, est dans <a href="article/paper.fr.html">l'article</a>.
-    phi3:mini a perdu 10 de ses 44 matchs sur des réponses illisibles et est
-    rapporté comme illisible plutôt que comme un résultat.
+  </p>
+  <figure>
+    <img src="llm/results/opening_round.png" alt="La coopération au premier tour que chaque paire contrôle, selon ce dont le modèle disposait pour raisonner">
+    <figcaption>Le tour 0 décide du match. Chaque colonne est une chose différente sur laquelle raisonner.</figcaption>
+  </figure>
+  <p>
+    Presque tous les matchs se stabilisent au premier tour que la paire contrôle :
+    tout le résultat porte donc sur une seule décision, et c'est la seule où l'on
+    sait exactement de quoi le modèle dispose, à savoir la matrice des gains, un
+    tour fabriqué si la cellule en impose un, un message si elle a un canal. qwen3
+    s'y comporte de trois façons. Sur la seule matrice des gains, il fait
+    défection. Avec un message et rien d'autre, il coopère, quatre fois sur
+    quatre. Avec un message <em>et</em> un tour défectif imposé, il refait
+    défection, et sa raison cite le tour imposé sans mentionner le message :
+    <em>« especially since both players have already chosen to defect in the first
+    round. »</em> Donc <strong>un historique planté prime sur un signal émis au
+    même instant</strong>, et lequel des deux l'emporte est une propriété du
+    modèle : qwen2.5 les hiérarchise dans l'autre sens sur le traitement identique.
+  </p>
+  <h3>Ce qu'un modèle donne quand on ne peut pas le refuser</h3>
+  <figure>
+    <img src="llm/results/one_shot_offers.png" alt="Ce que chaque modèle donne au jeu du dictateur, à l'ultimatum, et le minimum qu'il dit accepter">
+    <figcaption>Le jeu du dictateur supprime le refus : l'écart entre les deux offres est ce qu'un modèle paie pour ne pas être refusé.</figcaption>
+  </figure>
+  <p>
+    Le cadre du rapport définit deux autres jeux, et aucun des deux chiffres ne
+    dit grand-chose seul. Retirer le refus laisse une disposition ; le remettre
+    laisse une stratégie. <strong>qwen3 donne la moitié quand le refus est
+    impossible et 99 sur 100 quand il ne l'est pas</strong>, une prime de 49
+    points contre un risque qu'une offre de 60 aurait écarté. gemma3 et qwen2.5
+    offrent chacun exactement 50 et exigent chacun 51 : tous deux refuseraient
+    donc le partage qu'ils venaient de qualifier d'équitable.
+  </p>
+  <p>
+    Ce dernier cas est celui qui relie l'étude. qwen3 paraît impitoyable dans un
+    jeu et absurdement généreux dans l'autre, et ses propres raisons montrent une
+    seule règle produisant les deux : faire défection <em>« guarantees at least 1
+    point compared to potentially 0 »</em>, et offrir 99 sert <em>« to avoid
+    getting nothing »</em>. Éviter le pire cas recommande des comportements
+    opposés dans les deux jeux, ce qui met en garde contre la lecture d'un seul
+    jeu comme une personnalité.
+  </p>
+  <h3>Deux choses vérifiées plutôt que supposées</h3>
+  <p>
+    phi3:mini a perdu 10 de ses 44 matchs sur des réponses ne nommant aucune
+    action, et c'était aussi le seul modèle à une quantification plus grossière.
+    Rejouer tout son stage sur un build plus fin des <em>mêmes</em> poids, même
+    longueur de contexte et mêmes graines, ramène les pertes à 4 sur 44 sans les
+    supprimer : l'empaquetage comptait pour beaucoup, pas pour tout, et ses
+    cellules restent non interprétées.
+  </p>
+  <p>
+    La grille exécute tous les modèles délibération coupée, car l'activer coûte à
+    qwen3 34 secondes par appel au lieu de 1,9. Activée dans la cellule qui le
+    piège, elle le fait quitter le zéro exact pour 0,09 et il se met à sonder, en
+    disant clairement qu'il tente de briser le cycle, mais seulement là où un
+    canal existe. En silence, il reste exactement verrouillé.
   </p>
   <p>
     Les deux sont frères à dessein, et la portée de ce rapprochement est
