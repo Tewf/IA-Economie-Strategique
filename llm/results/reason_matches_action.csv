@@ -1,6 +1,6 @@
 model,rounds_naming_an_action,rounds_agreeing,agreement_rate
-gemma3:4b,1303,1221,0.937068
-mistral:7b,478,301,0.629707
-phi3:mini,511,355,0.694716
-qwen2.5:7b-instruct,1000,935,0.935000
-qwen3:8b,1359,1354,0.996321
+gemma3:4b,1583,1487,0.939356
+mistral:7b,500,333,0.666000
+phi3:mini,573,421,0.734729
+qwen2.5:7b-instruct,1044,979,0.937739
+qwen3:8b,1667,1662,0.997001

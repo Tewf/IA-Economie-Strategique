@@ -145,6 +145,56 @@ def a_message_turn_is_not_an_action_turn():
         "the player was built with one prompt for both kinds of call")
 
 
+def a_reason_is_read_against_its_own_round():
+    """The reason/action table must pair a reply with the move it decided.
+
+    A transcript is one entry per model call. With a channel a round costs two,
+    the message and then the action, so zipping the transcript against the
+    actions compared round k's reason with round 2k+1's move and ran out of
+    actions half way. It agreed anyway wherever a match never varied, which is
+    most of them, so the table looked plausible while being wrong on exactly the
+    matches that carried information.
+
+    The fixture below states one Defect against a run of Cooperates, in a
+    talking match, so a misaligned read scores it as agreement and the correct
+    read scores it as the contradiction it is.
+    """
+    def reply(text):
+        return {"content": text, "thinking": "", "seconds": 0.0}
+
+    rounds, transcript = [], []
+    for index in range(4):
+        action = "Defect" if index == 1 else "Cooperate"
+        rounds.append({"a_action": action, "b_action": "Cooperate",
+                       "a_score": 0, "b_score": 0})
+        transcript.append(reply("Let us keep cooperating."))
+        transcript.append(reply(f"ACTION: {action}\nREASON: I will Cooperate."))
+    talking = {"model": "fixture", "condition": "with_cheap_talk",
+               "cell": "self_play", "rounds": rounds, "a_transcript": transcript,
+               "b_transcript": []}
+
+    paired = list(zip(measurements._action_replies(talking, "a"),
+                      [step["a_action"] for step in rounds]))
+    assert len(paired) == len(rounds), (
+        f"{len(paired)} replies paired against {len(rounds)} rounds; a talking "
+        "match must not lose half of its own log")
+    assert all("ACTION:" in text["content"] for text, _ in paired), (
+        "a message was paired with an action, so the stride is wrong")
+
+    model, naming, agreeing, rate = measurements.reason_matches_action([talking])[0]
+    assert naming == 4, f"read {naming} of 4 reasons"
+    assert agreeing == 3, (
+        f"{agreeing} of 4 agreed; the round that says Cooperate and plays "
+        "Defect has to be counted as a contradiction")
+    assert abs(rate - 0.75) < 1e-9, rate
+
+    silent = dict(talking, condition="without_cheap_talk",
+                  a_transcript=transcript[1::2])
+    assert measurements.reason_matches_action([silent])[0][1:3] == (4, 3), (
+        "a silent match, whose transcript is already one entry per round, "
+        "must read the same way")
+
+
 def bots_behave_as_themselves():
     """Tit-for-Tat must mirror, and Grudger must never forgive."""
     opponent = ["Cooperate", "Cooperate", "Defect", "Cooperate", "Defect"]
@@ -484,7 +534,8 @@ def the_log_records_the_prompt_once_and_never_echoes_it():
 OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            a_player_sees_its_own_moves, the_answer_format_is_read_correctly,
            the_prompt_is_not_anchored_on_one_action,
-           a_message_turn_is_not_an_action_turn, bots_behave_as_themselves,
+           a_message_turn_is_not_an_action_turn,
+           a_reason_is_read_against_its_own_round, bots_behave_as_themselves,
            a_bot_is_never_asked_to_talk, seeds_are_stable_across_processes,
            the_run_resumes_where_it_stopped, an_opening_reaches_both_players,
            one_stage_at_a_time_and_the_owner_is_named,

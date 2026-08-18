@@ -152,6 +152,24 @@ def self_play_lock_in(matches):
     return rows
 
 
+def _action_replies(match, seat):
+    """The replies that decided a move, in round order.
+
+    **A transcript is one entry per model call, not per round.** With a channel
+    a round costs two calls, the message and then the action, so the reply that
+    decided round k sits at 2k+1 and the even entries are messages. Zipping the
+    whole transcript against the actions therefore compared round k's stated
+    reason with round 2k+1's move, and silently dropped the second half of every
+    talking match when the actions ran out. Both were wrong only where a match
+    varied its action, which is why the error survived a table that looked
+    plausible.
+    """
+    transcript = match.get(f"{seat}_transcript", [])
+    if match["condition"] == "with_cheap_talk":
+        return transcript[1::2]
+    return transcript
+
+
 def reason_matches_action(matches):
     """Does the reason a model gives name the action it actually took?
 
@@ -164,9 +182,8 @@ def reason_matches_action(matches):
     grouped = collections.defaultdict(lambda: [0, 0])
     for match in matches:
         for seat in ("a", "b"):
-            transcript = match.get(f"{seat}_transcript", [])
             actions = _actions(match, seat)
-            for reply, action in zip(transcript, actions):
+            for reply, action in zip(_action_replies(match, seat), actions):
                 reason = reply.get("content", "").split("REASON:", 1)
                 if len(reason) < 2:
                     continue
