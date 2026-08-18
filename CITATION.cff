@@ -46,13 +46,28 @@ abstract: >-
   for leaving an imposed regime, and the ability to leave one is a property of
   the individual model rather than of language models.
 
-  Reading the messages supplies a mechanism for that split: the two models a
-  message does not free are the two whose messages never propose anything, one
-  sending phatic fragments averaging 21 characters and the other sending fluent
-  collaborative prose while defecting in every round. The channel fails not
-  because a proposal is ignored but because none is made. The full write-up,
-  with the literature review that positions each result as a replication or not,
-  is in article/paper.qmd.
+  Almost every match is decided in the first round a pair controls, and crossing
+  the openings with the channel separates what a model has to reason from. One
+  model settles the mechanism by behaving three ways: it defects on the payoff
+  matrix alone, cooperates when a message is the only signal, and defects again
+  when a fabricated history and a message are both present, its stated reason
+  citing the history and never the message. A planted history therefore outranks
+  a live non-binding signal, and which of the two wins is a property of the
+  model. Where the channel fails it is usually unused: the models a message does
+  not free are the ones whose messages never propose anything, one sending
+  phatic fragments averaging 21 characters and the other sending fluent
+  collaborative prose while defecting in every round.
+
+  Three further arms accompany the grid. The Dictator and Ultimatum games
+  measure what a model gives when refusal is impossible against when it is not,
+  which for one model is a premium of 49 points of 100. Re-running the single
+  model whose replies could not be parsed at a finer quantisation of the same
+  weights more than halves its losses without removing them. Turning on explicit
+  reasoning moves that model off an exact zero in the cell that traps it, but
+  only where a channel exists.
+
+  The full write-up, in English and French, with the literature review that
+  positions each result as a replication or not, is in article/.
 keywords:
   - tacit collusion
   - iterated prisoner's dilemma
@@ -66,7 +81,7 @@ license:
   - MIT
   - CC-BY-4.0
 license-url: https://github.com/Tewf/IA-Economie-Strategique/blob/main/LICENSE
-version: 1.1.0
+version: 1.2.0
 date-released: "2026-08-18"
 references:
   - type: article
