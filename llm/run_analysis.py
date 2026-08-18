@@ -35,6 +35,12 @@ TABLES = [
       "settled_on_mutual_cooperation", "settled_on_mutual_defection",
       "unsettled", "mean_score_per_turn"],
      lambda played, lost: measurements.self_play_lock_in(played)),
+    ("one_shot_offers.csv",
+     ["model", "dictator_decisions", "dictator_offer", "ultimatum_decisions",
+      "ultimatum_offer", "paid_to_avoid_refusal", "responder_decisions",
+      "minimum_accepted", "would_reject_own_offer"],
+     lambda played, lost: measurements.one_shot_offers(
+         measurements.read_one_shot())),
     ("opening_round.csv",
      ["model", "opening", "condition", "seats", "cooperated_in_round_0"],
      lambda played, lost: measurements.opening_round(played)),

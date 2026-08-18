@@ -201,6 +201,59 @@ def settling(matches):
     return rows
 
 
+ONE_SHOT_LOG = pathlib.Path(__file__).parent / "results" / "one_shot.jsonl"
+
+
+def read_one_shot(log=ONE_SHOT_LOG):
+    """Every decision from the one-shot games. A separate log, and separate here.
+
+    The Dictator and Ultimatum games are one decision rather than thirty rounds,
+    so they share no field with `matches.jsonl` and are kept out of it. Reading
+    them here rather than in a second module keeps one home for "every table the
+    write-up quotes".
+    """
+    if not log.exists():
+        return []
+    decisions = []
+    for line in log.read_text().splitlines():
+        try:
+            decisions.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return decisions
+
+
+def one_shot_offers(decisions):
+    """What each model gives, and what it demands, across the two games.
+
+    The pair is the measurement, not either game alone. The Dictator game has no
+    rejection, so what is offered there is disposition; the Ultimatum proposer
+    faces the same split with a refusal possible, so **the difference between the
+    two is what a model gives in order not to be refused**. The responder's
+    stated minimum is asked before any proposal is shown, so it cannot be an
+    accommodation to one, and it is the number that says whether a model would
+    accept its own offer.
+    """
+    grouped = collections.defaultdict(list)
+    for decision in decisions:
+        if decision["value"] is None:
+            continue
+        grouped[(decision["model"], decision["game"], decision["role"])].append(
+            decision["value"])
+    rows = []
+    for model in sorted({decision["model"] for decision in decisions}):
+        given = grouped[(model, "dictator", "")]
+        offered = grouped[(model, "ultimatum", "proposer")]
+        demanded = grouped[(model, "ultimatum", "responder")]
+        gap = (_mean(offered) - _mean(given)
+               if given and offered else float("nan"))
+        rows.append((model, len(given), _mean(given), len(offered),
+                     _mean(offered), gap, len(demanded), _mean(demanded),
+                     _mean(offered) < _mean(demanded) if offered and demanded
+                     else False))
+    return rows
+
+
 def opening_round(matches):
     """What a pair does in the first round it actually controls.
 

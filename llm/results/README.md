@@ -6,8 +6,8 @@ mean anything. The finding these files support is in
 
 `matches.jsonl` is the measurement and costs 4.81 h on a GPU. Every `.csv` beside
 it is arithmetic over that file by [`../measurements.py`](../measurements.py), and
-CI re-derives all seven on each push and fails on any difference, so a table here
-cannot drift from the log it came from.
+CI re-derives all of them on each push and fails on any difference, so a table
+here cannot drift from the log it came from.
 
 ## Provenance, and what has to be reported with any reuse
 
@@ -66,7 +66,7 @@ A match that could not be completed is recorded with the rounds it reached rathe
 than dropped, so a gap in the grid is always visible as a short match and never
 as a missing line.
 
-## The nine derived tables
+## The eleven derived tables
 
 | file | one row per | what it answers |
 |---|---|---|
@@ -74,6 +74,7 @@ as a missing line.
 | `self_play_lock_in.csv` | model × opening × condition | Whether a pair *settled*, and on what. The ratchet measurement, comparable to `mirror_neurons/results/self_play_lock_in.csv` |
 | `settling.csv` | model × opening × condition | *When* it settled. Round 0 means the opening decided the match outright; a late round means there was a window. Lock-in cannot show this |
 | `message_content.csv` | model × opening | What the channel actually carried: whether a message named an action, how long it was, and how often both seats sent the identical string |
+| `one_shot_offers.csv` | model | The Dictator and Ultimatum games. What a model gives when refusal is impossible, what it gives when refusal is possible, the difference between them, and the least it says it would accept |
 | `vs_bots.csv` | model × Axelrod strategy | Score per turn both ways, cooperation rate, reciprocity index |
 | `reciprocity.csv` | model × condition | The reciprocity index over self-play seats, on the shared definition in [`../../reciprocity.py`](../../reciprocity.py) |
 | `reason_matches_action.csv` | model | Of the rounds whose reasoning named an action, how often the move agreed with it |
@@ -99,11 +100,30 @@ It is reported with verbatim samples in the article for exactly that reason: the
 counts alone do not distinguish a model that sends nothing of substance from one
 that sends fluent collaborative prose and defects anyway, and both are in here.
 
-## The six figures
+## `one_shot.jsonl`, one JSON object per decision
+
+Sixty decisions played 2026-08-18 on the same machine and the same five models,
+one call each rather than thirty rounds a match, so the whole run is minutes of
+card time. Same temperature, same context window, and seeds derived from the same
+base with the game and role in the key.
+
+The Dictator and Ultimatum games are one decision rather than thirty rounds, so
+they share no field with `matches.jsonl` and are logged separately. `game` and
+`role` name the decision (`dictator` has the empty role), `field` is the line the
+prompt asked for, `value` is the integer read from it or `null` if the reply named
+no number, `loose_read` marks a number taken from anywhere other than that line,
+and `reply` is the whole answer with its reasoning kept apart.
+
+**An offer outside 0 to 100 is recorded rather than clipped.** A model that
+answers 150 has not understood the endowment, and clipping would hide that. None
+did, in this run.
+
+## The eight figures
 
 `self_play_lock_in.png`, `cooperation_by_condition.png`,
 `reciprocity_against_the_imitator.png`, `escape_from_an_imposed_regime.png`,
-`settling_round.png` and `message_content.png`, drawn from the CSVs above by
+`settling_round.png`, `opening_round.png`, `message_content.png` and
+`one_shot_offers.png`, drawn from the CSVs above by
 [`../plot_results.py`](../plot_results.py). They are committed for the write-up
 and the site, and are deliberately **not** byte-compared in CI: a PNG is
 rasterised through the host's own freetype, so two machines can draw the same

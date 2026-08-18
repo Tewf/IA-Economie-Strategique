@@ -247,6 +247,29 @@ def plot_message_content(rows):
     save(figure, "message_content.png")
 
 
+def plot_one_shot_offers(rows):
+    """What a model gives when refusal is impossible, and when it is not."""
+    models = [row["model"] for row in rows]
+    figure, axes = plt.subplots(figsize=(9, 4.5))
+    width = 0.27
+    series = (("dictator_offer", -width, "#8250df", "Dictator: no refusal possible"),
+              ("ultimatum_offer", 0, TALK, "Ultimatum: the offer"),
+              ("minimum_accepted", width, NO_TALK, "Ultimatum: the least it would accept"))
+    for column, offset, colour, label in series:
+        values = [float(row[column]) for row in rows]
+        bars = axes.bar([i + offset for i in range(len(models))], values, width,
+                        color=colour, label=label)
+        axes.bar_label(bars, fmt="%.0f", padding=2, fontsize=8)
+    axes.axhline(50, ls="--", lw=1, c="#57606a")
+    axes.text(-0.48, 52, "an equal split", fontsize=8, c="#57606a", ha="left")
+    axes.set_xticks(range(len(models)), models, rotation=15, ha="right")
+    axes.set_ylabel("points given to the other player, of 100")
+    axes.set_ylim(0, 108)
+    axes.set_title("What a model gives away, and what it demands")
+    axes.legend(frameon=False, fontsize=8, loc="upper left")
+    save(figure, "one_shot_offers.png")
+
+
 def _mean(values):
     return sum(values) / len(values) if values else float("nan")
 
@@ -266,7 +289,8 @@ def main():
     drawn += 1
     for table, draw in (("settling.csv", plot_settling_round),
                         ("opening_round.csv", plot_opening_round),
-                        ("message_content.csv", plot_message_content)):
+                        ("message_content.csv", plot_message_content),
+                        ("one_shot_offers.csv", plot_one_shot_offers)):
         rows = read(RESULTS, table)
         if rows:
             draw(rows)

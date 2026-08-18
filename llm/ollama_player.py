@@ -29,6 +29,47 @@ class UnparseableReply(ValueError):
     """The model named no action. A result about the model, not an error to hide."""
 
 
+def ask_once(model, system, user_message, seed=0, temperature=TEMPERATURE,
+             max_tokens=300, context_tokens=CONTEXT_TOKENS, think=False):
+    """One call to Ollama, as a plain function.
+
+    The iterated game holds a player across thirty rounds; a one-shot game has
+    no state to hold and needs the same request. This is that request, so
+    `one_shot_games.py` does not carry a second copy of the HTTP call, the
+    context setting or the reasoning field, each of which has already been a
+    source of silent error once.
+    """
+    body = json.dumps({
+        "model": model,
+        "messages": [{"role": "system", "content": system},
+                     {"role": "user", "content": user_message}],
+        "stream": False,
+        "think": think,
+        "options": {"temperature": temperature, "seed": seed,
+                    "num_predict": max_tokens, "num_ctx": context_tokens},
+    }).encode()
+    request = urllib.request.Request(
+        f"{OLLAMA_HOST}/api/chat", data=body,
+        headers={"Content-Type": "application/json"})
+    started = time.monotonic()
+    with urllib.request.urlopen(request,
+                                timeout=REQUEST_TIMEOUT_SECONDS) as response:
+        answer = json.load(response)
+    message = answer["message"]
+    return {"content": message.get("content", ""),
+            "thinking": message.get("thinking", ""),
+            # How close this call came to the window. Recorded because a prompt
+            # over `num_ctx` is cut rather than refused, and the cut takes the
+            # system prompt first, so the only way to know the experiment was
+            # still the experiment is to hold the number.
+            "prompt_tokens": answer.get("prompt_eval_count"),
+            # Timed per call, because the first call to a cold model also pays
+            # to load it from disk. A long run pays that once per model; a rate
+            # that smears it over three calls prices a grid at several times its
+            # cost.
+            "seconds": round(time.monotonic() - started, 3)}
+
+
 class OllamaPlayer:
     """One model, one game, one running transcript."""
 
@@ -136,35 +177,9 @@ class OllamaPlayer:
         one thing not recoverable, the system prompt that is the treatment, was
         the part not stored at all. `run_experiment` writes that once per run.
         """
-        body = json.dumps({
-            "model": self.model,
-            "messages": [{"role": "system", "content": system},
-                         {"role": "user", "content": user_message}],
-            "stream": False,
-            "think": self.think,
-            "options": {"temperature": self.temperature, "seed": self.seed,
-                        "num_predict": self.max_tokens,
-                        "num_ctx": self.context_tokens},
-        }).encode()
-        request = urllib.request.Request(
-            f"{OLLAMA_HOST}/api/chat", data=body,
-            headers={"Content-Type": "application/json"})
-        started = time.monotonic()
-        with urllib.request.urlopen(request,
-                                    timeout=REQUEST_TIMEOUT_SECONDS) as response:
-            answer = json.load(response)
-        message = answer["message"]
-        # Timed per call, because the first call to a cold model also pays to
-        # load it from disk. A long run pays that once per model; a rate that
-        # smears it over three calls prices the grid at several times its cost.
-        reply = {"content": message.get("content", ""),
-                 "thinking": message.get("thinking", ""),
-                 # How close this call came to the window. Recorded because a
-                 # prompt over `num_ctx` is cut rather than refused, and the cut
-                 # takes the system prompt first, so the only way to know the
-                 # experiment was still the experiment is to hold the number.
-                 "prompt_tokens": answer.get("prompt_eval_count"),
-                 "seconds": round(time.monotonic() - started, 3)}
+        reply = ask_once(self.model, system, user_message, seed=self.seed,
+                         temperature=self.temperature, max_tokens=self.max_tokens,
+                         context_tokens=self.context_tokens, think=self.think)
         self.transcript.append(reply)
         return reply
 

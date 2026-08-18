@@ -26,6 +26,7 @@ import axelrod as axl
 import grid_config
 import machine_gate
 import measurements
+import one_shot_games
 import ollama_player
 import prompt_loader
 import run_analysis
@@ -193,6 +194,47 @@ def a_reason_is_read_against_its_own_round():
     assert measurements.reason_matches_action([silent])[0][1:3] == (4, 3), (
         "a silent match, whose transcript is already one entry per round, "
         "must read the same way")
+
+
+def a_one_shot_role_gets_only_its_own_scenario():
+    """Each role of a one-shot game is given its own text, and answers its own field.
+
+    The Ultimatum file holds two roles separated by a rule, and they are not two
+    formats over one scenario as the iterated game's calls are: a proposer is
+    told it proposes, a responder is told someone has proposed, and sending
+    either the other's text would be a different experiment that still parses.
+    The Dictator file has one role and no heading, so it must come back under the
+    empty key rather than needing a caller to special-case it.
+    """
+    proposer = prompt_loader.render_one_shot("ultimatum", "proposer")
+    responder = prompt_loader.render_one_shot("ultimatum", "responder")
+    dictator = prompt_loader.render_one_shot("dictator")
+    assert "OFFER:" in proposer and "MINIMUM:" not in proposer, proposer[:120]
+    assert "MINIMUM:" in responder and "OFFER:" not in responder, responder[:120]
+    assert "OFFER:" in dictator, dictator[:120]
+    assert "reject" not in dictator.lower(), (
+        "the dictator scenario mentions rejection, which is the one thing that "
+        "distinguishes it from the ultimatum")
+    assert "propose" in proposer.lower() and "propose" in responder.lower()
+    assert proposer != responder != dictator
+
+    # A number outside the endowment is recorded, not clipped, and a reply that
+    # names none is a loss rather than a zero.
+    for text, field, expected, loose in (
+            ("OFFER: 40\nREASON: fair.", "OFFER", 40, False),
+            ("```\nOFFER: 99\n```", "OFFER", 99, False),
+            ("MINIMUM: 0\nREASON: anything.", "MINIMUM", 0, False),
+            ("I would take about 30 of them.", "MINIMUM", 30, True),
+            ("OFFER: 150", "OFFER", 150, False),
+            ("no number at all", "OFFER", None, False)):
+        assert one_shot_games.read_number(text, field) == (expected, loose), (
+            f"{text!r} read as {one_shot_games.read_number(text, field)}, "
+            f"expected {(expected, loose)}")
+
+    plan = one_shot_games.build_plan()
+    assert len(plan) == len(PANEL) * 3 * grid_config.REPETITIONS, len(plan)
+    assert len({one_shot_games.key_of(spec) for spec in plan}) == len(plan), (
+        "two decisions share a key, so one would be skipped as already done")
 
 
 def bots_behave_as_themselves():
@@ -535,7 +577,9 @@ OFFLINE = [cheap_talk_is_simultaneous, scoring_matches_the_payoffs,
            a_player_sees_its_own_moves, the_answer_format_is_read_correctly,
            the_prompt_is_not_anchored_on_one_action,
            a_message_turn_is_not_an_action_turn,
-           a_reason_is_read_against_its_own_round, bots_behave_as_themselves,
+           a_reason_is_read_against_its_own_round,
+           a_one_shot_role_gets_only_its_own_scenario,
+           bots_behave_as_themselves,
            a_bot_is_never_asked_to_talk, seeds_are_stable_across_processes,
            the_run_resumes_where_it_stopped, an_opening_reaches_both_players,
            one_stage_at_a_time_and_the_owner_is_named,

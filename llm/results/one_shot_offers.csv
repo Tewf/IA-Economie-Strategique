@@ -1,0 +1,6 @@
+model,dictator_decisions,dictator_offer,ultimatum_decisions,ultimatum_offer,paid_to_avoid_refusal,responder_decisions,minimum_accepted,would_reject_own_offer
+gemma3:4b,4,50.000000,4,50.000000,0.000000,4,51.000000,True
+mistral:7b,4,73.750000,4,72.500000,-1.250000,4,46.750000,False
+phi3:mini,4,62.500000,4,68.000000,5.500000,4,52.500000,False
+qwen2.5:7b-instruct,4,50.000000,4,50.000000,0.000000,4,51.000000,True
+qwen3:8b,4,50.000000,4,99.000000,49.000000,4,50.000000,False

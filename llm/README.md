@@ -163,6 +163,16 @@ the expensive half raw and the checkable half cheap.
 The same split makes the run resumable: each match is keyed and a key already in
 the log is skipped, so a crash costs the match in flight and nothing more.
 
+**The Dictator and Ultimatum games are run too**, in
+[`one_shot_games.py`](one_shot_games.py): one decision rather than thirty rounds,
+so the pair costs minutes. The gap between what a model gives when refusal is
+impossible and what it gives when refusal is possible is what it pays not to be
+refused, and qwen3 pays 49 points of 100 for it while two models offer a split
+they would themselves reject. Deferred for a year as a structural decision about
+where the loops should live, and settled by reading the note next door: the
+imitator is *mute* in the Dictator game, so there was never a shared home to
+design.
+
 **[`results/README.md`](results/README.md) is the data dictionary**: every field
 of the raw log, every column of the seven tables, and the run conditions that have
 to be reported with a number for it to mean anything: the model digests and

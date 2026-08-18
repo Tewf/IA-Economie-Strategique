@@ -68,6 +68,37 @@ def render(game, repetition=0, asking_for="action"):
     return text.strip()
 
 
+def roles(game):
+    """The scenario split by role, for the one-shot games.
+
+    `render` is built for the iterated game, where one scenario is sent twice
+    with different answer-format blocks. The Ultimatum game is the other shape:
+    two roles that are given *different scenarios* and asked for different
+    things, separated in the file by a rule and headed `## Proposer` and
+    `## Responder`. The Dictator game has one role and no heading, so it comes
+    back under the empty key and callers do not special-case it.
+    """
+    sections = load(game).split(NOTE_SEPARATOR)
+    found = {}
+    for section in sections:
+        text = section.strip()
+        if not text:
+            continue
+        heading = re.match(r"##\s+(.+)", text)
+        name = heading.group(1).strip().lower() if heading else ""
+        found[name] = (text[heading.end():].strip() if heading else text)
+    return found
+
+
+def render_one_shot(game, role=""):
+    """The scenario one role of a one-shot game is given, and nothing else."""
+    available = roles(game)
+    if role not in available:
+        raise ValueError(
+            f"{game}.md has roles {sorted(available)}, not {role!r}")
+    return available[role]
+
+
 def payoff_orderings(game):
     """Both orderings, for a check that they differ and say the same thing."""
     return render(game, 0), render(game, 1)
