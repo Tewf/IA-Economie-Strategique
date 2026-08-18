@@ -2,7 +2,7 @@ This repository contains both software and research output, and they are
 licensed separately.
 
 ================================================================================
-THE CODE — MIT License
+THE CODE: MIT License
 ================================================================================
 
 Applies to every `.py` and `.ipynb` file, the CI configuration, and `site.css`.
@@ -28,7 +28,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ================================================================================
-THE WRITE-UP, THE DATA AND THE FIGURES — CC BY 4.0
+THE WRITE-UP, THE DATA AND THE FIGURES: CC BY 4.0
 ================================================================================
 
 Applies to every `.md` and `.html` file, the design notes, the prompts, the

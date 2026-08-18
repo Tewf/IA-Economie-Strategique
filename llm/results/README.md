@@ -9,7 +9,7 @@ it is arithmetic over that file by [`../measurements.py`](../measurements.py), a
 CI re-derives all seven on each push and fails on any difference, so a table here
 cannot drift from the log it came from.
 
-## Provenance — report these with any reuse
+## Provenance, and what has to be reported with any reuse
 
 220 matches of 30 rounds played 2026-08-17 on one machine: Ubuntu 24.04, Intel
 i5-12450H, 16 GB RAM, NVIDIA RTX 4060 Mobile (8 GB), Ollama serving one model at
@@ -42,7 +42,7 @@ Every model in the panel is 4B to 8B and 4-bit quantised on an 8 GB card. Where
 these results differ from work using frontier models, model scale and
 quantisation are live explanations that this design cannot rule out.
 
-## `matches.jsonl` — one JSON object per finished match
+## `matches.jsonl`, one JSON object per finished match
 
 Append-only, one line per match, never regenerated. 220 lines.
 
@@ -53,9 +53,9 @@ Append-only, one line per match, never regenerated. 220 lines.
 | `model` | string | The Ollama tag seated in seat A |
 | `opponent` | string | The same tag again in `self_play`, or the Axelrod strategy name in `vs_bot` |
 | `condition` | string | `with_cheap_talk` or `without_cheap_talk` |
-| `opening` | string | `neutral`, `mutual_cooperation` or `mutual_defection` — the synthetic first round injected before play |
+| `opening` | string | The synthetic first round injected before play: `neutral`, `mutual_cooperation` or `mutual_defection` |
 | `repetition` | int | 0 to 3. Parity selects the payoff-line order, so repetitions are not interchangeable draws |
-| `rounds` | list | **The play itself**, one object per round: `a_action` and `b_action` (`"Cooperate"` / `"Defect"`), `a_score` and `b_score`, and `a_message` / `b_message` when the condition has a channel. Its length is how far the match got — 30 in a whole match, fewer in a lost one |
+| `rounds` | list | **The play itself**, one object per round: `a_action` and `b_action` (`"Cooperate"` / `"Defect"`), `a_score` and `b_score`, and `a_message` / `b_message` when the condition has a channel. Its length is how far the match got: 30 in a whole match, fewer in a lost one |
 | `a_total`, `b_total` | int | Payoff summed over the match, seat A first. 90 is mutual cooperation throughout, 30 mutual defection throughout |
 | `a_transcript`, `b_transcript` | list | The raw model replies for that seat, one entry per **call** rather than per round: 30 with no channel and 60 with one, since a cheap-talk round costs a message call and an action call. Each is `{content, thinking, seconds}`, keeping a reasoning field apart from the answer text for the models that return one |
 | `a_parse_fallbacks`, `b_parse_fallbacks` | int | Rounds where the strict `ACTION:` read failed and a lenient read was used. Non-zero means the reply's prose was trusted more than its format |
@@ -71,7 +71,7 @@ as a missing line.
 | file | one row per | what it answers |
 |---|---|---|
 | `cooperation_rates.csv` | model × condition × opening | The headline: how often the model cooperated in each experimental cell |
-| `self_play_lock_in.csv` | model × opening × condition | Whether a pair *settled*, and on what — the ratchet measurement, comparable to `mirror_neurons/results/self_play_lock_in.csv` |
+| `self_play_lock_in.csv` | model × opening × condition | Whether a pair *settled*, and on what. The ratchet measurement, comparable to `mirror_neurons/results/self_play_lock_in.csv` |
 | `vs_bots.csv` | model × Axelrod strategy | Score per turn both ways, cooperation rate, reciprocity index |
 | `reciprocity.csv` | model × condition | The reciprocity index over self-play seats, on the shared definition in [`../../reciprocity.py`](../../reciprocity.py) |
 | `reason_matches_action.csv` | model | Of the rounds whose reasoning named an action, how often the move agreed with it |
@@ -80,7 +80,7 @@ as a missing line.
 
 `reciprocity_index` is P(cooperate | opponent cooperated last) minus
 P(cooperate | opponent defected last), on the shared definition in
-[`../../reciprocity.py`](../../reciprocity.py). It is `NaN` — not zero — whenever
+[`../../reciprocity.py`](../../reciprocity.py). It is `NaN`, and not zero, whenever
 **the opponent never varied**, which is exactly the case against a pure defector
 or against a partner that cooperated in every round, because the conditional the
 measure subtracts was never observed. `0.000000` means something different: the

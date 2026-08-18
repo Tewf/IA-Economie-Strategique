@@ -101,7 +101,7 @@ stratégies exploitables et lui coûte 1,13 face aux vindicatives que les
 coopérateurs exploitent à 3,00. Reconnaître un défecteur pur sépare de nouveau le
 panel : qwen2.5 et gemma3 cessent d'alimenter Defector (0,05 et 0,03 de
 coopération), tandis que **mistral coopère avec lui 59 % du temps, lui offrant
-3,37 par tour pour 0,41 gagné** — la pire cellule de la grille.
+3,37 par tour pour 0,41 gagné**. C'est la pire cellule de la grille.
 
 ### La raison annoncée correspond-elle au coup joué
 
@@ -116,8 +116,8 @@ chacun de ses chiffres ci-dessus.
 
 - **phi3:mini est rapporté comme illisible, non comme un résultat.** 10 matchs
   sur 44 perdus à une moyenne de 16,2 tours, aucune condition silencieuse ne se
-  stabilisant, et un prompt le plus long à 8023 tokens contre les 8192 demandés —
-  **169 tokens de marge**, là où mistral en avait 5540 et qwen3 6211. Il est
+  stabilisant, et un prompt le plus long à 8023 tokens contre les 8192 demandés,
+  soit **169 tokens de marge**, là où mistral en avait 5540 et qwen3 6211. Il est
   passé à 169 tokens de redéclencher la troncature qui avait invalidé un run
   antérieur.
 - **Le panel est de cinq modèles de 4B à 8B sur une carte de 8 Go.** Là où ces
@@ -176,7 +176,7 @@ match en cours.
 **[`results/README.md`](results/README.md) est le dictionnaire des données** :
 chaque champ du journal brut, chaque colonne des sept tables, et les conditions
 d'exécution qu'il faut rapporter avec un chiffre pour qu'il veuille dire quelque
-chose — les empreintes et les niveaux de quantification des modèles, les graines,
+chose : les empreintes et les niveaux de quantification des modèles, les graines,
 le matériel, et le facteur confondant que porte le build de phi3:mini. Il est
 rédigé en anglais, comme les notes de conception et les prompts.
 

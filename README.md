@@ -55,7 +55,7 @@ and the Dictator game from the defence slides.
 | | |
 |---|---|
 | <img src="mirror_neurons/results/standings.png" width="320" alt="The imitating agent finishes eighth of eight"> | **[`mirror_neurons/`](mirror_neurons/), run and reported.** Observing an action multiplies its weight and renormalises, and the report expects Tit-for-Tat to fall out of that without being programmed. Given seven opponents from the literature, **it does not: over matches of 10 to 100 turns the agent finishes eighth of eight, behind a coin flip.** What the update implements is frequency matching, whose state is a pair of counts and so cannot depend on the last round at all. It passes the coin flip only in matches of several hundred turns, by freezing into a constant player rather than by reciprocating. |
-| <img src="llm/results/self_play_lock_in.png" width="320" alt="Three of four readable models lock into an imposed defective regime"> | **[`llm/`](llm/), run and reported.** Homo silicus, which the report cites in its conclusion without ever running. Five open-weight models, locally and offline, on the same games: 220 matches, 2026-08-17. Handed a mutually defecting opening with no channel, **three of the four readable models defect for all 30 rounds, 4 matches out of 4 — the imitator's ratchet reproduced in a language model.** A non-binding message then frees exactly one of those three, does nothing at all for the other two, and the fourth model escapes the regime without any message. **The channel is neither necessary nor sufficient; which models can leave is a fact about the models.** |
+| <img src="llm/results/self_play_lock_in.png" width="320" alt="Three of four readable models lock into an imposed defective regime"> | **[`llm/`](llm/), run and reported.** Homo silicus, which the report cites in its conclusion without ever running. Five open-weight models, locally and offline, on the same games: 220 matches, 2026-08-17. Handed a mutually defecting opening with no channel, **three of the four readable models defect for all 30 rounds, 4 matches out of 4. That is the imitator's ratchet reproduced in a language model.** A non-binding message then frees exactly one of those three, does nothing at all for the other two, and the fourth model escapes the regime without any message. **The channel is neither necessary nor sufficient; which models can leave is a fact about the models.** |
 
 **On the question at the top of this page**, the mirror-neuron mechanism
 sustains tacit cooperation and neither breaks nor intensifies it. Two imitators
@@ -68,8 +68,8 @@ payoffs to do it. [The full reading](mirror_neurons/#what-it-adds-up-to),
 including what would change it.
 
 **Put to language models, the same question has no single answer.** The ratchet
-does reproduce — qwen2.5, gemma3 and qwen3 all stay in an imposed defective
-regime for every one of 30 rounds when they cannot speak — but a non-binding
+does reproduce, since qwen2.5, gemma3 and qwen3 all stay in an imposed defective
+regime for every one of 30 rounds when they cannot speak. But a non-binding
 message frees only qwen2.5, moving it from a 0.00 cooperation rate to 1.00, and
 leaves gemma3 and qwen3 at 0.00. mistral never locks in at all, and qwen3 is the
 one model that defects even from a *neutral* silent start. So communication is
@@ -112,8 +112,8 @@ nine papers; this is a tenth.
 Machine-readable metadata is in [`CITATION.cff`](CITATION.cff), so GitHub's
 **Cite this repository** button gives a formatted reference. Please cite the
 repository rather than a figure: **the language-model results are only
-interpretable with the run conditions reported alongside them** — model digests,
-quantisation levels, seeds and hardware — which are in
+interpretable with the run conditions reported alongside them**, meaning the
+model digests, quantisation levels, seeds and hardware. Those are in
 [`llm/results/README.md`](llm/results/README.md) together with the schema of every
 file.
 

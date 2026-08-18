@@ -61,10 +61,10 @@ mistral is never captured in the first place: it climbs out of the defective
 opening while silent, 0.99, and the message *lowers* that to 0.74.
 
 So the answer to the question above is that two talking agents can leave an
-imposed regime, but **the channel is neither necessary nor sufficient** — mistral
-leaves without one, gemma3 and qwen3 stay with one. Which models can is a fact
-about the models, reported as the design notes require: variation across models,
-stated as variation across models, not as a property of language models.
+imposed regime, but **the channel is neither necessary nor sufficient**. mistral
+leaves without one, and gemma3 and qwen3 stay with one. Which models can is a
+fact about the models, reported as the design notes require: variation across
+models, stated as variation across models, not as a property of language models.
 
 **Silence is not one treatment either.** qwen3:8b defects for all 30 rounds from
 a *neutral* start when silent, 4 out of 4, where every other model cooperates. For
@@ -92,8 +92,8 @@ mutual 3.00 against every reciprocator; qwen3 cooperates with nothing at all
 strategies and costs it 1.13 against the retaliators the cooperators farm at
 3.00. Recognising a pure defector splits the panel again: qwen2.5 and gemma3 stop
 feeding Defector (0.05 and 0.03 cooperation), while **mistral cooperates with it
-59% of the time, handing it 3.37 per turn while earning 0.41** — the worst cell
-in the grid.
+59% of the time, handing it 3.37 per turn while earning 0.41**. That is the
+worst cell in the grid.
 
 ### Does the stated reason match the move
 
@@ -107,16 +107,16 @@ loose parses is the caveat on every mistral number above.
 
 - **phi3:mini is reported as unreadable, not as a result.** 10 of 44 matches lost
   at a mean of 16.2 rounds in, no silent condition ever settling, and a longest
-  prompt of 8023 tokens against the 8192 requested — **169 tokens of headroom**,
-  where mistral had 5540 and qwen3 6211. It came within 169 tokens of
+  prompt of 8023 tokens against the 8192 requested, which leaves **169 tokens of
+  headroom** where mistral had 5540 and qwen3 6211. It came within 169 tokens of
   re-triggering the truncation that invalidated an earlier run.
 - **The panel is five models of 4B to 8B on an 8 GB card.** Where these results
   differ from Horton et al. or Bauer et al., model scale is a live explanation and
   cannot be ruled out from inside this repository.
 
 The payoff-order effect the first stage showed against Alternator does not
-generalise across the panel — gemma3 and mistral are fully exploited in both
-orders, qwen3 fully exploits it in both. It stays reported as what it always was:
+generalise across the panel. gemma3 and mistral are fully exploited in both
+orders, and qwen3 fully exploits it in both. It stays reported as what it was:
 evidence that counterbalancing the payoff order was worth doing, an instance of
 Fish, Gonczarowski and Shorrer (2024), and not a finding about language models.
 
@@ -160,7 +160,7 @@ the log is skipped, so a crash costs the match in flight and nothing more.
 
 **[`results/README.md`](results/README.md) is the data dictionary**: every field
 of the raw log, every column of the seven tables, and the run conditions that have
-to be reported with a number for it to mean anything — the model digests and
+to be reported with a number for it to mean anything: the model digests and
 quantisation levels, the seeds, the hardware, and the confound in phi3:mini's
 build.
 
