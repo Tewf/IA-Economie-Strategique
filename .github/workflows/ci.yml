@@ -62,3 +62,10 @@ jobs:
         run: |
           python llm/run_analysis.py
           git diff --exit-code --stat -- 'llm/results/*.csv'
+
+      # The join between the two halves is arithmetic over both sets of CSVs, so
+      # it gets the same guarantee: it cannot quietly disagree with either side.
+      - name: The two halves still join on their shared opponents
+        run: |
+          python comparison.py
+          git diff --exit-code --stat -- comparison.csv
