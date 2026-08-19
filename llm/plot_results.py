@@ -24,6 +24,7 @@ plt.rcParams.update({"figure.figsize": (8, 4.5), "axes.spines.top": False,
                      "axes.spines.right": False, "figure.dpi": 110})
 TALK = "#1f6feb"
 NO_TALK = "#c1440e"
+UNREADABLE = "#6e7781"
 
 
 def read(folder, name):
@@ -115,15 +116,23 @@ def plot_reciprocity_against_the_imitator(rows):
     save(figure, "reciprocity_against_the_imitator.png")
 
 
-def plot_escape_from_an_imposed_regime(rows):
+def plot_escape_from_an_imposed_regime(rows, parse=None):
     """The headline cell alone: does a message get a pair out of defection?
 
     Averaging over openings, as `cooperation_by_condition` does, hides this:
     every model cooperates from a neutral or cooperative start, so the mean
     moves little and the one cell where the models disagree is diluted away.
+
+    A model that lost matches to unreadable replies is drawn hatched and named
+    in the axis label, because the prose counts only the models that lost none
+    and a reader counting bars would otherwise count a different panel. The
+    rule is the one `article/analysis.py` calls READABLE.
     """
     here = [row for row in rows if row["opening"] == "mutual_defection"]
     models = sorted({row["model"] for row in here})
+    lost = {row["model"]: (int(row["matches_lost"]),
+                           int(row["matches_played"]) + int(row["matches_lost"]))
+            for row in parse or [] if int(row["matches_lost"])}
     figure, axes = plt.subplots()
     height = 0.38
     for offset, condition, colour in ((height / 2, "with_cheap_talk", TALK),
@@ -133,9 +142,20 @@ def plot_escape_from_an_imposed_regime(rows):
                          and row["condition"] == condition]) for model in models]
         bars = axes.barh([i + offset for i in range(len(models))], values, height,
                          color=colour, label=condition.replace("_", " "))
+        for bar, model in zip(bars, models):
+            if model in lost:
+                bar.set_hatch("///")
+                bar.set_edgecolor("white")
         axes.bar_label(bars, fmt="%.2f", padding=3, fontsize=8)
     axes.set_yticks(range(len(models)), models)
-    axes.set_xlabel("cooperation rate over the 30 rounds")
+    for label, model in zip(axes.get_yticklabels(), models):
+        if model in lost:
+            label.set_color(UNREADABLE)
+    axes.set_xlabel("cooperation rate over the 30 rounds" if not lost else
+                    "cooperation rate over the 30 rounds. Hatched, and not "
+                    "interpreted: " + ", ".join(
+                        f"{model} lost {n} of {total} matches"
+                        for model, (n, total) in sorted(lost.items())))
     axes.set_xlim(0, 1.15)
     axes.set_title("Handed a mutually defecting opening, who leaves it")
     axes.legend(frameon=False, loc="lower right")
@@ -285,7 +305,8 @@ def main():
     plot_lock_in(lock_in)
     plot_reciprocity_against_the_imitator(reciprocity)
     drawn = 3
-    plot_escape_from_an_imposed_regime(cooperation)
+    plot_escape_from_an_imposed_regime(cooperation,
+                                       read(RESULTS, "parse_health.csv"))
     drawn += 1
     for table, draw in (("settling.csv", plot_settling_round),
                         ("opening_round.csv", plot_opening_round),

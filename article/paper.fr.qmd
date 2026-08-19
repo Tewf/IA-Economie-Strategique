@@ -301,7 +301,7 @@ md(["modèle", "neutre, silence", "neutre, message", "coopérative, silence",
 print("\n: Taux de coopération sur les trente tours, quatre matchs par cellule.")
 ```
 
-![Placés sur une ouverture de défection mutuelle, qui en sort. Moyenner sur les ouvertures masque cette cellule, puisque tous les modèles coopèrent depuis un départ neutre ou coopératif.](../llm/results/escape_from_an_imposed_regime.png){#fig-escape-fr}
+![Placés sur une ouverture de défection mutuelle, qui en sort. Moyenner sur les ouvertures masque cette cellule, puisque tous les modèles coopèrent depuis un départ neutre ou coopératif. Cinq modèles sont tracés, quatre sont comptés plus bas : phi3:mini est hachuré parce que 10 de ses 44 parties ont été perdues sur des réponses ne nommant aucune action, et ses deux barres ne sont donc pas interprétées. mistral:7b quitte le régime sans canal, ce qui n'est pas la même chose qu'en être libéré par un.](../llm/results/escape_from_an_imposed_regime.png){#fig-escape-fr}
 
 ```{python}
 #| label: escape-fr

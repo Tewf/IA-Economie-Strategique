@@ -295,7 +295,7 @@ md(["model", "neutral, silent", "neutral, talk", "cooperative, silent",
 print("\n: Cooperation rate over the thirty rounds, four matches per cell.")
 ```
 
-![Handed a mutually defecting opening, who leaves it. Averaging over openings hides this cell, because every model cooperates from a neutral or cooperative start.](../llm/results/escape_from_an_imposed_regime.png){#fig-escape}
+![Handed a mutually defecting opening, who leaves it. Averaging over openings hides this cell, because every model cooperates from a neutral or cooperative start. Five models are drawn and four are counted below: phi3:mini is hatched because 10 of its 44 matches were lost to replies naming no action, so its two bars are not interpreted. mistral:7b leaves the regime without a channel, which is not the same as being freed by one.](../llm/results/escape_from_an_imposed_regime.png){#fig-escape}
 
 ```{python}
 #| label: escape
